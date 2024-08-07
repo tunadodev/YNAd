@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#0C111D">
+
+        <ImageView
+            android:id="@+id/cvLogo"
+            android:layout_width="@dimen/_120sdp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="175dp"
+            android:layout_height="@dimen/_120sdp"
+            android:src="@drawable/img" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/cvLogo"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:text="@string/app_name"
+            android:textAlignment="center"
+            android:textColor="@color/gntWhite"
+            android:textSize="@dimen/_25sdp"
+            android:textStyle="bold" />
+
+        <RelativeLayout
+            android:id="@+id/loading_box"
+            android:layout_width="match_parent"
+            android:layout_height="232dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="0dp">
+
+            <ProgressBar
+                android:id="@+id/interstoragePregressfive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:indeterminateTintMode="src_atop"
+                android:indeterminateTint="@color/gntWhite"
+                android:layout_centerInParent="true" />
+            </RelativeLayout>
+    </RelativeLayout>
+</layout>

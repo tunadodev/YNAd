@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.ads.demo.MainActivity">
+
+        <RelativeLayout
+            android:id="@+id/ll_ads"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <Button
+                android:id="@+id/showInter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Show inters Ads"
+                />
+
+            <com.ads.yeknomadmob.ads_components.ads_native.YNMNativeAdView
+                android:id="@+id/ykmNativeAds"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_150sdp"
+                android:layout_above="@+id/textView2"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="433dp"
+                android:layout_marginBottom="28dp"
+                android:background="@drawable/bg_shimmer_card_ads"
+                app:layoutCustomNativeAd="@layout/custom_native_admod_medium_rate"
+                app:layoutLoading="@layout/loading_native_medium" />
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/bannerView"
+                android:layout_marginBottom="0dp"
+                android:text="Banner ads" />
+
+            <com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerAdView
+                android:id="@+id/bannerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+        </RelativeLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
