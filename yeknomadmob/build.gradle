@@ -9,8 +9,8 @@ android {
     defaultConfig {
         minSdk 21
         targetSdk 34
-        versionCode 103
-        versionName "1.0.3"
+        versionCode 104
+        versionName "1.0.4"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -53,8 +53,8 @@ afterEvaluate {
             release(MavenPublication) {
                 from components.findByName('release')
                 groupId = 'com.github.tunadodev'
-                artifactId = 'YN'
-                version = '1.0.3'
+                artifactId = 'YNAd'
+                version = '1.0.4'
             }
         }
     }
