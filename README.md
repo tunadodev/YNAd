@@ -19,7 +19,7 @@ allprojects {
 ~~~
 Thêm vào project_dir/app/build.gradle
 ~~~
-    implementation 'com.github.tunadodev:YNMAdsLibrary:1.0.0'
+    implementation 'com.github.tunadodev:YNAd:1.0.3'
     implementation 'com.google.android.play:core:1.10.3'
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
     implementation 'com.google.android.gms:play-services-ads:21.3.0'
