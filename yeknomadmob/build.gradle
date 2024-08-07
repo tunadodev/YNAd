@@ -46,3 +46,16 @@ dependencies {
     // airbridge
     implementation "io.airbridge:sdk-android:2.+"
 }
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                from components.findByName('release')
+                groupId = 'com.github.tunadodev'
+                artifactId = 'YN'
+                version = '1.0.2'
+            }
+        }
+    }
+}
