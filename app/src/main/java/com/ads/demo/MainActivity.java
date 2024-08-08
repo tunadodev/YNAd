@@ -10,7 +10,6 @@ import com.ads.yeknomadmob.ads_components.wrappers.AdsInterstitial;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding>{
     private YNMNativeAdView ynmAdNative = null;
-    private AdsInterstitial inters = null;
     @Override
     protected int getLayoutActivity() {
         return R.layout.activity_main;
@@ -24,14 +23,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>{
         }) ;
 
         viewBinding.showInter.setOnClickListener(view -> {
-           inters =  YNMAds.getInstance().getInterstitialAds(this, BuildConfig.ad_interstitial_splash, new YNMAdsCallbacks(){
-               @Override
-               public void onInterstitialLoad(@Nullable AdsInterstitial interstitialAd) {
-                   super.onInterstitialLoad(interstitialAd);
-                   super.onAdLoaded();
-                   YNMAds.getInstance().forceShowInterstitial(MainActivity.this, inters , new YNMAdsCallbacks() {});
-               }
-           });
+            YNMAds.getInstance().loadInterstitialAds(MainActivity.this, BuildConfig.ad_interstitial_splash, 5000, 0, true, new YNMAdsCallbacks(){
+                @Override
+                public void onNextAction() {
+
+                }
+            });
         });
     }
 

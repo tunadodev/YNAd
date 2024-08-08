@@ -408,11 +408,8 @@ public class Admob {
      * Load quảng cáo Full tại màn SplashActivity
      * Sau khoảng thời gian timeout thì load ads và callback về cho View
      *
-     * @param context
-     * @param id
      * @param timeOut    : thời gian chờ ads, timeout <= 0 tương đương với việc bỏ timeout
      * @param timeDelay  : thời gian chờ show ad từ lúc load ads
-     * @param adListener
      */
     public void loadSplashInterstitialAds(final Context context, String id, long timeOut, long timeDelay, AdsCallback adListener) {
         isTimeDelay = false;
@@ -472,7 +469,6 @@ public class Admob {
                 }
             }
 
-
             @Override
             public void onAdFailedToLoad(LoadAdError i) {
                 super.onAdFailedToLoad(i);
@@ -517,6 +513,9 @@ public class Admob {
     public void loadSplashInterstitialAds(final Context context, String id, long timeOut, long timeDelay, boolean showSplashIfReady, AdsCallback adListener) {
         isTimeDelay = false;
         isTimeout = false;
+        dialog = new PrepareLoadingAdsDialog(context);
+        dialog.setCancelable(false);
+        dialog.show();
         Log.i(TAG, "loadSplashInterstitialAds  start time loading:" + Calendar.getInstance().getTimeInMillis() + "    ShowLoadingSplash:" + isShowLoadingSplash);
 
         new Handler().postDelayed(new Runnable() {
@@ -793,11 +792,7 @@ public class Admob {
 
         if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
             try {
-                if (dialog != null && dialog.isShowing())
-                    dialog.dismiss();
-                dialog = new PrepareLoadingAdsDialog(activity);
                 try {
-                    dialog.show();
                     AppOpenManager.getInstance().setInterstitialShowing(true);
                 } catch (Exception e) {
                     adListener.onNextAction();
@@ -937,7 +932,6 @@ public class Admob {
                     dialog.dismiss();
                 dialog = new PrepareLoadingAdsDialog(activity);
                 try {
-                    dialog.show();
                     AppOpenManager.getInstance().setInterstitialShowing(true);
                 } catch (Exception e) {
                     adListener.onNextAction();
@@ -1238,11 +1232,8 @@ public class Admob {
                 try {
                     if (dialog != null && dialog.isShowing())
                         dialog.dismiss();
-                    dialog = new PrepareLoadingAdsDialog(context);
-                    dialog.setCancelable(false);
                     try {
                         callback.onInterstitialShow();
-                        dialog.show();
                         AppOpenManager.getInstance().setInterstitialShowing(true);
                     } catch (Exception e) {
                         callback.onNextAction();
