@@ -223,6 +223,57 @@ public class YNMAds {
         return apInterstitialAd;
     }
 
+    public void loadInterstitialAds(final Context context, String id, long timeOut, long timeDelay, boolean showSplashIfReady, YNMAdsCallbacks adListener) {
+        Admob.getInstance().loadSplashInterstitialAds(context, id, timeOut, timeDelay, showSplashIfReady, new AdsCallback() {
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+                adListener.onAdClosed();
+            }
+
+            @Override
+            public void onNextAction() {
+                super.onNextAction();
+                adListener.onNextAction();
+            }
+
+            @Override
+            public void onAdFailedToLoad(@Nullable LoadAdError i) {
+                super.onAdFailedToLoad(i);
+                adListener.onAdFailedToLoad(new AdsError(i));
+
+            }
+
+            @Override
+            public void onAdFailedToShow(@Nullable AdError adError) {
+                super.onAdFailedToShow(adError);
+                adListener.onAdFailedToShow(new AdsError(adError));
+
+            }
+
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                adListener.onAdLoaded();
+            }
+
+            @Override
+            public void onAdSplashReady() {
+                super.onAdSplashReady();
+                adListener.onAdSplashReady();
+            }
+
+
+            @Override
+            public void onAdClicked() {
+                super.onAdClicked();
+                if (adListener != null) {
+                    adListener.onAdClicked();
+                }
+            }
+        });
+    }
+
     /**
      * Called force show AdsInterstitial when ready
      */
