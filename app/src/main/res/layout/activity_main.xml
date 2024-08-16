@@ -33,7 +33,7 @@
                 android:layout_marginTop="433dp"
                 android:layout_marginBottom="28dp"
                 android:background="@drawable/bg_shimmer_card_ads"
-                app:layoutCustomNativeAd="@layout/custom_native_admod_medium_rate"
+                app:layoutCustomNativeAd="@layout/custom_native_admod_medium"
                 app:layoutLoading="@layout/loading_native_medium" />
 
             <TextView

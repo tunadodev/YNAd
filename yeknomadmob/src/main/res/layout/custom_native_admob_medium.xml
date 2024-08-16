@@ -110,13 +110,6 @@
                     android:textColor="@color/white"
                     android:textSize="@dimen/_10sdp" />
 
-                <com.google.android.gms.ads.nativead.MediaView
-                    android:id="@+id/ad_media"
-                    android:layout_width="@dimen/_230sdp"
-                    android:layout_height="@dimen/_110sdp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="5dp" />
-
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

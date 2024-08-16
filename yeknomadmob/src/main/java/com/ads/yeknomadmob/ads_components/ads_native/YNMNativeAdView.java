@@ -97,7 +97,7 @@ public class YNMNativeAdView extends RelativeLayout {
             setLayoutLoading(R.layout.loading_native_medium);
         }
         if (layoutCustomNativeAd == 0) {
-            layoutCustomNativeAd = R.layout.custom_native_admod_medium_rate;
+            layoutCustomNativeAd = R.layout.custom_native_admob_medium;
             setLayoutCustomNativeAd(layoutCustomNativeAd);
         }
         YNMAds.getInstance().loadNativeAd(activity, idAd, layoutCustomNativeAd, layoutPlaceHolder, layoutLoading, YNMAdsCallbacks);
@@ -113,7 +113,7 @@ public class YNMNativeAdView extends RelativeLayout {
                     setLayoutLoading(R.layout.loading_native_medium);
                 }
                 if (layoutCustomNativeAd == 0) {
-                    layoutCustomNativeAd = R.layout.custom_native_admod_medium_rate;
+                    layoutCustomNativeAd = R.layout.custom_native_admob_medium;
                     setLayoutCustomNativeAd(layoutCustomNativeAd);
                 }
                 break;
