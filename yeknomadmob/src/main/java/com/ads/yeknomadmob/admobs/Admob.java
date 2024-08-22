@@ -2106,6 +2106,10 @@ public class Admob {
         return "";
     }
 
+    public PrepareLoadingAdsDialog getDialog() {
+        return dialog;
+    }
+
     public final static int SPLASH_ADS = 0;
     public final static int RESUME_ADS = 1;
     private final static int BANNER_ADS = 2;

@@ -3,6 +3,7 @@ package com.ads.yeknomadmob.utils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.ads.yeknomadmob.admobs.Admob;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
@@ -22,6 +23,7 @@ public class AdsCallback {
     }
 
     public void onAdFailedToLoad(@Nullable LoadAdError i) {
+        Admob.getInstance().getDialog().dismiss();
     }
 
     public void onAdFailedToLoadHigh(@Nullable LoadAdError i) {
