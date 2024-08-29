@@ -56,7 +56,7 @@ public class AdsHelper {
             public void onAboveThreshold(int viewHeight) {
                 // Update the view's height
                 ViewGroup.LayoutParams layoutParams = nativeAdView.getLayoutParams();
-                layoutParams.height = (int) context.getResources().getDimension(com.intuit.sdp.R.dimen._150sdp);
+                layoutParams.height = (int) context.getResources().getDimension(com.intuit.sdp.R.dimen._160sdp);
                 nativeAdView.setLayoutParams(layoutParams);
 
                 AdsNative apNativeAd = new AdsNative(medium, nativeAd);
