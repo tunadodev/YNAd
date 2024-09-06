@@ -71,7 +71,7 @@ dependencies {
     implementation libs.constraintlayout
     implementation libs.play.services.ads
     implementation project(path: ':yeknomadmob')
-
+    implementation(libs.facebook)
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

@@ -356,7 +356,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
             if (isSplash) {
                 showAdsWithLoading();
             } else {
-                //showResumeAds();
+                showResumeAds();
             }
 
         } else {
