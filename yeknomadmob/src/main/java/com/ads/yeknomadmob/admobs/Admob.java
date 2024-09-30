@@ -129,52 +129,7 @@ public class Admob {
      */
     public void init(Activity activity, Context context, List<String> testDeviceList) {
         this.context = context;
-        // Create a ConsentRequestParameters object.
-        ConsentDebugSettings debugSettings = new ConsentDebugSettings.Builder(activity)
-                .setDebugGeography(ConsentDebugSettings.DebugGeography.DEBUG_GEOGRAPHY_EEA)
-                .addTestDeviceHashedId("495ADA41523A0ADC48950EB9BA26AA77")
-                .build();
-        ConsentRequestParameters params = new ConsentRequestParameters
-                .Builder()
-                .setConsentDebugSettings(debugSettings)
-                .build();
-
-        consentInformation = UserMessagingPlatform.getConsentInformation(activity);
-        consentInformation.requestConsentInfoUpdate(
-                activity,
-                params,
-                (ConsentInformation.OnConsentInfoUpdateSuccessListener) () -> {
-                    UserMessagingPlatform.loadAndShowConsentFormIfRequired(
-                            activity,
-                            (ConsentForm.OnConsentFormDismissedListener) loadAndShowError -> {
-                                if (loadAndShowError != null) {
-                                    // Consent gathering failed.
-                                    Log.w(TAG, String.format("%s: %s",
-                                            loadAndShowError.getErrorCode(),
-                                            loadAndShowError.getMessage()));
-                                }
-
-                                // Consent has been gathered.
-                                if (consentInformation.canRequestAds()) {
-                                    initializeMobileAdsSdk(testDeviceList);
-                                }
-                            }
-                    );
-                },
-                (ConsentInformation.OnConsentInfoUpdateFailureListener) requestConsentError -> {
-                    // Consent gathering failed.
-                    Log.w(TAG, String.format("%s: %s",
-                            requestConsentError.getErrorCode(),
-                            requestConsentError.getMessage()));
-                });
-
-        // Check if you can initialize the Google Mobile Ads SDK in parallel
-        // while checking for new consent information. Consent obtained in
-        // the previous session can be used to request ads.
-        if (consentInformation.canRequestAds()) {
-            initializeMobileAdsSdk(testDeviceList);
-        }
-
+        initializeMobileAdsSdk(testDeviceList);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             String processName = Application.getProcessName();
             String packageName = context.getPackageName();

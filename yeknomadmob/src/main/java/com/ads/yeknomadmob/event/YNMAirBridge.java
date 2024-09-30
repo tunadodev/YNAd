@@ -74,12 +74,13 @@ public class YNMAirBridge {
             adPartners.put("admob", admob);
             Map<String, Object> semanticAttributes = new HashMap<>();
             semanticAttributes.put("adPartners", adPartners);
-            //semanticAttributes.put("currency", currencyCode);
+            semanticAttributes.put("currency", currencyCode);
 
             event.setAction(adUnitId);
             event.setLabel(adNetworkAdapter);
             event.setValue(valueMicros / 1000000.0);
             event.setSemanticAttributes(semanticAttributes);
+
             Airbridge.trackEvent(event);
         }
     }
