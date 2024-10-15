@@ -3,12 +3,12 @@ package com.ads.demo;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import com.ads.demo.databinding.ActivitySplashScreenBinding;
-import com.ads.yeknomadmob.admobs.Admob;
-import com.ads.yeknomadmob.admobs.AppOpenManager;
-import com.ads.yeknomadmob.ads_components.YNMAds;
-import com.ads.yeknomadmob.ads_components.YNMInitCallback;
-import com.ads.yeknomadmob.config.AirBridgeConfig;
-import com.ads.yeknomadmob.config.YNMAdsConfig;
+import com.ads.nekoadmob.admobs.Admob;
+import com.ads.nekoadmob.admobs.AppOpenManager;
+import com.ads.nekoadmob.ads_components.YNMAds;
+import com.ads.nekoadmob.ads_components.YNMInitCallback;
+import com.ads.nekoadmob.config.AirBridgeConfig;
+import com.ads.nekoadmob.config.YNMAdsConfig;
 import com.google.android.gms.ads.FullScreenContentCallback;
 
 import java.util.Timer;

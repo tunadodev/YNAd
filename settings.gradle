@@ -25,6 +25,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "YeknomAdmob"
+rootProject.name = "NekoAdmob"
 include ':app'
-include ':yeknomadmob'
+include ':nekoadmob'

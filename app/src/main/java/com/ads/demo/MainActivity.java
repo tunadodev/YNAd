@@ -1,12 +1,9 @@
 package com.ads.demo;
 
-import androidx.annotation.Nullable;
-
 import com.ads.demo.databinding.ActivityMainBinding;
-import com.ads.yeknomadmob.ads_components.YNMAds;
-import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
-import com.ads.yeknomadmob.ads_components.ads_native.YNMNativeAdView;
-import com.ads.yeknomadmob.ads_components.wrappers.AdsInterstitial;
+import com.ads.nekoadmob.ads_components.YNMAds;
+import com.ads.nekoadmob.ads_components.YNMAdsCallbacks;
+import com.ads.nekoadmob.ads_components.ads_native.YNMNativeAdView;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding>{
     private YNMNativeAdView ynmAdNative = null;
