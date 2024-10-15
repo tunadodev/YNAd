@@ -1,6 +1,7 @@
 [versions]
 agp = "8.5.1"
-facebook = "6.17.0.0"
+applovin = "13.0.0.1"
+facebook = "6.18.0.0"
 firebaseBom = "33.1.2"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -14,6 +15,8 @@ constraintlayout = "2.1.4"
 playServicesAds = "23.3.0"
 sdpAndroid = "1.1.1"
 shimmer = "0.5.0"
+userMessagingPlatform = "3.0.0"
+pangle = "6.2.0.7.0"
 
 [libraries]
 facebook = { module = "com.google.ads.mediation:facebook", version.ref = "facebook" }
@@ -31,6 +34,10 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 play-services-ads = { module = "com.google.android.gms:play-services-ads", version.ref = "playServicesAds" }
 sdp-android = { module = "com.intuit.sdp:sdp-android", version.ref = "sdpAndroid" }
 shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
+applovin = { module = "com.google.ads.mediation:applovin", version.ref = "applovin" }
+user-messaging-platform = { module = "com.google.android.ump:user-messaging-platform", version.ref = "userMessagingPlatform" }
+pangle = { module = "com.google.ads.mediation:pangle", version.ref = "pangle" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

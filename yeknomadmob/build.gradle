@@ -42,10 +42,13 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
-    implementation("com.google.android.ump:user-messaging-platform:3.0.0")
-    implementation("com.google.ads.mediation:facebook:6.17.0.0")
     // airbridge
     implementation "io.airbridge:sdk-android:2.+"
+    implementation(libs.user.messaging.platform)
+    implementation(libs.facebook)
+    implementation(libs.applovin)
+    implementation(libs.pangle)
+
 
 }
 afterEvaluate {
