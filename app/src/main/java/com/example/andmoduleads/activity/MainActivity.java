@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        YNNativeAdView = findViewById(R.id.itgNativeAds);
+        YNNativeAdView = findViewById(R.id.YNNativeAds);
 
 
         configMediationProvider();
@@ -115,33 +115,39 @@ public class MainActivity extends AppCompatActivity {
         loadAdInterstitial();
 
         findViewById(R.id.btShowAds).setOnClickListener(v -> {
-            if (mInterstitialAd.isReady()) {
-
-                ApInterstitialAd inter = YNAd.getInstance().getInterstitialAds(this, idInter, null);
-
-                YNAd.getInstance().showInterstitialAdByTimes(this, mInterstitialAd, new YNAdCallback() {
-                    @Override
-                    public void onNextAction() {
-                        Log.i(TAG, "onNextAction: start content and finish main");
-                        startActivity(new Intent(MainActivity.this, ContentActivity.class));
-                    }
-
-                    @Override
-                    public void onAdFailedToShow(@Nullable ApAdError adError) {
-                        super.onAdFailedToShow(adError);
-                        Log.i(TAG, "onAdFailedToShow:" + adError.getMessage());
-                    }
-
-                    @Override
-                    public void onInterstitialShow() {
-                        super.onInterstitialShow();
-                        Log.d(TAG, "onInterstitialShow");
-                    }
-                }, true);
-            } else {
-                Toast.makeText(this, "start loading ads", Toast.LENGTH_SHORT).show();
-                loadAdInterstitial();
-            }
+            YNAd.getInstance().loadSplashInterstitialAds(this, idInter, 5000, 0, true, new YNAdCallback() {
+                @Override
+                public void onNextAction() {
+                    startActivity(new Intent(MainActivity.this, ContentActivity.class));
+                }
+            });
+//            if (mInterstitialAd.isReady()) {
+//
+//                ApInterstitialAd inter = YNAd.getInstance().getInterstitialAds(this, idInter, null);
+//
+//                YNAd.getInstance().showInterstitialAdByTimes(this, mInterstitialAd, new YNAdCallback() {
+//                    @Override
+//                    public void onNextAction() {
+//                        Log.i(TAG, "onNextAction: start content and finish main");
+//                        startActivity(new Intent(MainActivity.this, ContentActivity.class));
+//                    }
+//
+//                    @Override
+//                    public void onAdFailedToShow(@Nullable ApAdError adError) {
+//                        super.onAdFailedToShow(adError);
+//                        Log.i(TAG, "onAdFailedToShow:" + adError.getMessage());
+//                    }
+//
+//                    @Override
+//                    public void onInterstitialShow() {
+//                        super.onInterstitialShow();
+//                        Log.d(TAG, "onInterstitialShow");
+//                    }
+//                }, true);
+//            } else {
+//                Toast.makeText(this, "start loading ads", Toast.LENGTH_SHORT).show();
+//                loadAdInterstitial();
+//            }
         });
 
         findViewById(R.id.btForceShowAds).setOnClickListener(v -> {

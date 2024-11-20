@@ -8,7 +8,7 @@
     tools:context=".activity.MainActivity">
 
     <com.ads.yn.ads.nativeAds.YNNativeAdView
-        android:id="@+id/itgNativeAds"
+        android:id="@+id/YNNativeAds"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_150sdp"
         android:background="@drawable/bg_card_ads"
@@ -29,7 +29,7 @@
         android:gravity="center"
         android:orientation="vertical"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/itgNativeAds">
+        app:layout_constraintTop_toBottomOf="@+id/YNNativeAds">
 
 
         <Button
@@ -66,25 +66,6 @@
             android:layout_centerHorizontal="true"
             android:text="IAP test" />
 
-        <Button
-
-            android:id="@+id/btnAdjustEvent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/btIap"
-            android:layout_centerHorizontal="true"
-            android:onClick="onTrackSimpleEventClick"
-            android:text="Event sample adjust" />
-
-        <Button
-
-            android:id="@+id/btnAdjustTrack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/btnAdjustEvent"
-            android:layout_centerHorizontal="true"
-            android:onClick="onTrackRevenueEventClick"
-            android:text="Track Revenue adjust" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <com.ads.yn.ads.bannerAds.YNBannerAdView

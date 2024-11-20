@@ -1,5 +1,6 @@
 package com.example.andmoduleads.adapter;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,7 +37,7 @@ public class ListSimpleAdapter extends RecyclerView.Adapter<ListSimpleAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, @SuppressLint("RecyclerView") int position) {
        TextView title =  holder.itemView.findViewById(R.id.txtTile);
        title.setText(sampleData.get(position));
        holder.itemView.setOnClickListener(new View.OnClickListener() {

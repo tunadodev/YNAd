@@ -1,5 +1,5 @@
 
-# ITGModuleAds
+# YNModuleAds
 - Admob
 - MAX Mediation(Applovin)
 - Google Billing
@@ -10,14 +10,14 @@
 # Import Module
 ~~~
     maven { url 'https://jitpack.io' }
-    implementation 'com.github.trongluan99:ITGModuleAds:1.0.8'
+    implementation 'com.github.trongluan99:YNModuleAds:1.0.8'
     implementation 'com.google.android.play:core:1.10.3'
     implementation 'com.facebook.shimmer:shimmer:0.5.0'
     implementation 'com.google.android.gms:play-services-ads:21.3.0'
     implementation 'androidx.multidex:multidex:2.0.1'
 ~~~  
 # Summary
-* [Setup ITGAd](#setup_ITGad)
+* [Setup YNAd](#setup_YNad)
     * [Setup id ads](#set_up_ads)
     * [Config ads](#config_ads)
     * [Ads Formats](#ads_formats)
@@ -25,7 +25,7 @@
 * [Billing App](#billing_app)
 * [Ads rule](#ads_rule)
 
-# <a id="setup_ITGad"></a>Setup ITGAd
+# <a id="setup_YNad"></a>Setup YNAd
 ## <a id="set_up_ads"></a>Setup enviroment with id ads for project
 
 We recommend you to setup 2 environments for your project, and only use test id during development, ids from your admob only use when needed and for publishing to Google Store
@@ -92,30 +92,30 @@ class App extends AdsMultiDexApplication(){
     public void onCreate() {
         super.onCreate();
     ...
-        String environment = BuildConfig.build_debug ? ITGAdConfig.ENVIRONMENT_DEVELOP : ITGAdConfig.ENVIRONMENT_PRODUCTION;
-        itgAdConfig = new ITGAdConfig(this, ITGAdConfig.PROVIDER_ADMOB, environment);
+        String environment = BuildConfig.build_debug ? YNAdConfig.ENVIRONMENT_DEVELOP : YNAdConfig.ENVIRONMENT_PRODUCTION;
+        YNAdConfig = new YNAdConfig(this, YNAdConfig.PROVIDER_ADMOB, environment);
 
         // Optional: setup Adjust event
         AdjustConfig adjustConfig = new AdjustConfig(true,ADJUST_TOKEN);
         // adjustConfig.setEventAdImpression(EVENT_AD_IMPRESSION_ADJUST);
         // adjustConfig.setEventNamePurchase(EVENT_PURCHASE_ADJUST);
-        itgAdConfig.setAdjustConfig(adjustConfig);
+        YNAdConfig.setAdjustConfig(adjustConfig);
 
         // Optional: setup Appsflyer event
         AppsflyerConfig appsflyerConfig = new AppsflyerConfig(true,APPSFLYER_TOKEN);
-        itgAdConfig.setAppsflyerConfig(appsflyerConfig);
+        YNAdConfig.setAppsflyerConfig(appsflyerConfig);
     
         // Optional: setup client token SDK Facebook
-        itgAdConfig.setFacebookClientToken(FACEBOOK_CLIENT_TOKEN)
+        YNAdConfig.setFacebookClientToken(FACEBOOK_CLIENT_TOKEN)
 
         // Optional: enable ads resume
-        itgAdConfig.setIdAdResume(BuildConfig.ads_open_app);
+        YNAdConfig.setIdAdResume(BuildConfig.ads_open_app);
 
         // Optional: setup list device test - recommended to use
         listTestDevice.add(DEVICE_ID_TEST);
-        itgAdConfig.setListDeviceTest(listTestDevice);
+        YNAdConfig.setListDeviceTest(listTestDevice);
 
-        ITGAd.getInstance().init(this, itgAdConfig, false);
+        YNAd.getInstance().init(this, YNAdConfig, false);
 
         // Auto disable ad resume after user click ads and back to app
         Admob.getInstance().setDisableAdResumeWhenClickAds(true);
@@ -147,10 +147,10 @@ SplashActivity
     };
 ~~~
 ~~~
-        ITGAd.getInstance().setInitCallback(new ITGInitCallback() {
+        YNAd.getInstance().setInitCallback(new YNInitCallback() {
             @Override
             public void initAdSuccess() {
-                ITGAd.getInstance().loadSplashInterstitialAds(SplashActivity.this, idAdSplash, TIME_OUT, TIME_DELAY_SHOW_AD, true, adCallback);
+                YNAd.getInstance().loadSplashInterstitialAds(SplashActivity.this, idAdSplash, TIME_OUT, TIME_DELAY_SHOW_AD, true, adCallback);
             }
         });
 ~~~
@@ -174,13 +174,13 @@ Load ad interstital before show
 Check null when Load Inter
 ~~~
   private fun loadInterCreate() {
-    ApInterstitialAd mInterstitialAd = ITGAd.getInstance().getInterstitialAds(this, idInter);
+    ApInterstitialAd mInterstitialAd = YNAd.getInstance().getInterstitialAds(this, idInter);
   }
 ~~~
 Show and auto release ad interstitial
 ~~~
          if (mInterstitialAd.isReady()) {
-                ITGAd.getInstance().forceShowInterstitial(this, mInterstitialAd, new YNAdCallback() {
+                YNAd.getInstance().forceShowInterstitial(this, mInterstitialAd, new YNAdCallback() {
             @Override
             public void onNextAction() {
                 super.onNextAction();
@@ -220,13 +220,13 @@ call load ad banner
 ~~~
 call load ad banner
 ~~~
-  ITGAd.getInstance().loadBanner(this, idBanner);
+  YNAd.getInstance().loadBanner(this, idBanner);
 ~~~
 
 ### Ad Native
 Load ad native before show
 ~~~
-        ITGAd.getInstance().loadNativeAdResultCallback(this,ID_NATIVE_AD, com.ads.control.R.layout.custom_native_max_small,new YNAdCallback(){
+        YNAd.getInstance().loadNativeAdResultCallback(this,ID_NATIVE_AD, com.ads.control.R.layout.custom_native_max_small,new YNAdCallback(){
             @Override
             public void onNativeAdLoaded(@NonNull ApNativeAd nativeAd) {
                 super.onNativeAdLoaded(nativeAd);
@@ -236,14 +236,14 @@ Load ad native before show
 ~~~
 Populate native ad to view
 ~~~
-    ITGAd.getInstance().populateNativeAdView(MainApplovinActivity.this,nativeAd,flParentNative,shimmerFrameLayout);
+    YNAd.getInstance().populateNativeAdView(MainApplovinActivity.this,nativeAd,flParentNative,shimmerFrameLayout);
 ~~~
 auto load and show native contains loading
 
 in layout XML
 ~~~
       <com.ads.control.ads.nativeAds.YNNativeAdView
-        android:id="@+id/ITGNativeAds"
+        android:id="@+id/YNNativeAds"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_150sdp"
         android:background="@drawable/bg_card_ads"
@@ -254,16 +254,16 @@ in layout XML
 ~~~
 Call load native ad
 ~~~
- ITGNativeAdView.loadNativeAd(this, idNative);
+ YNNativeAdView.loadNativeAd(this, idNative);
 ~~~
 Load Ad native for recyclerView
 ~~~~
     // ad native repeating interval
-    ITGAdAdapter     adAdapter = ITGAd.getInstance().getNativeRepeatAdapter(this, idNative, layoutCustomNative, com.ads.control.R.layout.layout_native_medium,
+    YNAdAdapter     adAdapter = YNAd.getInstance().getNativeRepeatAdapter(this, idNative, layoutCustomNative, com.ads.control.R.layout.layout_native_medium,
                 originalAdapter, listener, 4);
     
     // ad native fixed in position
-        ITGAdAdapter   adAdapter = ITGAd.getInstance().getNativeFixedPositionAdapter(this, idNative, layoutCustomNative, com.ads.control.R.layout.layout_native_medium,
+        YNAdAdapter   adAdapter = YNAd.getInstance().getNativeFixedPositionAdapter(this, idNative, layoutCustomNative, com.ads.control.R.layout.layout_native_medium,
                 originalAdapter, listener, 4);
     
         recyclerView.setAdapter(adAdapter.getAdapter());
@@ -272,10 +272,10 @@ Load Ad native for recyclerView
 ### Ad Reward
 Get and show reward
 ~~~
-  ApRewardAd rewardAd = ITGAd.getInstance().getRewardAd(this, idAdReward);
+  ApRewardAd rewardAd = YNAd.getInstance().getRewardAd(this, idAdReward);
 
    if (rewardAd != null && rewardAd.isReady()) {
-                ITGAd.getInstance().forceShowRewardAd(this, rewardAd, new YNAdCallback());
+                YNAd.getInstance().forceShowRewardAd(this, rewardAd, new YNAdCallback());
             }
 });
 ~~~
@@ -285,7 +285,7 @@ App
   override fun onCreate() {
     super.onCreate()
     AppOpenManager.getInstance().enableAppResume()
-    ITGAdConfig.setIdAdResume(AppOpenManager.AD_UNIT_ID_TEST);
+    YNAdConfig.setIdAdResume(AppOpenManager.AD_UNIT_ID_TEST);
     ...
   }
     

@@ -34,7 +34,7 @@ public class AdmobRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == TYPE_AD_VIEW) {
             View view = LayoutInflater.from(parent.getContext()).inflate(settings.getLayoutAdPlaceHolder(), parent, false);
-            return new ITGViewHolder(view);
+            return new YNViewHolder(view);
         } else {
             return adapterOriginal.onCreateViewHolder(parent, viewType);
         }
@@ -70,8 +70,8 @@ public class AdmobRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.View
         return adPlacer.getAdjustedCount();
     }
 
-    private class ITGViewHolder extends RecyclerView.ViewHolder {
-        public ITGViewHolder(@NonNull View itemView) {
+    private class YNViewHolder extends RecyclerView.ViewHolder {
+        public YNViewHolder(@NonNull View itemView) {
             super(itemView);
         }
 

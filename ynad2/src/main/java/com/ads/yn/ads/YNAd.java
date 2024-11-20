@@ -59,8 +59,8 @@ import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 
 public class YNAd {
-    public static final String TAG_ADJUST = "ITGAdjust";
-    public static final String TAG = "ITGAd";
+    public static final String TAG_ADJUST = "YNAdjust";
+    public static final String TAG = "YNAd";
     private static volatile YNAd INSTANCE;
     private YNAdConfig adConfig;
     private YNInitCallback initCallback;
@@ -97,7 +97,7 @@ public class YNAd {
 
     /**
      * @param context
-     * @param adConfig ITGAdConfig object used for SDK initialisation
+     * @param adConfig YNAdConfig object used for SDK initialisation
      */
     public void init(Application context, YNAdConfig adConfig) {
         init(context, adConfig, false);
@@ -105,12 +105,12 @@ public class YNAd {
 
     /**
      * @param context
-     * @param adConfig             ITGAdConfig object used for SDK initialisation
+     * @param adConfig             YNAdConfig object used for SDK initialisation
      * @param enableDebugMediation set show Mediation Debugger - use only for Max Mediation
      */
     public void init(Application context, YNAdConfig adConfig, Boolean enableDebugMediation) {
         if (adConfig == null) {
-            throw new RuntimeException("cant not set ITGAdConfig null");
+            throw new RuntimeException("cant not set YNAdConfig null");
         }
         this.adConfig = adConfig;
         AppUtil.VARIANT_DEV = adConfig.isVariantDev();
@@ -134,7 +134,7 @@ public class YNAd {
                             AppOpenMax.getInstance().init(adConfig.getApplication(), adConfig.getIdAdResume());
                         }
                     }
-                }, enableDebugMediation);
+                }, enableDebugMediation, adConfig.getListDeviceTest());
                 break;
             case YNAdConfig.PROVIDER_ADMOB:
                 Admob.getInstance().init(context, adConfig.getListDeviceTest());
@@ -318,6 +318,8 @@ public class YNAd {
                         super.onAdImpression();
                         adCallback.onAdImpression();
                     }
+                    
+
                 });
         }
     }
@@ -1555,7 +1557,7 @@ public class YNAd {
     }
 
     /**
-     * Result a ITGAdAdapter with ad native repeating interval
+     * Result a YNAdAdapter with ad native repeating interval
      *
      * @param activity
      * @param id
@@ -1605,7 +1607,7 @@ public class YNAd {
     }
 
     /**
-     * Result a ITGAdAdapter with ad native fixed in position
+     * Result a YNAdAdapter with ad native fixed in position
      *
      * @param activity
      * @param id

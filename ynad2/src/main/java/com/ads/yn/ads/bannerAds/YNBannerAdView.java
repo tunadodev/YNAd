@@ -15,7 +15,7 @@ import com.ads.yn.funtion.AdCallback;
 
 public class YNBannerAdView extends RelativeLayout {
 
-    private String TAG = "ITGBannerAdView";
+    private String TAG = "YNBannerAdView";
 
     public YNBannerAdView(@NonNull Context context) {
         super(context);

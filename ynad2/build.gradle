@@ -41,12 +41,9 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-process:2.2.0'
 
     //admob
-    implementation 'com.google.android.gms:play-services-ads:21.4.0'
-    implementation 'com.google.android.gms:play-services-ads-identifier:18.0.1'
-    //mediation admob
-    implementation 'com.google.ads.mediation:facebook:6.12.0.0'
-    implementation 'com.google.ads.mediation:applovin:11.5.1.0'
-    implementation 'com.google.ads.mediation:vungle:6.12.0.0'
+    implementation 'com.google.android.gms:play-services-ads:23.3.0'
+    implementation 'com.google.android.gms:play-services-ads-identifier:18.1.0'
+
 
 
     def lifecycle_version = "2.0.0"
@@ -75,10 +72,21 @@ dependencies {
     implementation 'com.airbnb.android:lottie:5.0.2'
 
     // applovin
-    implementation 'com.applovin:applovin-sdk:11.4.2'
+    implementation 'com.applovin:applovin-sdk:13.0.1'
 
     implementation "io.airbridge:sdk-android:2.+"
 
+    //mediation admob
+    implementation 'com.google.ads.mediation:facebook:6.18.0.0'
+    implementation 'com.google.ads.mediation:applovin:13.0.0.1'
+    implementation 'com.google.ads.mediation:vungle:6.12.0.0'
+    implementation 'com.google.ads.mediation:pangle:6.2.0.7.0'
+    //mediation max
+//    implementation 'com.applovin.mediation:google-ad-manager-adapter:23.5.0.0'
+//    implementation 'com.applovin.mediation:ironsource-adapter:8.4.0.0.2'
+//    implementation 'com.applovin.mediation:facebook-adapter:6.18.0.1'
+//    implementation 'com.applovin.mediation:bytedance-adapter:6.3.0.4.0'
+//    implementation 'com.applovin.mediation:unityads-adapter:4.12.4.0'
 }
 
 afterEvaluate {

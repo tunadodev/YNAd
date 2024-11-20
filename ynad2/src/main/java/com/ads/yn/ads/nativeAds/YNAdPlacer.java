@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class YNAdPlacer {
-    String TAG = "ITGAdPlacer";
+    String TAG = "YNAdPlacer";
     private HashMap<Integer, ApNativeAd> listAd = new HashMap<>();
     private List<Integer> listPositionAd = new ArrayList<>();
     private YNAdPlacerSettings settings;

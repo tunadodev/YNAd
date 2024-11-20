@@ -44,10 +44,10 @@ public class MyApplication extends AdsMultiDexApplication {
 
     private void initAds() {
         String environment = BuildConfig.env_dev ? YNAdConfig.ENVIRONMENT_DEVELOP : YNAdConfig.ENVIRONMENT_PRODUCTION;
-        YNAdConfig = new YNAdConfig(this, YNAdConfig.PROVIDER_ADMOB, environment);
+        YNAdConfig = new YNAdConfig(this, YNAdConfig.PROVIDER_MAX, environment);
 
         // Optional: setup Adjust event
-//        itgAdConfig.setAdjustTokenTiktok("123456");
+//        YNAdConfig.setAdjustTokenTiktok("123456");
         // Optional: setup Airbridge
         AirBridgeConfig airBridgeConfig = new AirBridgeConfig();
         airBridgeConfig.setEnableAirBridge(true);
@@ -58,11 +58,11 @@ public class MyApplication extends AdsMultiDexApplication {
         YNAdConfig.setIdAdResume(BuildConfig.ads_open_app);
 
         // Optional: setup list device test - recommended to use
-        listTestDevice.add("EC25F576DA9B6CE74778B268CB87E431");
+        listTestDevice.add("2635738a-f29d-43f5-95bf-10ca1ad1abe1");
         YNAdConfig.setListDeviceTest(listTestDevice);
         YNAdConfig.setIntervalInterstitialAd(15);
 
-        YNAd.getInstance().init(this, YNAdConfig, false);
+        YNAd.getInstance().init(this, YNAdConfig, true);
 
         // Auto disable ad resume after user click ads and back to app
         Admob.getInstance().setDisableAdResumeWhenClickAds(true);

@@ -1,5 +1,6 @@
 package com.ads.yn.admob;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ActivityManager;
@@ -8,6 +9,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
@@ -29,6 +31,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.lifecycle.Lifecycle;
@@ -64,7 +67,7 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.OnUserEarnedRewardListener;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.VideoOptions;
-import com.google.android.gms.ads.formats.NativeAdOptions;
+import com.google.android.gms.ads.nativead.NativeAdOptions;
 import com.google.android.gms.ads.initialization.AdapterStatus;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
@@ -86,7 +89,7 @@ import java.util.Map;
 import java.util.Objects;
 
 public class Admob {
-    private static final String TAG = "ITGAdmob";
+    private static final String TAG = "YNAdmob";
     private static Admob instance;
     private int currentClicked = 0;
     private String nativeId;
@@ -881,7 +884,7 @@ public class Admob {
                         dialog.dismiss();
                     isShowLoadingSplash = false;
                     Log.e(TAG, "onShowSplash:   show fail in background after show loading ad");
-                    adListener.onAdFailedToShow(new AdError(0, " show fail in background after show loading ad", "ITGAd"));
+                    adListener.onAdFailedToShow(new AdError(0, " show fail in background after show loading ad", "YNAd"));
                 }
             }, 800);
 
@@ -1024,7 +1027,7 @@ public class Admob {
                         dialog.dismiss();
                     isShowLoadingSplash = false;
                     Log.e(TAG, "onShowSplash:   show fail in background after show loading ad");
-                    adListener.onAdFailedToShow(new AdError(0, " show fail in background after show loading ad", "ITGAd"));
+                    adListener.onAdFailedToShow(new AdError(0, " show fail in background after show loading ad", "YNAd"));
                 }
             }, 800);
 
@@ -1350,7 +1353,7 @@ public class Admob {
                         if (dialog != null && dialog.isShowing() && !((Activity) context).isDestroyed())
                             dialog.dismiss();
                         Log.e(TAG, "showInterstitialAd:   show fail in background after show loading ad");
-                        callback.onAdFailedToShow(new AdError(0, " show fail in background after show loading ad", "ITGAd"));
+                        callback.onAdFailedToShow(new AdError(0, " show fail in background after show loading ad", "YNAd"));
                     }
                 }, 800);
             }
@@ -2106,8 +2109,7 @@ public class Admob {
         VideoOptions videoOptions = new VideoOptions.Builder()
                 .setStartMuted(true)
                 .build();
-
-        NativeAdOptions adOptions = new NativeAdOptions.Builder()
+        NativeAdOptions adOptions = new com.google.android.gms.ads.nativead.NativeAdOptions.Builder()
                 .setVideoOptions(videoOptions)
                 .build();
 

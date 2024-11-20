@@ -11,8 +11,8 @@ import java.util.List;
 
 public abstract class AdsMultiDexApplication extends MultiDexApplication {
 
-    protected YNAdConfig YNAdConfig;
-    protected List<String> listTestDevice ;
+    public YNAdConfig YNAdConfig;
+    public List<String> listTestDevice ;
     @Override
     public void onCreate() {
         super.onCreate();

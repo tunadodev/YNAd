@@ -18,12 +18,12 @@ import java.util.Currency;
 
 public class YNLogEventManager {
 
-    private static final String TAG = "ITGLogEventManager";
+    private static final String TAG = "YNLogEventManager";
 
     public static void logPaidAdImpression(Context context, AdValue adValue, String adUnitId, String mediationAdapterClassName, AdType adType) {
         logEventWithAds(context, (float) adValue.getValueMicros(), adValue.getPrecisionType(), adUnitId, mediationAdapterClassName, YNAdConfig.PROVIDER_ADMOB);
-//        ITGAdjust.pushTrackEventAdmob(adValue);
-//        ITGAppsflyer.getInstance().pushTrackEventAdmob(adValue, adUnitId, adType);
+//        YNAdjust.pushTrackEventAdmob(adValue);
+//        YNAppsflyer.getInstance().pushTrackEventAdmob(adValue, adUnitId, adType);
         // Log revenue Facebook 30/08
         float value = adValue.getValueMicros() * 1.0f / 1000000 * 24000;
         AppEventsLogger.newLogger(context).logPurchase(BigDecimal.valueOf(value), Currency.getInstance("VND"));
@@ -39,10 +39,10 @@ public class YNLogEventManager {
     }
 
     public static void logPaidAdImpression(Context context, MaxAd adValue, AdType adType) {
-//        logEventWithAds(context, (float) adValue.getRevenue(), 0, adValue.getAdUnitId(), adValue.getNetworkName(), ITGAdConfig.PROVIDER_MAX);
+//        logEventWithAds(context, (float) adValue.getRevenue(), 0, adValue.getAdUnitId(), adValue.getNetworkName(), YNAdConfig.PROVIDER_MAX);
         logEventWithMaxAds(context, adValue);
-//        ITGAdjust.pushTrackEventApplovin(adValue, context);
-//        ITGAppsflyer.getInstance().pushTrackEventApplovin(adValue, adType);
+//        YNAdjust.pushTrackEventApplovin(adValue, context);
+//        YNAppsflyer.getInstance().pushTrackEventApplovin(adValue, adType);
     }
 
     private static void logEventWithMaxAds(Context context, MaxAd impressionData) {
@@ -102,7 +102,7 @@ public class YNLogEventManager {
         params.putString("network", network);
 
 
-//        ITGAdjust.logPaidAdImpressionValue(value, "USD");
+//        YNAdjust.logPaidAdImpressionValue(value, "USD");
         FirebaseAnalyticsUtil.logPaidAdImpressionValue(context, params, mediationProvider);
 
         FacebookEventUtils.logPaidAdImpressionValue(context, params, mediationProvider);
@@ -164,35 +164,35 @@ public class YNLogEventManager {
 
 
 //    public static void setEventNamePurchaseAdjust(String eventNamePurchase) {
-//        ITGAdjust.setEventNamePurchase(eventNamePurchase);
+//        YNAdjust.setEventNamePurchase(eventNamePurchase);
 //    }
 
 //    public static void trackAdRevenue(String id) {
-//        ITGAdjust.trackAdRevenue(id);
+//        YNAdjust.trackAdRevenue(id);
 //    }
 
 //    public static void onTrackEvent(String eventName) {
-//        ITGAdjust.onTrackEvent(eventName);
+//        YNAdjust.onTrackEvent(eventName);
 //    }
 
     public static void onTrackEvent(String eventName, String id) {
-//        ITGAdjust.onTrackEvent(eventName, id);
+//        YNAdjust.onTrackEvent(eventName, id);
     }
 
     public static void onTrackRevenue(String eventName, float revenue, String currency) {
-//        ITGAdjust.onTrackRevenue(eventName, revenue, currency);
+//        YNAdjust.onTrackRevenue(eventName, revenue, currency);
     }
 
     public static void onTrackRevenuePurchase(float revenue, String currency, String idPurchase, int typeIAP) {
-//        ITGAdjust.onTrackRevenuePurchase(revenue, currency);
-//        ITGAppsflyer.getInstance().onTrackRevenuePurchase(revenue, currency, idPurchase, typeIAP);
+//        YNAdjust.onTrackRevenuePurchase(revenue, currency);
+//        YNAppsflyer.getInstance().onTrackRevenuePurchase(revenue, currency, idPurchase, typeIAP);
     }
 
     public static void pushTrackEventAdmob(AdValue adValue) {
-//        ITGAdjust.pushTrackEventAdmob(adValue);
+//        YNAdjust.pushTrackEventAdmob(adValue);
     }
 
     public static void pushTrackEventApplovin(MaxAd ad, Context context) {
-//        ITGAdjust.pushTrackEventApplovin(ad, context);
+//        YNAdjust.pushTrackEventApplovin(ad, context);
     }
 }

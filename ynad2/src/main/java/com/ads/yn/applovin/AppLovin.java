@@ -12,6 +12,7 @@ import android.webkit.WebView;
 import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,10 +40,15 @@ import com.applovin.mediation.nativeAds.MaxNativeAdViewBinder;
 import com.applovin.mediation.nativeAds.adPlacer.MaxAdPlacer;
 import com.applovin.mediation.nativeAds.adPlacer.MaxAdPlacerSettings;
 import com.applovin.mediation.nativeAds.adPlacer.MaxRecyclerAdapter;
+import com.applovin.sdk.AppLovinMediationProvider;
 import com.applovin.sdk.AppLovinSdk;
+import com.applovin.sdk.AppLovinSdkConfiguration;
+import com.applovin.sdk.AppLovinSdkSettings;
 import com.facebook.shimmer.ShimmerFrameLayout;
 
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 
 public class AppLovin {
     private static final String TAG = "AppLovin";
@@ -96,7 +102,7 @@ public class AppLovin {
         this.context = context;
     }
 
-    public void init(Context context, AppLovinCallback adCallback, Boolean enableDebug) {
+    public void init(Context context, AppLovinCallback adCallback, Boolean enableDebug,  List<String> testDeviceList) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             String processName = Application.getProcessName();
             String packageName = context.getPackageName();
@@ -104,10 +110,16 @@ public class AppLovin {
                 WebView.setDataDirectorySuffix(processName);
             }
         }
+
+        AppLovinSdkSettings settings = new AppLovinSdkSettings( context );
+        settings.setTestDeviceAdvertisingIds(testDeviceList);
+        AppLovinSdk sdk = AppLovinSdk.getInstance( settings, context );
         if (enableDebug)
-            AppLovinSdk.getInstance(context).showMediationDebugger();
-        AppLovinSdk.getInstance(context).setMediationProvider("max");
-        AppLovinSdk.initializeSdk(context, configuration -> {
+            sdk.showMediationDebugger();
+        // Initialize the SDK with the configuration
+
+        sdk.setMediationProvider(AppLovinMediationProvider.MAX);
+        sdk.initializeSdk(context, configuration -> {
             // AppLovin SDK is initialized, start loading ads
             Log.d(TAG, "init: applovin success");
             adCallback.initAppLovinSuccess();
@@ -493,7 +505,7 @@ public class AppLovin {
             Log.d(TAG, "getInterstitialAds: ignore");
             return null;
         }
-        final MaxInterstitialAd interstitialAd = new MaxInterstitialAd(id, (Activity) context);
+        final MaxInterstitialAd interstitialAd =  new MaxInterstitialAd(id, context);
         interstitialAd.setListener(new MaxAdListener() {
             @Override
             public void onAdLoaded(MaxAd ad) {
@@ -947,7 +959,7 @@ public class AppLovin {
                 .setAdvertiserTextViewId(R.id.ad_advertiser)
                 .setIconImageViewId(R.id.ad_app_icon)
                 .setMediaContentViewGroupId(R.id.ad_media)
-                .setOptionsContentViewGroupId(R.id.options_view)
+                .setOptionsContentViewGroupId(R.id.ad_options_view)
                 .setCallToActionButtonId(R.id.ad_call_to_action)
                 .build();
 
@@ -1034,15 +1046,6 @@ public class AppLovin {
     public MaxRewardedAd getRewardAd(Activity activity, String id, AppLovinCallback callback) {
         MaxRewardedAd rewardedAd = MaxRewardedAd.getInstance(id, activity);
         rewardedAd.setListener(new MaxRewardedAdListener() {
-            @Override
-            public void onRewardedVideoStarted(MaxAd ad) {
-                Log.d(TAG, "onRewardedVideoStarted: ");
-            }
-
-            @Override
-            public void onRewardedVideoCompleted(MaxAd ad) {
-                Log.d(TAG, "onRewardedVideoCompleted: ");
-            }
 
             @Override
             public void onUserRewarded(MaxAd ad, MaxReward reward) {
@@ -1101,15 +1104,6 @@ public class AppLovin {
         if (maxRewardedAd.isReady()) {
             maxRewardedAd.setRevenueListener(ad -> YNLogEventManager.logPaidAdImpression( activity,ad, AdType.REWARDED));
             maxRewardedAd.setListener(new MaxRewardedAdListener() {
-                @Override
-                public void onRewardedVideoStarted(MaxAd ad) {
-                    Log.d(TAG, "onRewardedVideoStarted: ");
-                }
-
-                @Override
-                public void onRewardedVideoCompleted(MaxAd ad) {
-                    Log.d(TAG, "onRewardedVideoCompleted: ");
-                }
 
                 @Override
                 public void onUserRewarded(MaxAd ad, MaxReward reward) {

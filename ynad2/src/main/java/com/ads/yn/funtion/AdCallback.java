@@ -99,4 +99,8 @@ public class AdCallback {
     public void onInterstitialShow() {
 
     }
+
+    public void onAdLoadFailed() {
+
+    }
 }

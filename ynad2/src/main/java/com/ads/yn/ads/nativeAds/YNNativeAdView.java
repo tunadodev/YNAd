@@ -23,7 +23,7 @@ public class YNNativeAdView extends RelativeLayout {
     private int layoutCustomNativeAd = 0;
     private ShimmerFrameLayout layoutLoading;
     private FrameLayout layoutPlaceHolder;
-    private String TAG = "ITGNativeAdView";
+    private String TAG = "YNNativeAdView";
 
     public YNNativeAdView(@NonNull Context context) {
         super(context);
@@ -47,10 +47,10 @@ public class YNNativeAdView extends RelativeLayout {
     }
 
     private void init(AttributeSet attrs) {
-        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.ITGNativeAdView, 0, 0);
+        TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.YNNativeAdView, 0, 0);
         // Get layout native view custom and  layout loading
-        layoutCustomNativeAd = typedArray.getResourceId(R.styleable.ITGNativeAdView_layoutCustomNativeAd, 0);
-        int idLayoutLoading = typedArray.getResourceId(R.styleable.ITGNativeAdView_layoutLoading, 0);
+        layoutCustomNativeAd = typedArray.getResourceId(R.styleable.YNNativeAdView_layoutCustomNativeAd, 0);
+        int idLayoutLoading = typedArray.getResourceId(R.styleable.YNNativeAdView_layoutLoading, 0);
         if (idLayoutLoading != 0)
             layoutLoading = (ShimmerFrameLayout) LayoutInflater.from(getContext()).inflate(idLayoutLoading, null);
 
