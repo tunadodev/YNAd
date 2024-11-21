@@ -54,9 +54,10 @@ public class YNMAirBridge {
 
     public static void logPaidAdImpressionValue(Context context, AdValue adValue, String adUnitId, String mediationAdapterClassName, TypeAds adType) {
         if (enableAirBridge) {
+            // Extract the impression-level ad revenue data.
             long valueMicros = adValue.getValueMicros();
             String currencyCode = adValue.getCurrencyCode();
-            String precision = String.valueOf(adValue.getPrecisionType());
+            int precision = adValue.getPrecisionType();
 
             // Get the ad unit ID.
             String adNetworkAdapter = mediationAdapterClassName;
