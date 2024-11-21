@@ -10,13 +10,12 @@
     <com.ads.yn.ads.nativeAds.YNNativeAdView
         android:id="@+id/YNNativeAds"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_150sdp"
+        android:layout_height="@dimen/_260sdp"
         android:background="@drawable/bg_card_ads"
-        app:layoutCustomNativeAd="@layout/custom_native_admod_medium_rate"
+        app:layoutCustomNativeAd="@layout/custom_native_max_medium2"
         app:layoutLoading="@layout/loading_native_medium"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 <!--    <include
 
         android:id="@+id/include3"

@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -28,6 +30,13 @@ import com.ads.yn.dialog.InAppDialog;
 import com.ads.yn.funtion.AdCallback;
 import com.ads.yn.funtion.DialogExitListener;
 import com.ads.yn.funtion.PurchaseListener;
+import com.applovin.mediation.MaxAd;
+import com.applovin.mediation.MaxError;
+import com.applovin.mediation.nativeAds.MaxNativeAd;
+import com.applovin.mediation.nativeAds.MaxNativeAdListener;
+import com.applovin.mediation.nativeAds.MaxNativeAdLoader;
+import com.applovin.mediation.nativeAds.MaxNativeAdView;
+import com.bumptech.glide.Glide;
 import com.example.andmoduleads.BuildConfig;
 import com.example.andmoduleads.R;
 import com.google.android.gms.ads.FullScreenContentCallback;
@@ -83,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 super.onAdImpression();
             }
         });
+//        loadNativeAd();
 
 
         AppPurchase.getInstance().setPurchaseListener(new PurchaseListener() {
@@ -121,33 +131,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(MainActivity.this, ContentActivity.class));
                 }
             });
-//            if (mInterstitialAd.isReady()) {
-//
-//                ApInterstitialAd inter = YNAd.getInstance().getInterstitialAds(this, idInter, null);
-//
-//                YNAd.getInstance().showInterstitialAdByTimes(this, mInterstitialAd, new YNAdCallback() {
-//                    @Override
-//                    public void onNextAction() {
-//                        Log.i(TAG, "onNextAction: start content and finish main");
-//                        startActivity(new Intent(MainActivity.this, ContentActivity.class));
-//                    }
-//
-//                    @Override
-//                    public void onAdFailedToShow(@Nullable ApAdError adError) {
-//                        super.onAdFailedToShow(adError);
-//                        Log.i(TAG, "onAdFailedToShow:" + adError.getMessage());
-//                    }
-//
-//                    @Override
-//                    public void onInterstitialShow() {
-//                        super.onInterstitialShow();
-//                        Log.d(TAG, "onInterstitialShow");
-//                    }
-//                }, true);
-//            } else {
-//                Toast.makeText(this, "start loading ads", Toast.LENGTH_SHORT).show();
-//                loadAdInterstitial();
-//            }
+
         });
 
         findViewById(R.id.btForceShowAds).setOnClickListener(v -> {
@@ -277,5 +261,69 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+    private MaxNativeAdLoader nativeAdLoader;
+    private MaxAd nativeAd;
+    private void loadNativeAd() {
+        nativeAdLoader = new MaxNativeAdLoader(idNative, this);
+        nativeAdLoader.setNativeAdListener(new MaxNativeAdListener() {
+            @Override
+            public void onNativeAdLoaded(final MaxNativeAdView nativeAdView, final MaxAd maxNativeAdView)
+            {
+                if (nativeAd != null) {
+                    nativeAdLoader.destroy(nativeAd);
+                }
+
+                nativeAd = maxNativeAdView;
+
+                // Lấy thông tin quảng cáo
+                MaxNativeAd nativeAdData = maxNativeAdView.getNativeAd();
+                if (nativeAdData != null) {
+//                    FrameLayout adContainer = findViewById(R.id.native_ad_container);
+//                    adContainer.removeAllViews();
+//                    adContainer.addView(nativeAdView);
+                    bindNativeAd(nativeAdData);
+                }
+            }
+
+            @Override
+            public void onNativeAdLoadFailed(final String adUnitId, final MaxError error)
+            {
+                Toast.makeText(MainActivity.this, "Load Ad Failed: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                // Native ad load failed.
+                // AppLovin recommends retrying with exponentially higher delays up to a maximum delay.
+            }
+
+            @Override
+            public void onNativeAdClicked(final MaxAd nativeAd) {
+                Toast.makeText(MainActivity.this, "Ad Clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        nativeAdLoader.loadAd();
+    }
+
+    private void bindNativeAd(MaxNativeAd nativeAd) {
+        // Tìm các view trong layout quảng cáo
+    //        FrameLayout adContainer = findViewById(R.id.native_ad_container);
+    //        adContainer.removeAllViews();
+    //
+//            View nativeAdView = getLayoutInflater().inflate(R.layout.custom_native_max_medium2, null);
+//
+//            TextView title = nativeAdView.findViewById(R.id.native_ad_title);
+//            TextView body = nativeAdView.findViewById(R.id.native_ad_body);
+//            ImageView icon = nativeAdView.findViewById(R.id.native_ad_icon);
+//            ImageView mediaImage = nativeAdView.findViewById(R.id.native_ad_media_image);
+//
+//            // Hiển thị dữ liệu quảng cáo
+//            title.setText(nativeAd.getTitle());
+//            body.setText(nativeAd.getBody());
+//
+//            // Sử dụng thư viện Glide để load ảnh từ URL
+//            Glide.with(this).load(nativeAd.getIcon().getUri()).into(icon);
+//            Glide.with(this).load(nativeAd.getMainImage().getUri()).into(mediaImage);
+//
+//            // Thêm quảng cáo vào container
+//            adContainer.addView(nativeAdView);
     }
 }

@@ -23,7 +23,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textView3">
 
             <ImageView
-                android:id="@+id/ad_app_icon"
+                android:id="@+id/native_ad_icon"
                 android:layout_width="35dip"
                 android:layout_height="35dip"
                 android:adjustViewBounds="true"

@@ -11,13 +11,7 @@
         android:id="@+id/include2"
         layout="@layout/layout_native_control" />
 
-    <include
-        android:id="@+id/include"
-        layout="@layout/layout_banner_control"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        app:layout_constraintBottom_toBottomOf="parent" />
+
 
     <Button
         android:id="@+id/btnLoadInter"

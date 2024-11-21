@@ -1,5 +1,7 @@
 package com.ads.yn.applovin;
 
+import android.view.View;
+
 import androidx.annotation.Nullable;
 
 import com.applovin.mediation.MaxError;
@@ -45,7 +47,7 @@ public class AppLovinCallback {
     }
 
 
-    public void onUnifiedNativeAdLoaded(MaxNativeAdView unifiedNativeAd) {
+    public void onUnifiedNativeAdLoaded(View unifiedNativeAd) {
 
     }
 }

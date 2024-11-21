@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentActivity;
@@ -33,6 +35,7 @@ import com.applovin.mediation.MaxRewardedAdListener;
 import com.applovin.mediation.ads.MaxAdView;
 import com.applovin.mediation.ads.MaxInterstitialAd;
 import com.applovin.mediation.ads.MaxRewardedAd;
+import com.applovin.mediation.nativeAds.MaxNativeAd;
 import com.applovin.mediation.nativeAds.MaxNativeAdListener;
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader;
 import com.applovin.mediation.nativeAds.MaxNativeAdView;
@@ -44,6 +47,7 @@ import com.applovin.sdk.AppLovinMediationProvider;
 import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkConfiguration;
 import com.applovin.sdk.AppLovinSdkSettings;
+import com.bumptech.glide.Glide;
 import com.facebook.shimmer.ShimmerFrameLayout;
 
 import java.util.Arrays;
@@ -971,7 +975,25 @@ public class AppLovin {
             @Override
             public void onNativeAdLoaded(final MaxNativeAdView nativeAdView, final MaxAd ad) {
                 Log.d(TAG, "onNativeAdLoaded ");
-                callback.onUnifiedNativeAdLoaded(nativeAdView);
+                View newAdView = (activity).getLayoutInflater().inflate(R.layout.custom_native_max_medium2, null);
+                MaxNativeAd nativeAd = ad.getNativeAd();
+                TextView title = newAdView.findViewById(R.id.ad_headline);
+                TextView body = newAdView.findViewById(R.id.ad_body);
+                ImageView icon = newAdView.findViewById(R.id.ad_app_icon);
+                ImageView mediaImage = newAdView.findViewById(R.id.native_ad_media_image);
+
+                // Hiển thị dữ liệu quảng cáo
+                title.setText(nativeAd.getTitle());
+                body.setText(nativeAd.getBody());
+
+                // Sử dụng thư viện Glide để load ảnh từ URL
+                Glide.with(context).load(nativeAd.getIcon().getUri()).into(icon);
+                Glide.with(context).load(nativeAd.getMainImage().getUri()).into(mediaImage);
+//                ImageView icon = nativeAdView.findViewById(R.id.ad_app_icon);
+//                ImageView mediaImage = nativeAdView.findViewById(R.id.ad_media);
+//                Glide.with(context).load(ad.getNativeAd().getIcon().getUri()).into(icon);
+//                Glide.with(context).load(ad.getNativeAd().getMainImage().getUri()).into(mediaImage);
+                callback.onUnifiedNativeAdLoaded(newAdView);
             }
 
             @Override
@@ -989,7 +1011,7 @@ public class AppLovin {
                     AppOpenMax.getInstance().disableAdResumeByClickAction();
             }
         });
-        nativeAdLoader.loadAd(nativeAdView);
+        nativeAdLoader.loadAd();
     }
 
     public MaxRecyclerAdapter getNativeRepeatAdapter(Activity activity, String id, int layoutCustomNative, RecyclerView.Adapter originalAdapter,
@@ -1006,7 +1028,7 @@ public class AppLovin {
                 .setBodyTextViewId(com.ads.yn.R.id.ad_body)
                 .setAdvertiserTextViewId(com.ads.yn.R.id.ad_advertiser)
                 .setIconImageViewId(com.ads.yn.R.id.ad_app_icon)
-                .setMediaContentViewGroupId(com.ads.yn.R.id.ad_media)
+                .setMediaContentViewGroupId(com.ads.yn.R.id.native_ad_media_image)
                 .setOptionsContentViewGroupId(com.ads.yn.R.id.ad_options_view)
                 .setCallToActionButtonId(com.ads.yn.R.id.ad_call_to_action)
                 .build();

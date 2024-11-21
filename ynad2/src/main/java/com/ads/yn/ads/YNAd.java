@@ -1118,7 +1118,7 @@ public class YNAd {
             case YNAdConfig.PROVIDER_MAX:
                 AppLovin.getInstance().loadNativeAd(activity, id, layoutCustomNative, new AppLovinCallback() {
                     @Override
-                    public void onUnifiedNativeAdLoaded(MaxNativeAdView unifiedNativeAd) {
+                    public void onUnifiedNativeAdLoaded(View unifiedNativeAd) {
                         super.onUnifiedNativeAdLoaded(unifiedNativeAd);
                         populateNativeAdView(activity, new ApNativeAd(layoutCustomNative, unifiedNativeAd), adPlaceHolder, containerShimmerLoading);
                     }
@@ -1164,7 +1164,7 @@ public class YNAd {
             case YNAdConfig.PROVIDER_MAX:
                 AppLovin.getInstance().loadNativeAd(activity, id, layoutCustomNative, new AppLovinCallback() {
                     @Override
-                    public void onUnifiedNativeAdLoaded(MaxNativeAdView unifiedNativeAd) {
+                    public void onUnifiedNativeAdLoaded(View unifiedNativeAd) {
                         super.onUnifiedNativeAdLoaded(unifiedNativeAd);
                         populateNativeAdView(activity, new ApNativeAd(layoutCustomNative, unifiedNativeAd), adPlaceHolder, containerShimmerLoading);
                     }
@@ -1229,7 +1229,7 @@ public class YNAd {
             case YNAdConfig.PROVIDER_MAX:
                 AppLovin.getInstance().loadNativeAd(activity, id, layoutCustomNative, new AppLovinCallback() {
                     @Override
-                    public void onUnifiedNativeAdLoaded(MaxNativeAdView unifiedNativeAd) {
+                    public void onUnifiedNativeAdLoaded(View unifiedNativeAd) {
                         super.onUnifiedNativeAdLoaded(unifiedNativeAd);
                         callback.onNativeAdLoaded(new ApNativeAd(layoutCustomNative, unifiedNativeAd));
                         populateNativeAdView(activity, new ApNativeAd(layoutCustomNative, unifiedNativeAd), adPlaceHolder, containerShimmerLoading);
@@ -1293,8 +1293,8 @@ public class YNAd {
             case YNAdConfig.PROVIDER_MAX:
                 AppLovin.getInstance().loadNativeAd(activity, id, layoutCustomNative, new AppLovinCallback() {
                     @Override
-                    public void onUnifiedNativeAdLoaded(MaxNativeAdView unifiedNativeAd) {
-                        super.onUnifiedNativeAdLoaded(unifiedNativeAd);
+                    public void onUnifiedNativeAdLoaded(View unifiedNativeAd) {
+                        super.onUnifiedNativeAdLoaded((unifiedNativeAd));
                         callback.onNativeAdLoaded(new ApNativeAd(layoutCustomNative, unifiedNativeAd));
                     }
 
