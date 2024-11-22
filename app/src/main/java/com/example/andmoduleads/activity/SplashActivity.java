@@ -45,7 +45,7 @@ public class SplashActivity extends AppCompatActivity {
 //                });
         startMain();
         String idNative = getString(R.string.applovin_test_native);
-        AdsNativePreload.PreLoadNative(SplashActivity.this, idNative,"test");
+        AdsNativePreload.PreLoadNative(SplashActivity.this, idNative,"test", R.layout.custom_native_max_medium2);
     }
 
     private void startMain() {

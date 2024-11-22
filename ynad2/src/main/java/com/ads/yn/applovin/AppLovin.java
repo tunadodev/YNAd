@@ -950,6 +950,31 @@ public class AppLovin {
         nativeAdLoader.loadAd(nativeAdView);
     }
 
+    private void handleNativeAdImages(View nativeAdView, MaxAd ad, Activity act) {
+        try {
+            MaxNativeAd nativeAd = ad.getNativeAd();
+
+            // Handle Icon
+            ImageView iconView = nativeAdView.findViewById(R.id.ad_app_icon);
+            if (iconView != null && nativeAd.getIcon() != null && nativeAd.getIcon().getUri() != null) {
+                Glide.with(act)
+                        .load(nativeAd.getIcon().getUri())
+                        .into(iconView);
+            }
+
+            // Handle Main Image
+            ImageView mediaView = nativeAdView.findViewById(R.id.native_ad_media_image);
+            if (mediaView != null && nativeAd.getMainImage() != null && nativeAd.getMainImage().getUri() != null) {
+                Glide.with(act)
+                        .load(nativeAd.getMainImage().getUri())
+                        .into(mediaView);
+            }
+
+        } catch (Exception e) {
+            Log.e("NativeAd", "Error loading images: " + e.getMessage());
+        }
+    }
+
     public void loadNativeAd(Activity activity, String id, int layoutCustomNative, AppLovinCallback callback) {
 
         if (AppPurchase.getInstance().isPurchased(context)) {
@@ -962,8 +987,6 @@ public class AppLovin {
                 .setBodyTextViewId(R.id.ad_body)
                 .setAdvertiserTextViewId(R.id.ad_advertiser)
                 .setIconImageViewId(R.id.ad_app_icon)
-                .setMediaContentViewGroupId(R.id.ad_media)
-                .setOptionsContentViewGroupId(R.id.ad_options_view)
                 .setCallToActionButtonId(R.id.ad_call_to_action)
                 .build();
 
@@ -975,25 +998,8 @@ public class AppLovin {
             @Override
             public void onNativeAdLoaded(final MaxNativeAdView nativeAdView, final MaxAd ad) {
                 Log.d(TAG, "onNativeAdLoaded ");
-                View newAdView = (activity).getLayoutInflater().inflate(R.layout.custom_native_max_medium2, null);
-                MaxNativeAd nativeAd = ad.getNativeAd();
-                TextView title = newAdView.findViewById(R.id.ad_headline);
-                TextView body = newAdView.findViewById(R.id.ad_body);
-                ImageView icon = newAdView.findViewById(R.id.ad_app_icon);
-                ImageView mediaImage = newAdView.findViewById(R.id.native_ad_media_image);
-
-                // Hiển thị dữ liệu quảng cáo
-                title.setText(nativeAd.getTitle());
-                body.setText(nativeAd.getBody());
-
-                // Sử dụng thư viện Glide để load ảnh từ URL
-                Glide.with(context).load(nativeAd.getIcon().getUri()).into(icon);
-                Glide.with(context).load(nativeAd.getMainImage().getUri()).into(mediaImage);
-//                ImageView icon = nativeAdView.findViewById(R.id.ad_app_icon);
-//                ImageView mediaImage = nativeAdView.findViewById(R.id.ad_media);
-//                Glide.with(context).load(ad.getNativeAd().getIcon().getUri()).into(icon);
-//                Glide.with(context).load(ad.getNativeAd().getMainImage().getUri()).into(mediaImage);
-                callback.onUnifiedNativeAdLoaded(newAdView);
+                handleNativeAdImages(nativeAdView, ad, activity);
+                callback.onUnifiedNativeAdLoaded(nativeAdView);
             }
 
             @Override
@@ -1011,7 +1017,7 @@ public class AppLovin {
                     AppOpenMax.getInstance().disableAdResumeByClickAction();
             }
         });
-        nativeAdLoader.loadAd();
+        nativeAdLoader.loadAd(nativeAdView);
     }
 
     public MaxRecyclerAdapter getNativeRepeatAdapter(Activity activity, String id, int layoutCustomNative, RecyclerView.Adapter originalAdapter,

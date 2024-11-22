@@ -156,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
-        AdsNativePreload.flexPreloadedShowNativeAds(this, YNNativeAdView, "test", YNNativeAdView.layoutPlaceHolder, YNNativeAdView.layoutLoading, idNative);
+        AdsNativePreload.flexPreloadedShowNativeAds(this, YNNativeAdView, "test", idNative, R.layout.custom_native_max_medium2);
 
         findViewById(R.id.btnShowReward).setOnClickListener(v -> {
 
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
             idBanner = getString(R.string.applovin_test_banner);
             idNative = getString(R.string.applovin_test_native);
             idInter = getString(R.string.applovin_test_inter);
-            layoutNativeCustom = com.ads.yn.R.layout.custom_native_max_medium;
+            layoutNativeCustom = com.ads.yn.R.layout.custom_native_max_medium2;
         }
     }
 

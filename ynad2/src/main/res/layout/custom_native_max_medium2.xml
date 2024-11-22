@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:gravity="center"
         tools:ignore="MissingConstraints">
 
         <LinearLayout
@@ -76,23 +77,21 @@
             app:layout_constraintEnd_toEndOf="@+id/linearLayout3"
             app:layout_constraintStart_toStartOf="@+id/linearLayout3"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout3" />
+
         <ImageView
             android:id="@+id/native_ad_media_image"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_marginBottom="8dp"
-            android:scaleType="centerCrop"
+            android:layout_height="@dimen/_120sdp"
+            android:adjustViewBounds="true"
+            android:scaleType="centerInside"
             app:layout_constraintEnd_toEndOf="@+id/ad_body"
             app:layout_constraintStart_toStartOf="@+id/ad_body"
-            app:layout_constraintTop_toBottomOf="@+id/ad_body"
-            android:background="@color/colorGrayAds" />
+            app:layout_constraintTop_toBottomOf="@+id/ad_body" />
 
         <Button
             android:id="@+id/ad_call_to_action"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-
-            android:layout_marginBottom="8dp"
             android:background="@drawable/ads_bg_lib"
             android:gravity="center"
             android:text="Cài Đặt"
@@ -100,10 +99,7 @@
             android:textSize="@dimen/_12sdp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/native_ad_media_image"
-            app:layout_constraintStart_toStartOf="@+id/native_ad_media_image"
             app:layout_constraintTop_toBottomOf="@+id/native_ad_media_image" />
-
 
         <TextView
             android:id="@+id/textView3"

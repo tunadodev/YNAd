@@ -4,11 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -1347,7 +1350,13 @@ public class YNAd {
                 if (apNativeAd.getNativeView().getParent() != null) {
                     ((ViewGroup) apNativeAd.getNativeView().getParent()).removeAllViews();
                 }
-                adPlaceHolder.addView(apNativeAd.getNativeView());
+                View nativeView = apNativeAd.getNativeView();
+                adPlaceHolder.addView(nativeView);
+                RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                        FrameLayout.LayoutParams.MATCH_PARENT,
+                        FrameLayout.LayoutParams.WRAP_CONTENT
+                );
+                adPlaceHolder.setLayoutParams(params);
         }
     }
 

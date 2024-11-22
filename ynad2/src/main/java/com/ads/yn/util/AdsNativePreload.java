@@ -73,8 +73,8 @@ public class AdsNativePreload {
         return null;
     }
 
-    public static void PreLoadNative(Context context, String adId, String identifyKey) {
-        YNAd.getInstance().loadNativeAdResultCallback((Activity) context,adId, R.layout.custom_native_admod_medium2,new YNAdCallback(){
+    public static void PreLoadNative(Context context, String adId, String identifyKey,int layoutId) {
+        YNAd.getInstance().loadNativeAdResultCallback((Activity) context,adId, layoutId,new YNAdCallback(){
             @Override
             public void onNativeAdLoaded(@NonNull ApNativeAd nativeAd) {
                 super.onNativeAdLoaded(nativeAd);
@@ -85,8 +85,8 @@ public class AdsNativePreload {
     }
 
     //with listener
-    public static void PreLoadNative(Context context, String adId, String identifyKey, NativeAdLoadListener listener) {
-        YNAd.getInstance().loadNativeAdResultCallback((Activity) context,adId, R.layout.custom_native_max_medium,new YNAdCallback(){
+    public static void PreLoadNative(Context context, String adId, String identifyKey,int layoutId, NativeAdLoadListener listener) {
+        YNAd.getInstance().loadNativeAdResultCallback((Activity) context,adId, layoutId,new YNAdCallback(){
             @Override
             public void onNativeAdLoaded(@NonNull ApNativeAd nativeAd) {
                 super.onNativeAdLoaded(nativeAd);
@@ -101,19 +101,18 @@ public class AdsNativePreload {
     }
 
     //load from preload native, if not available, reload, show an auto resized ads
-    public static void flexPreloadedShowNativeAds(Context context, YNNativeAdView adView, String key, FrameLayout
-            adPlaceHolder, ShimmerFrameLayout containerShimmerLoading, String adsId){
+    public static void flexPreloadedShowNativeAds(Context context, YNNativeAdView adView, String key, String adsId, int layoutId){
         YNAd.getInstance().setInitCallback(() -> {
             if (AdsNativePreload.getNativeAd(key) != null) {
                 // Native Ad đã được load xong, bạn có thể sử dụng nó ở đây
                 ApNativeAd nativeAd = AdsNativePreload.getNativeAd(key);
-                YNAd.getInstance().populateNativeAdView((Activity) context, nativeAd,adPlaceHolder,containerShimmerLoading);
+                YNAd.getInstance().populateNativeAdView((Activity) context, nativeAd,adView.layoutPlaceHolder,adView.layoutLoading);
 
             } else {
                 //Khong thi load lai
-                AdsNativePreload.PreLoadNative(context, adsId, key,  () -> {
+                AdsNativePreload.PreLoadNative(context, adsId, key,layoutId,  () -> {
                     ApNativeAd nativeAd = AdsNativePreload.getNativeAd(key);
-                    YNAd.getInstance().populateNativeAdView((Activity) context, nativeAd,adPlaceHolder,containerShimmerLoading);
+                    YNAd.getInstance().populateNativeAdView((Activity) context, nativeAd,adView.layoutPlaceHolder,adView.layoutLoading);
                 });
             };
         });
