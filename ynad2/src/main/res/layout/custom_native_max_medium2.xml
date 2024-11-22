@@ -89,7 +89,7 @@
 
         <Button
             android:id="@+id/ad_call_to_action"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
             android:layout_marginBottom="8dp"

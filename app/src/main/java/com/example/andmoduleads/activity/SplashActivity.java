@@ -8,8 +8,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.ads.yn.admob.AppOpenManager;
 import com.ads.yn.ads.YNAd;
+import com.ads.yn.ads.wrapper.ApNativeAd;
 import com.ads.yn.config.YNAdConfig;
 import com.ads.yn.funtion.AdCallback;
+import com.ads.yn.util.AdsNativePreload;
 import com.example.andmoduleads.BuildConfig;
 import com.example.andmoduleads.R;
 
@@ -32,15 +34,18 @@ public class SplashActivity extends AppCompatActivity {
         else
             idAdSplash = getString(R.string.applovin_test_inter);
 
-        AppOpenManager.getInstance().loadAdOpenSplash2id(SplashActivity.class, this,
-                "ca-app-pub-3940256099942544/3419835294",
-                "ca-app-pub-3940256099942544/3419835294", 25000, new AdCallback() {
-                    @Override
-                    public void onNextAction() {
-                        super.onNextAction();
-                        startMain();
-                    }
-                });
+//        AppOpenManager.getInstance().loadAdOpenSplash2id(SplashActivity.class, this,
+//                "ca-app-pub-3940256099942544/3419835294",
+//                "ca-app-pub-3940256099942544/3419835294", 25000, new AdCallback() {
+//                    @Override
+//                    public void onNextAction() {
+//                        super.onNextAction();
+//                        startMain();
+//                    }
+//                });
+        startMain();
+        String idNative = getString(R.string.applovin_test_native);
+        AdsNativePreload.PreLoadNative(SplashActivity.this, idNative,"test");
     }
 
     private void startMain() {

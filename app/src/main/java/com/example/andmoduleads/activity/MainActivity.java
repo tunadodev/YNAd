@@ -1,5 +1,6 @@
 package com.example.andmoduleads.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +20,7 @@ import com.ads.yn.admob.AppOpenManager;
 import com.ads.yn.ads.YNAd;
 import com.ads.yn.ads.YNAdCallback;
 import com.ads.yn.ads.nativeAds.YNNativeAdView;
+import com.ads.yn.ads.wrapper.ApNativeAd;
 import com.ads.yn.config.YNAdConfig;
 import com.ads.yn.ads.bannerAds.YNBannerAdView;
 import com.ads.yn.ads.wrapper.ApAdError;
@@ -37,8 +39,10 @@ import com.applovin.mediation.nativeAds.MaxNativeAdListener;
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader;
 import com.applovin.mediation.nativeAds.MaxNativeAdView;
 import com.bumptech.glide.Glide;
+import com.ads.yn.util.AdsNativePreload;
 import com.example.andmoduleads.BuildConfig;
 import com.example.andmoduleads.R;
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.nativead.NativeAd;
 
@@ -86,14 +90,6 @@ public class MainActivity extends AppCompatActivity {
         /**
          * Sample integration native ads
          */
-        YNNativeAdView.loadNativeAd(this, idNative, new YNAdCallback() {
-            @Override
-            public void onAdImpression() {
-                super.onAdImpression();
-            }
-        });
-//        loadNativeAd();
-
 
         AppPurchase.getInstance().setPurchaseListener(new PurchaseListener() {
             @Override
@@ -160,13 +156,15 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
+        AdsNativePreload.flexPreloadedShowNativeAds(this, YNNativeAdView, "test", YNNativeAdView.layoutPlaceHolder, YNNativeAdView.layoutLoading, idNative);
 
         findViewById(R.id.btnShowReward).setOnClickListener(v -> {
-            if (rewardAd != null && rewardAd.isReady()) {
-                YNAd.getInstance().forceShowRewardAd(this, rewardAd, new YNAdCallback());
-                return;
-            }
-            rewardAd = YNAd.getInstance().getRewardAd(this,  BuildConfig.ad_reward, null);
+
+//            if (rewardAd != null && rewardAd.isReady()) {
+//                YNAd.getInstance().forceShowRewardAd(this, rewardAd, new YNAdCallback());
+//                return;
+//            }
+//            rewardAd = YNAd.getInstance().getRewardAd(this,  BuildConfig.ad_reward, null);
         });
 
         Button btnIAP = findViewById(R.id.btIap);

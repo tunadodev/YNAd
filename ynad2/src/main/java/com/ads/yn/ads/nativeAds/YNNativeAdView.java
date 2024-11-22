@@ -21,8 +21,8 @@ import com.facebook.shimmer.ShimmerFrameLayout;
 public class YNNativeAdView extends RelativeLayout {
 
     private int layoutCustomNativeAd = 0;
-    private ShimmerFrameLayout layoutLoading;
-    private FrameLayout layoutPlaceHolder;
+    public ShimmerFrameLayout layoutLoading;
+    public FrameLayout layoutPlaceHolder;
     private String TAG = "YNNativeAdView";
 
     public YNNativeAdView(@NonNull Context context) {
