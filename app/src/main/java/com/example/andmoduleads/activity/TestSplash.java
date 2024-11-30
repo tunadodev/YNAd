@@ -5,9 +5,9 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.ads.yn.ads.YNAd;
-import com.ads.yn.funtion.AdCallback;
-import com.ads.yn.util.AppConstant;
+import com.ads.nomyek.ads.YNAd;
+import com.ads.nomyek.funtion.AdCallback;
+import com.ads.nomyek.util.AppConstant;
 import com.example.andmoduleads.R;
 
 public class TestSplash extends AppCompatActivity {

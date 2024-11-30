@@ -1,48 +1,42 @@
 package com.example.andmoduleads.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.ads.yn.admob.Admob;
-import com.ads.yn.admob.AppOpenManager;
-import com.ads.yn.ads.YNAd;
-import com.ads.yn.ads.YNAdCallback;
-import com.ads.yn.ads.nativeAds.YNNativeAdView;
-import com.ads.yn.ads.wrapper.ApNativeAd;
-import com.ads.yn.config.YNAdConfig;
-import com.ads.yn.ads.bannerAds.YNBannerAdView;
-import com.ads.yn.ads.wrapper.ApAdError;
-import com.ads.yn.ads.wrapper.ApInterstitialAd;
-import com.ads.yn.ads.wrapper.ApRewardAd;
-import com.ads.yn.billing.AppPurchase;
-import com.ads.yn.dialog.DialogExitApp1;
-import com.ads.yn.dialog.InAppDialog;
-import com.ads.yn.funtion.AdCallback;
-import com.ads.yn.funtion.DialogExitListener;
-import com.ads.yn.funtion.PurchaseListener;
+import com.ads.nomyek.admob.Admob;
+import com.ads.nomyek.admob.AppOpenManager;
+import com.ads.nomyek.ads.YNAd;
+import com.ads.nomyek.ads.YNAdCallback;
+import com.ads.nomyek.ads.nativeAds.YNNativeAdView;
+import com.ads.nomyek.config.YNAdConfig;
+import com.ads.nomyek.ads.bannerAds.YNBannerAdView;
+import com.ads.nomyek.ads.wrapper.ApAdError;
+import com.ads.nomyek.ads.wrapper.ApInterstitialAd;
+import com.ads.nomyek.ads.wrapper.ApRewardAd;
+import com.ads.nomyek.billing.AppPurchase;
+import com.ads.nomyek.dialog.DialogExitApp1;
+import com.ads.nomyek.dialog.InAppDialog;
+import com.ads.nomyek.funtion.AdCallback;
+import com.ads.nomyek.funtion.DialogExitListener;
+import com.ads.nomyek.funtion.PurchaseListener;
 import com.applovin.mediation.MaxAd;
 import com.applovin.mediation.MaxError;
 import com.applovin.mediation.nativeAds.MaxNativeAd;
 import com.applovin.mediation.nativeAds.MaxNativeAdListener;
 import com.applovin.mediation.nativeAds.MaxNativeAdLoader;
 import com.applovin.mediation.nativeAds.MaxNativeAdView;
-import com.bumptech.glide.Glide;
-import com.ads.yn.util.AdsNativePreload;
+import com.ads.nomyek.util.AdsNativePreload;
 import com.example.andmoduleads.BuildConfig;
 import com.example.andmoduleads.R;
-import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.nativead.NativeAd;
 
@@ -193,12 +187,12 @@ public class MainActivity extends AppCompatActivity {
             idBanner = BuildConfig.ad_banner;
             idNative = BuildConfig.ad_native;
             idInter = BuildConfig.ad_interstitial_splash;
-            layoutNativeCustom = com.ads.yn.R.layout.custom_native_admod_medium_rate;
+            layoutNativeCustom = com.ads.nomyek.R.layout.custom_native_admod_medium_rate;
         } else {
             idBanner = getString(R.string.applovin_test_banner);
             idNative = getString(R.string.applovin_test_native);
             idInter = getString(R.string.applovin_test_inter);
-            layoutNativeCustom = com.ads.yn.R.layout.custom_native_max_medium2;
+            layoutNativeCustom = com.ads.nomyek.R.layout.custom_native_max_medium2;
         }
     }
 

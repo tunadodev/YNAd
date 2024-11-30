@@ -1,14 +1,14 @@
 package com.example.andmoduleads;
 
-import com.ads.yn.ads.YNAd;
-import com.ads.yn.config.AirBridgeConfig;
-import com.ads.yn.config.YNAdConfig;
-import com.ads.yn.application.AdsMultiDexApplication;
-import com.ads.yn.applovin.AppLovin;
-import com.ads.yn.applovin.AppOpenMax;
-import com.ads.yn.billing.AppPurchase;
-import com.ads.yn.admob.Admob;
-import com.ads.yn.admob.AppOpenManager;
+import com.ads.nomyek.ads.YNAd;
+import com.ads.nomyek.config.AirBridgeConfig;
+import com.ads.nomyek.config.YNAdConfig;
+import com.ads.nomyek.application.AdsMultiDexApplication;
+import com.ads.nomyek.applovin.AppLovin;
+import com.ads.nomyek.applovin.AppOpenMax;
+import com.ads.nomyek.billing.AppPurchase;
+import com.ads.nomyek.admob.Admob;
+import com.ads.nomyek.admob.AppOpenManager;
 import com.example.andmoduleads.activity.MainActivity;
 import com.example.andmoduleads.activity.SplashActivity;
 

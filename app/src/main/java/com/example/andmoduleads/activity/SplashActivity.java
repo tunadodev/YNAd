@@ -6,12 +6,11 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.ads.yn.admob.AppOpenManager;
-import com.ads.yn.ads.YNAd;
-import com.ads.yn.ads.wrapper.ApNativeAd;
-import com.ads.yn.config.YNAdConfig;
-import com.ads.yn.funtion.AdCallback;
-import com.ads.yn.util.AdsNativePreload;
+import com.ads.nomyek.admob.AppOpenManager;
+import com.ads.nomyek.ads.YNAd;
+import com.ads.nomyek.config.YNAdConfig;
+import com.ads.nomyek.funtion.AdCallback;
+import com.ads.nomyek.util.AdsNativePreload;
 import com.example.andmoduleads.BuildConfig;
 import com.example.andmoduleads.R;
 

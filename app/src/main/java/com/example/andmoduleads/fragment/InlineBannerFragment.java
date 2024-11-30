@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.ads.yn.admob.Admob;
+import com.ads.nomyek.admob.Admob;
 import com.example.andmoduleads.R;
 
 /**

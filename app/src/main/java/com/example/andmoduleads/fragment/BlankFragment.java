@@ -12,10 +12,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.ads.yn.admob.Admob;
-import com.ads.yn.ads.YNAd;
-import com.ads.yn.config.YNAdConfig;
-import com.ads.yn.funtion.AdCallback;
+import com.ads.nomyek.admob.Admob;
+import com.ads.nomyek.ads.YNAd;
+import com.ads.nomyek.config.YNAdConfig;
+import com.ads.nomyek.funtion.AdCallback;
 import com.example.andmoduleads.R;
 import com.example.andmoduleads.activity.ContentActivity;
 import com.facebook.shimmer.ShimmerFrameLayout;
@@ -73,6 +73,6 @@ public class BlankFragment extends Fragment {
 
         FrameLayout flPlaceHolder = view.findViewById(R.id.fl_adplaceholder);
         ShimmerFrameLayout shimmerFrameLayout = view.findViewById(R.id.shimmer_container_native);
-        YNAd.getInstance().loadNativeAd(requireActivity(), getString(R.string.admod_native_id), com.ads.yn.R.layout.custom_native_admob_free_size, flPlaceHolder, shimmerFrameLayout, null);
+        YNAd.getInstance().loadNativeAd(requireActivity(), getString(R.string.admod_native_id), com.ads.nomyek.R.layout.custom_native_admob_free_size, flPlaceHolder, shimmerFrameLayout, null);
     }
 }

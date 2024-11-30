@@ -7,7 +7,7 @@
     android:background="#FDA6A6"
     tools:context=".activity.MainActivity">
 
-    <com.ads.yn.ads.nativeAds.YNNativeAdView
+    <com.ads.nomyek.ads.nativeAds.YNNativeAdView
         android:id="@+id/YNNativeAds"
         android:layout_width="match_parent"
         android:layout_height="@dimen/_250sdp"
@@ -67,7 +67,7 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <com.ads.yn.ads.bannerAds.YNBannerAdView
+    <com.ads.nomyek.ads.bannerAds.YNBannerAdView
         android:id="@+id/bannerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

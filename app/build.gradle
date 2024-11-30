@@ -9,13 +9,13 @@ android {
 
 
     defaultConfig {
-        applicationId "com.yeknom.dinosaur.coloring.pages"
+        applicationId "com.nomyek.princess.coloring.dreamland"
         minSdkVersion 24
         targetSdkVersion 34
         versionCode 2
         versionName "2.0"
         def formattedDate = new Date().format('MMM.dd.yyyy')
-        archivesBaseName = "YNModuleAds_v${versionName}(${versionCode})_${formattedDate}"
+        archivesBaseName = "NekyomAds_v${versionName}(${versionCode})_${formattedDate}"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -65,7 +65,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation project(path: ':ynad2')
+    implementation project(path: ':nomyekAdMax')
     implementation 'com.google.android.gms:play-services-ads:23.3.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'

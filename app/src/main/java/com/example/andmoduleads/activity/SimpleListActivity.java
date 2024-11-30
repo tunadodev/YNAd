@@ -8,11 +8,11 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.ads.yn.ads.YNAd;
-import com.ads.yn.config.YNAdConfig;
-import com.ads.yn.ads.nativeAds.YNAdPlacer;
-import com.ads.yn.ads.nativeAds.YNAdAdapter;
-import com.ads.yn.ads.wrapper.ApAdValue;
+import com.ads.nomyek.ads.YNAd;
+import com.ads.nomyek.config.YNAdConfig;
+import com.ads.nomyek.ads.nativeAds.YNAdPlacer;
+import com.ads.nomyek.ads.nativeAds.YNAdAdapter;
+import com.ads.nomyek.ads.wrapper.ApAdValue;
 import com.example.andmoduleads.R;
 import com.example.andmoduleads.adapter.ListSimpleAdapter;
 
@@ -22,7 +22,7 @@ import java.util.List;
 public class SimpleListActivity extends AppCompatActivity {
     private static final String TAG = "SimpleListActivity";
     YNAdAdapter adAdapter;
-    int layoutCustomNative = com.ads.yn.R.layout.custom_native_admod_medium;
+    int layoutCustomNative = com.ads.nomyek.R.layout.custom_native_admod_medium;
     String idNative = "";
     SwipeRefreshLayout swRefresh;
     ListSimpleAdapter originalAdapter;
@@ -77,10 +77,10 @@ public class SimpleListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         if (YNAd.getInstance().getMediationProvider() == YNAdConfig.PROVIDER_ADMOB) {
-            layoutCustomNative = com.ads.yn.R.layout.custom_native_admod_medium;
+            layoutCustomNative = com.ads.nomyek.R.layout.custom_native_admod_medium;
             idNative = getString(R.string.admod_native_id);
         } else {
-            layoutCustomNative = com.ads.yn.R.layout.custom_native_max_small;
+            layoutCustomNative = com.ads.nomyek.R.layout.custom_native_max_small;
             idNative = getString(R.string.applovin_test_native);
         }
 
@@ -93,7 +93,7 @@ public class SimpleListActivity extends AppCompatActivity {
     }
 
     private void setupAdAdapter() {
-        adAdapter = YNAd.getInstance().getNativeRepeatAdapter(this, idNative, layoutCustomNative, com.ads.yn.R.layout.layout_native_medium,
+        adAdapter = YNAd.getInstance().getNativeRepeatAdapter(this, idNative, layoutCustomNative, com.ads.nomyek.R.layout.layout_native_medium,
                 originalAdapter, listener, 5);
 
         recyclerView.setAdapter(adAdapter.getAdapter());
