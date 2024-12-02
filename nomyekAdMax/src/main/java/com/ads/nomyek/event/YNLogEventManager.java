@@ -30,6 +30,10 @@ public class YNLogEventManager {
         YNMAirBridge.logPaidAdImpressionValue(context, adValue, adUnitId, mediationAdapterClassName);
     }
 
+    public static void logPaidAdImpressionMax(Context context, MaxAd maxAd) {
+        YNMAirBridge.logPaidAdImpressionValueMAX(context, maxAd);
+    }
+
     public static void logPaidAdjustWithToken(AdValue adValue, String adUnitId, String token) {
 //        AdjustEvent adjustEvent = new AdjustEvent(token);
 //        float value = adValue.getValueMicros() * 1.0f / 1000000;
@@ -43,6 +47,7 @@ public class YNLogEventManager {
         logEventWithMaxAds(context, adValue);
 //        YNAdjust.pushTrackEventApplovin(adValue, context);
 //        YNAppsflyer.getInstance().pushTrackEventApplovin(adValue, adType);
+        YNMAirBridge.logPaidAdImpressionValueMAX(context, adValue);
     }
 
     private static void logEventWithMaxAds(Context context, MaxAd impressionData) {
