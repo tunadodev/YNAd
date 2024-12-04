@@ -21,8 +21,11 @@ import com.ads.yn.ads.YNAdCallback;
 import com.ads.yn.ads.wrapper.ApAdError;
 import com.ads.yn.billing.AppPurchase;
 import com.ads.yn.dialog.ResumeLoadingDialog;
+import com.ads.yn.event.YNLogEventManager;
+import com.ads.yn.funtion.AdType;
 import com.applovin.mediation.MaxAd;
 import com.applovin.mediation.MaxAdListener;
+import com.applovin.mediation.MaxAdRevenueListener;
 import com.applovin.mediation.MaxError;
 import com.applovin.mediation.ads.MaxAppOpenAd;
 import com.applovin.sdk.AppLovinSdk;
@@ -68,6 +71,7 @@ public class AppOpenMax implements Application.ActivityLifecycleCallbacks, Lifec
     // Policy Max: Load sau Ad Splash
     public void loadAdResumeMax(Application application, String appOpenAdId) {
         appOpenAd = new MaxAppOpenAd(appOpenAdId, application);
+        appOpenAd.setRevenueListener(ad -> YNLogEventManager.logPaidAdImpression(application.getApplicationContext(),ad, AdType.APP_OPEN));
         appOpenAd.setListener(new MaxAdListener() {
             @Override
             public void onAdLoaded(MaxAd ad) {

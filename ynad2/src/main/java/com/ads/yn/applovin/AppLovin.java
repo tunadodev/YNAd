@@ -208,6 +208,7 @@ public class AppLovin {
         }
 
         isShowLoadingSplash = true;
+        interstitialSplash.setRevenueListener(ad -> YNLogEventManager.logPaidAdImpression(context,ad, AdType.INTERSTITIAL));
 
         interstitialSplash.setListener(new MaxAdListener() {
             @Override
@@ -323,6 +324,7 @@ public class AppLovin {
         }
 
         isShowLoadingSplash = true;
+        interstitialSplash.setRevenueListener(ad -> YNLogEventManager.logPaidAdImpression(context,ad, AdType.INTERSTITIAL));
 
         interstitialSplash.setListener(new MaxAdListener() {
             @Override
@@ -471,7 +473,7 @@ public class AppLovin {
                 return;
             }
             new Handler().postDelayed(() -> {
-                if (activity != null && !activity.isDestroyed())
+                if (activity != null && !activity.isDestroyed() && interstitialSplash != null && interstitialSplash.isReady())
                     interstitialSplash.showAd();
             }, 800);
         } else {
@@ -510,6 +512,8 @@ public class AppLovin {
             return null;
         }
         final MaxInterstitialAd interstitialAd =  new MaxInterstitialAd(id, context);
+        interstitialAd.setRevenueListener(ad -> YNLogEventManager.logPaidAdImpression(context,ad, AdType.INTERSTITIAL));
+
         interstitialAd.setListener(new MaxAdListener() {
             @Override
             public void onAdLoaded(MaxAd ad) {
@@ -1073,6 +1077,8 @@ public class AppLovin {
 
     public MaxRewardedAd getRewardAd(Activity activity, String id, AppLovinCallback callback) {
         MaxRewardedAd rewardedAd = MaxRewardedAd.getInstance(id, activity);
+        rewardedAd.setRevenueListener(ad -> YNLogEventManager.logPaidAdImpression(context,ad, AdType.REWARDED));
+
         rewardedAd.setListener(new MaxRewardedAdListener() {
 
             @Override

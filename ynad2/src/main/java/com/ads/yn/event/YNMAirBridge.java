@@ -5,6 +5,8 @@ import android.content.Context;
 import android.util.Log;
 
 
+import com.applovin.mediation.MaxAd;
+import com.applovin.sdk.AppLovinSdk;
 import com.google.android.gms.ads.AdValue;
 
 import java.util.HashMap;
@@ -81,6 +83,35 @@ public class YNMAirBridge {
             event.setValue(valueMicros / 1000000.0);
             event.setSemanticAttributes(semanticAttributes);
 
+            Airbridge.trackEvent(event);
+        }
+    }
+
+    public static void logPaidAdImpressionValueMAX(Context context, MaxAd maxAd) {
+        if (enableAirBridge) {
+            Event event = new Event("airbridge.adImpression");
+
+            Map<String, Object> appLovin = new HashMap<>();
+            appLovin.put("revenue", maxAd.getRevenue());
+            appLovin.put("country_code", AppLovinSdk.getInstance(context).getConfiguration().getCountryCode());
+            appLovin.put("network_name", maxAd.getNetworkName());
+            appLovin.put("network_placement", maxAd.getNetworkPlacement());
+            appLovin.put("adunit_identifier", maxAd.getAdUnitId());
+            appLovin.put("creative_identifier", maxAd.getCreativeId());
+            appLovin.put("placement", maxAd.getPlacement());
+
+            Map<String, Object> adPartners = new HashMap<>();
+            adPartners.put("appLovin", appLovin);
+
+            Map<String, Object> semanticAttributes = new HashMap<>();
+            semanticAttributes.put("adPartners", adPartners);
+            // AppLovin MAX has a default currency of USD
+            semanticAttributes.put("currency", "USD");
+
+            event.setAction(maxAd.getNetworkName());
+            event.setLabel(maxAd.getNetworkPlacement());
+            event.setValue(maxAd.getRevenue());
+            event.setSemanticAttributes(semanticAttributes);
             Airbridge.trackEvent(event);
         }
     }
