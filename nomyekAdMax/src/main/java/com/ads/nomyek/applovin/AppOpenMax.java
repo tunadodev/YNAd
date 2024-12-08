@@ -17,6 +17,7 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.OnLifecycleEvent;
 import androidx.lifecycle.ProcessLifecycleOwner;
 
+import com.ads.nomyek.admob.AppOpenManager;
 import com.ads.nomyek.ads.YNAdCallback;
 import com.ads.nomyek.ads.wrapper.ApAdError;
 import com.ads.nomyek.billing.AppPurchase;
@@ -161,6 +162,7 @@ public class AppOpenMax implements Application.ActivityLifecycleCallbacks, Lifec
 
     public void setInterstitialShowing(boolean interstitialShowing) {
         isInterstitialShowing = interstitialShowing;
+        AppOpenManager.getInstance().setInterstitialShowing(interstitialShowing);
     }
 
     /**

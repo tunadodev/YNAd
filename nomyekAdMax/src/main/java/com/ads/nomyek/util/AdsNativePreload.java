@@ -6,8 +6,10 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.ads.nomyek.R;
+import com.ads.nomyek.admob.Admob;
 import com.ads.nomyek.ads.YNAd;
 import com.ads.nomyek.ads.YNAdCallback;
+import com.ads.nomyek.ads.YNInitCallback;
 import com.ads.nomyek.ads.nativeAds.YNNativeAdView;
 import com.ads.nomyek.ads.wrapper.ApNativeAd;
 import com.google.android.gms.ads.nativead.NativeAd;
@@ -110,6 +112,27 @@ public class AdsNativePreload {
                     YNAd.getInstance().populateNativeAdView((Activity) context, nativeAd,adView.layoutPlaceHolder,adView.layoutLoading);
                 });
             };
+        });
+    }
+
+    //load from preload native, if not available, reload, show an auto resized ads
+    public static void flexPreloadedShowNativeAds(Context context, YNNativeAdView adView, String key, int mediumLayout, int largeLayout, String adsId){
+        YNAd.getInstance().setInitCallback(() -> {
+         {
+                if (AdsNativePreload.getNativeAd(key) != null) {
+                    // Native Ad đã được load xong, bạn có thể sử dụng nó ở đây
+                    NativeAd nativeAd = AdsNativePreload.getNativeAd(key).getAdmobNativeAd();
+                    AdsHelper.initAutoResizeAds(context, adView, nativeAd, mediumLayout, largeLayout, true);
+                } else {
+                    //Khong thi load lai
+                    AdsNativePreload.PreLoadNative(context, adsId, key, largeLayout, () -> {
+                        NativeAd nativeAd = AdsNativePreload.getNativeAd(key).getAdmobNativeAd();
+                        if (!((Activity)context).isFinishing() && !((Activity)context).isDestroyed()) {
+                            AdsHelper.initAutoResizeAds(context, adView, nativeAd, mediumLayout, largeLayout, false);
+                        }
+                    });
+                };
+            }
         });
     }
 

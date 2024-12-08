@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.ads.nomyek.admob.Admob;
 import com.ads.nomyek.admob.AppOpenManager;
 import com.ads.nomyek.ads.YNAd;
+import com.ads.nomyek.ads.YNAdBackup;
 import com.ads.nomyek.ads.YNAdCallback;
 import com.ads.nomyek.ads.nativeAds.YNNativeAdView;
 import com.ads.nomyek.config.YNAdConfig;
@@ -28,6 +29,7 @@ import com.ads.nomyek.dialog.InAppDialog;
 import com.ads.nomyek.funtion.AdCallback;
 import com.ads.nomyek.funtion.DialogExitListener;
 import com.ads.nomyek.funtion.PurchaseListener;
+import com.ads.nomyek.util.AdsInterPreload;
 import com.applovin.mediation.MaxAd;
 import com.applovin.mediation.MaxError;
 import com.applovin.mediation.nativeAds.MaxNativeAd;
@@ -115,42 +117,33 @@ public class MainActivity extends AppCompatActivity {
         loadAdInterstitial();
 
         findViewById(R.id.btShowAds).setOnClickListener(v -> {
-            YNAd.getInstance().loadSplashInterstitialAds(this, idInter, 5000, 0, true, new YNAdCallback() {
+            YNAdBackup.getInstance().loadSplashInterstitialAds(this, idInter, 5000, 0, true, new YNAdCallback() {
                 @Override
                 public void onNextAction() {
-                    startActivity(new Intent(MainActivity.this, ContentActivity.class));
+                    Intent intent = new Intent(MainActivity.this, ContentActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
+
+                    //startActivity(new Intent(MainActivity.this, ContentActivity.class));
                 }
             });
 
         });
 
         findViewById(R.id.btForceShowAds).setOnClickListener(v -> {
-            if (mInterstitialAd.isReady()) {
-                YNAd.getInstance().forceShowInterstitial(this, mInterstitialAd, new YNAdCallback() {
-                    @Override
-                    public void onNextAction() {
-                        Log.i(TAG, "onAdClosed: start content and finish main");
-                        startActivity(new Intent(MainActivity.this, SimpleListActivity.class));
-                    }
-
-                    @Override
-                    public void onAdFailedToShow(@Nullable ApAdError adError) {
-                        super.onAdFailedToShow(adError);
-                        Log.i(TAG, "onAdFailedToShow:" + adError.getMessage());
-                    }
-
-                    @Override
-                    public void onInterstitialShow() {
-                        super.onInterstitialShow();
-                        Log.d(TAG, "onInterstitialShow");
-                    }
-                }, true);
-            } else {
-                loadAdInterstitial();
-            }
+            AdsInterPreload.showPreloadInterAds(this, "test", "test", idInter, 5000, new YNAdCallback() {
+                @Override
+                public void onNextAction() {
+                    Intent intent = new Intent(MainActivity.this, ContentActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    startActivity(intent);
+                   AdsInterPreload.preloadInterAds(MainActivity.this, idInter, "test");
+//                    AdsInterPreload.preloadInterAds(MainActivity.this, idInter, "test2");
+                }
+            });
 
         });
-        AdsNativePreload.flexPreloadedShowNativeAds(this, YNNativeAdView, "test", idNative, R.layout.custom_native_max_medium2);
+//        AdsNativePreload.flexPreloadedShowNativeAds(this, YNNativeAdView, "test", idNative, R.layout.custom_native_max_medium2);
 
         findViewById(R.id.btnShowReward).setOnClickListener(v -> {
 
@@ -194,11 +187,14 @@ public class MainActivity extends AppCompatActivity {
             idInter = getString(R.string.applovin_test_inter);
             layoutNativeCustom = com.ads.nomyek.R.layout.custom_native_max_medium2;
         }
+        idInter = "454b11dbaaa79380";
     }
 
     private void loadAdInterstitial() {
+        AdsInterPreload.preloadInterAds(this, idInter, "test");
+        //AdsInterPreload.preloadInterAds(MainActivity.this, idInter, "test2");
 
-        mInterstitialAd = YNAd.getInstance().getInterstitialAds(this, idInter, null);
+//        mInterstitialAd = YNAdBackup.getInstance().getInterstitialAds(this, idInter, null);
     }
 
     @Override

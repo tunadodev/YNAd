@@ -22,6 +22,7 @@ public class YNAdConfig {
      * config ad mediation using for app
      */
     private int mediationProvider = PROVIDER_ADMOB;
+    private int backupMediationProvider = PROVIDER_ADMOB;
 
     private boolean isVariantDev = false;
 
@@ -50,10 +51,11 @@ public class YNAdConfig {
         this.application = application;
     }
 
-    public YNAdConfig(Application application, int mediationProvider, String environment) {
+    public YNAdConfig(Application application, int mediationProvider, int backupMediationProvider, String environment) {
         this.mediationProvider = mediationProvider;
         this.isVariantDev = environment.equals(ENVIRONMENT_DEVELOP);
         this.application = application;
+        this.backupMediationProvider = backupMediationProvider;
     }
 
 
@@ -84,6 +86,10 @@ public class YNAdConfig {
 
     public int getMediationProvider() {
         return mediationProvider;
+    }
+
+    public int getBackupMediationProvider() {
+        return backupMediationProvider;
     }
 
     public Boolean isVariantDev() {

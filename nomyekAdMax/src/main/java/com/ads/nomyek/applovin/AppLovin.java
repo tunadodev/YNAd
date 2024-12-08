@@ -18,6 +18,9 @@ import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.ads.nomyek.R;
+import com.ads.nomyek.admob.AppOpenManager;
+import com.ads.nomyek.ads.YNAdCallback;
+import com.ads.nomyek.ads.wrapper.ApAdError;
 import com.ads.nomyek.billing.AppPurchase;
 import com.ads.nomyek.dialog.PrepareLoadingAdsDialog;
 import com.ads.nomyek.funtion.AdCallback;
@@ -46,6 +49,8 @@ import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkSettings;
 import com.bumptech.glide.Glide;
 import com.facebook.shimmer.ShimmerFrameLayout;
+import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.LoadAdError;
 
 import java.util.Calendar;
 import java.util.List;
@@ -73,6 +78,7 @@ public class AppLovin {
 
     private MaxInterstitialAd interstitialSplash;
     private MaxInterstitialAd interstitialAd;
+    public boolean isShowingInter = false;
     MaxNativeAdView nativeAdView;
 
     private boolean disableAdResumeWhenClickAds = false;
@@ -223,6 +229,7 @@ public class AppLovin {
             @Override
             public void onAdDisplayed(MaxAd ad) {
                 AppOpenMax.getInstance().setInterstitialShowing(true);
+                AppOpenManager.getInstance().setInterstitialShowing(true);
             }
 
             @Override
@@ -285,6 +292,10 @@ public class AppLovin {
         interstitialSplash = getInterstitialAds(context, id);
         new Handler().postDelayed(() -> {
             //check delay show ad splash
+            if (dialog == null || (dialog !=null && !dialog.isShowing())) {
+                dialog = new PrepareLoadingAdsDialog(context);
+                dialog.show();
+            }
             if (interstitialSplash != null && interstitialSplash.isReady()) {
                 Log.i(TAG, "loadSplashInterstitialAds:show ad on delay ");
                 if (showSplashIfReady)
@@ -342,6 +353,9 @@ public class AppLovin {
             @Override
             public void onAdDisplayed(MaxAd ad) {
                 AppOpenMax.getInstance().setInterstitialShowing(true);
+                AppOpenManager.getInstance().setInterstitialShowing(true);
+
+
             }
 
             @Override
@@ -380,6 +394,106 @@ public class AppLovin {
         });
     }
 
+    public void loadShowInterstitialAds(final Context context, String id, long timeOut, AdCallback adListener) {
+        //isTimeDelay = false;
+        isTimeout = false;
+
+        if (AppPurchase.getInstance().isPurchased(context)) {
+            if (adListener != null) {
+                adListener.onAdClosed();
+                adListener.onNextAction();
+            }
+            return;
+        }
+        isShowingInter = false;
+        interstitialAd = getInterstitialAds(context, id);
+        if (dialog == null || (dialog !=null && !dialog.isShowing())) {
+            dialog = new PrepareLoadingAdsDialog(context);
+            dialog.show();
+        }
+
+        if (timeOut > 0) {
+            handlerTimeout = new Handler();
+            rdTimeout = () -> {
+                Log.e(TAG, "loadSplashInterstitialAds: on timeout");
+                isTimeout = true;
+                if (!isShowingInter && interstitialAd != null && interstitialAd.isReady()) {
+                    Log.i(TAG, "loadSplashInterstitialAds:show ad on timeout ");
+                    forceShowInterstitial(context, interstitialAd, adListener, false);
+                    return;
+                }
+                if (!isShowingInter && adListener != null) {
+                    adListener.onAdClosed();
+                    adListener.onNextAction();
+                }
+            };
+            handlerTimeout.postDelayed(rdTimeout, timeOut);
+        }
+
+        interstitialAd.setRevenueListener(ad -> YNLogEventManager.logPaidAdImpression(context,ad, AdType.INTERSTITIAL));
+
+        interstitialAd.setListener(new MaxAdListener() {
+            @Override
+            public void onAdLoaded(MaxAd ad) {
+                Log.e(TAG, "loadSplashInterstitialAds end time loading success: "
+                        + Calendar.getInstance().getTimeInMillis()
+                        + " time limit:" + isTimeout);
+                if (isTimeout)
+                    return;
+                isShowingInter = true;
+                forceShowInterstitial(context, interstitialAd, adListener, false);
+            }
+
+            @Override
+            public void onAdDisplayed(MaxAd ad) {
+                AppOpenMax.getInstance().setInterstitialShowing(true);
+                AppOpenManager.getInstance().setInterstitialShowing(true);
+            }
+
+            @Override
+            public void onAdHidden(MaxAd ad) {
+
+            }
+
+            @Override
+            public void onAdClicked(MaxAd ad) {
+                YNLogEventManager.logClickAdsEvent(context, ad.getAdUnitId());
+                if (adListener != null) {
+                    adListener.onAdClicked();
+                }
+                if (disableAdResumeWhenClickAds)
+                    AppOpenMax.getInstance().disableAdResumeByClickAction();
+            }
+
+            @Override
+            public void onAdLoadFailed(String adUnitId, MaxError error) {
+                Log.e(TAG, "onAdLoadFailed: " + error.getMessage());
+                if (isTimeout)
+                    return;
+                if (adListener != null) {
+                    if (handlerTimeout != null && rdTimeout != null) {
+                        handlerTimeout.removeCallbacks(rdTimeout);
+                    }
+                    Log.e(TAG, "loadSplashInterstitialAds: load fail " + error.getMessage());
+                    adListener.onNextAction();
+                }
+            }
+
+            @Override
+            public void onAdDisplayFailed(MaxAd ad, MaxError error) {
+                if (isTimeout)
+                    return;
+                if (adListener != null) {
+                    if (handlerTimeout != null && rdTimeout != null) {
+                        handlerTimeout.removeCallbacks(rdTimeout);
+                    }
+                    Log.e(TAG, "loadSplashInterstitialAds: load fail " + error.getMessage());
+                    adListener.onNextAction();
+                }
+            }
+        });
+    }
+
     public void onShowSplash(Activity activity, AppLovinCallback adListener) {
         isShowLoadingSplash = true;
         Log.d(TAG, "onShowSplash: ");
@@ -405,6 +519,7 @@ public class AppLovin {
             public void onAdDisplayed(MaxAd ad) {
                 Log.d(TAG, "onAdDisplayed: ");
                 AppOpenMax.getInstance().setInterstitialShowing(true);
+                AppOpenManager.getInstance().setInterstitialShowing(true);
                 if (adListener != null) {
                     adListener.onAdImpression();
                 }
@@ -414,6 +529,7 @@ public class AppLovin {
             public void onAdHidden(MaxAd ad) {
                 Log.d(TAG, "onAdHidden: " + ((AppCompatActivity) activity).getLifecycle().getCurrentState());
                 AppOpenMax.getInstance().setInterstitialShowing(false);
+                AppOpenManager.getInstance().setInterstitialShowing(false);
                 isShowLoadingSplash = false;
                 if (adListener != null && ((AppCompatActivity) activity).getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
                     adListener.onAdClosed();
@@ -455,12 +571,14 @@ public class AppLovin {
 
         if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
             try {
-                if (dialog != null && dialog.isShowing())
-                    dialog.dismiss();
-                dialog = new PrepareLoadingAdsDialog(activity);
-                if (activity != null && !activity.isDestroyed()) {
-                    dialog.setCancelable(false);
-                    dialog.show();
+                if (dialog == null || (dialog !=null && !dialog.isShowing())) {
+                    if (dialog != null && dialog.isShowing())
+                        dialog.dismiss();
+                    dialog = new PrepareLoadingAdsDialog(activity);
+                    if (activity != null && !activity.isDestroyed()) {
+                        dialog.setCancelable(false);
+                        dialog.show();
+                    }
                 }
             } catch (Exception e) {
                 dialog = null;
@@ -469,8 +587,12 @@ public class AppLovin {
                 return;
             }
             new Handler().postDelayed(() -> {
-                if (activity != null && !activity.isDestroyed() && interstitialSplash != null && interstitialSplash.isReady())
+                if (activity != null && !activity.isDestroyed() && interstitialSplash != null && interstitialSplash.isReady()) {
+
                     interstitialSplash.showAd();
+                    adListener.onAdImpression();
+                }
+
             }, 800);
         } else {
             Log.e(TAG, "onShowSplash fail ");
@@ -547,6 +669,53 @@ public class AppLovin {
         return interstitialAd;
     }
 
+    public MaxInterstitialAd getInterstitialAds(Context context, String id, final AppLovinCallback adListener) {
+        if (AppPurchase.getInstance().isPurchased(context) || AppLovinHelper.getNumClickAdsPerDay(context, id) >= maxClickAds) {
+            Log.d(TAG, "getInterstitialAds: ignore");
+            return null;
+        }
+        final MaxInterstitialAd interstitialAd =  new MaxInterstitialAd(id, context);
+        interstitialAd.setRevenueListener(ad -> YNLogEventManager.logPaidAdImpression(context,ad, AdType.INTERSTITIAL));
+        interstitialAd.setListener(new MaxAdListener() {
+            @Override
+            public void onAdLoaded(MaxAd ad) {
+                Log.d(TAG, "onAdLoaded: getInterstitialAds");
+                adListener.onInterstitialLoad(interstitialAd);
+            }
+
+            @Override
+            public void onAdDisplayed(MaxAd ad) {
+                adListener.onAdImpression();
+            }
+
+            @Override
+            public void onAdHidden(MaxAd ad) {
+                adListener.onAdClosed();
+            }
+
+            @Override
+            public void onAdClicked(MaxAd ad) {
+                YNLogEventManager.logClickAdsEvent(context, ad.getAdUnitId());
+                if (disableAdResumeWhenClickAds)
+                    AppOpenMax.getInstance().disableAdResumeByClickAction();
+                adListener.onAdClicked();
+            }
+
+            @Override
+            public void onAdLoadFailed(String adUnitId, MaxError error) {
+                Log.e(TAG, "onAdLoadFailed: getInterstitialAds " + error.getMessage());
+                adListener.onAdFailedToLoad(error);
+            }
+
+            @Override
+            public void onAdDisplayFailed(MaxAd ad, MaxError error) {
+                adListener.onAdFailedToShow(error);
+            }
+        });
+        requestInterstitialAds(interstitialAd);
+        return interstitialAd;
+    }
+
     private void requestInterstitialAds(MaxInterstitialAd maxInterstitialAd) {
         if (maxInterstitialAd != null && !maxInterstitialAd.isReady()) {
             maxInterstitialAd.loadAd();
@@ -579,11 +748,13 @@ public class AppLovin {
         AppLovinHelper.setupAppLovinData(context);
         if (AppPurchase.getInstance().isPurchased(context)) {
             callback.onAdClosed();
+            callback.onNextAction();
             return;
         }
         if (interstitialAd == null || !interstitialAd.isReady()) {
             if (callback != null) {
                 callback.onAdClosed();
+                callback.onNextAction();
             }
             return;
         }
@@ -597,7 +768,11 @@ public class AppLovin {
 
             @Override
             public void onAdDisplayed(MaxAd ad) {
+                if (callback != null) {
+                    callback.onAdImpression();
+                }
                 AppOpenMax.getInstance().setInterstitialShowing(true);
+                AppOpenManager.getInstance().setInterstitialShowing(true);
                 SharePreferenceUtils.setLastImpressionInterstitialTime(context);
             }
 
@@ -605,8 +780,9 @@ public class AppLovin {
             @Override
             public void onAdHidden(MaxAd ad) {
                 AppOpenMax.getInstance().setInterstitialShowing(false);
-                if (callback != null && ((AppCompatActivity) context).getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
+                if (callback != null /*&& ((AppCompatActivity) context).getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)*/) {
                     callback.onAdClosed();
+                   // callback.onNextAction();
                     if (shouldReloadAds) {
                         requestInterstitialAds(interstitialAd);
                     }
@@ -622,6 +798,7 @@ public class AppLovin {
                 YNLogEventManager.logClickAdsEvent(context, ad.getAdUnitId());
                 if (callback != null) {
                     callback.onAdClicked();
+                    callback.onNextAction();
                 }
                 if (disableAdResumeWhenClickAds)
                     AppOpenMax.getInstance().disableAdResumeByClickAction();
@@ -637,6 +814,7 @@ public class AppLovin {
                 Log.e(TAG, "onAdDisplayFailed: " + error.getMessage());
                 if (callback != null) {
                     callback.onAdClosed();
+                    callback.onNextAction();
                     if (dialog != null) {
                         dialog.dismiss();
                     }
@@ -664,13 +842,19 @@ public class AppLovin {
         if (currentClicked >= numShowAds && interstitialAd != null) {
             if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
                 try {
-                    if (dialog != null && dialog.isShowing())
-                        dialog.dismiss();
-                    dialog = new PrepareLoadingAdsDialog(context);
-                    try {
-                        callback.onInterstitialShow();
+                    if (dialog != null && dialog.isShowing()) {
+
+                    } else {
+                        dialog = new PrepareLoadingAdsDialog(context);
                         dialog.setCancelable(false);
                         dialog.show();
+                    }
+//                        dialog.dismiss();
+
+                    try {
+//                        dialog.setCancelable(false);
+//                        dialog.show();
+                        callback.onInterstitialShow();
                     } catch (Exception e) {
                         callback.onAdClosed();
                         return;
@@ -679,7 +863,12 @@ public class AppLovin {
                     dialog = null;
                     e.printStackTrace();
                 }
-                new Handler().postDelayed(interstitialAd::showAd, 800);
+                new Handler().postDelayed(() -> {
+                    callback.onNextAction();
+                    interstitialAd.showAd();
+                }, 800);
+
+                //new Handler().postDelayed(interstitialAd::showAd, 800);
             }
             currentClicked = 0;
         } else if (callback != null) {

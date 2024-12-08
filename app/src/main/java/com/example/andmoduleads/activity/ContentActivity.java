@@ -20,7 +20,7 @@ public class ContentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_content);
 
 
-        showFragment(new BlankFragment(),"BlankFragment");
+        //showFragment(new BlankFragment(),"BlankFragment");
 //        showFragment(new InlineBannerFragment(),"InlineBannerFragment");
     }
 

@@ -44,7 +44,7 @@ public class MyApplication extends AdsMultiDexApplication {
 
     private void initAds() {
         String environment = BuildConfig.env_dev ? YNAdConfig.ENVIRONMENT_DEVELOP : YNAdConfig.ENVIRONMENT_PRODUCTION;
-        YNAdConfig = new YNAdConfig(this, YNAdConfig.PROVIDER_MAX, environment);
+        YNAdConfig = new YNAdConfig(this, YNAdConfig.PROVIDER_ADMOB, com.ads.nomyek.config.YNAdConfig.PROVIDER_MAX, environment);
 
         // Optional: setup Adjust event
 //        YNAdConfig.setAdjustTokenTiktok("123456");
@@ -58,7 +58,7 @@ public class MyApplication extends AdsMultiDexApplication {
         YNAdConfig.setIdAdResume(BuildConfig.ads_open_app);
 
         // Optional: setup list device test - recommended to use
-        listTestDevice.add("2635738a-f29d-43f5-95bf-10ca1ad1abe1");
+        //listTestDevice.add("2635738a-f29d-43f5-95bf-10ca1ad1abe1");
         YNAdConfig.setListDeviceTest(listTestDevice);
         YNAdConfig.setIntervalInterstitialAd(15);
 
