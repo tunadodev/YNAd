@@ -87,5 +87,7 @@ public class YNMAirBridge {
     }
 
     public static void logCustomEvent(String eventName) {
+        Event event = new Event(eventName);
+        Airbridge.trackEvent(event);
     }
 }
