@@ -1218,6 +1218,9 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                     @Override
                     public void onAdImpression() {
                         super.onAdImpression();
+                        if (adListener != null) {
+                            adListener.onAdImpression();
+                        }
                         isAppOpenShowed = true;
                         statusHigh = Type_Show_Success;
                     }
@@ -1325,6 +1328,9 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                                 super.onAdImpression();
                                 isAppOpenShowed = true;
                                 statusAll = Type_Load_Success;
+                                if (adListener != null) {
+                                    adListener.onAdImpression();
+                                }
                             }
 
                             @Override

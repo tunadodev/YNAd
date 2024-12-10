@@ -33,4 +33,10 @@ public class FirebaseAnalyticsUtil {
         FirebaseAnalytics.getInstance(context).logEvent(eventName, bundle);
     }
 
+    public static void logCustomEvent(String eventName, Context context, String key, String value) {
+        Bundle bundle = new Bundle();
+        bundle.putString(key, value);
+        FirebaseAnalytics.getInstance(context).logEvent(eventName, bundle);
+    }
+
 }

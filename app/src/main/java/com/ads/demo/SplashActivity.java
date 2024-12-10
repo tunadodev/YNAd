@@ -9,6 +9,7 @@ import com.ads.yeknomadmob.ads_components.YNMAds;
 import com.ads.yeknomadmob.ads_components.YNMInitCallback;
 import com.ads.yeknomadmob.config.AirBridgeConfig;
 import com.ads.yeknomadmob.config.YNMAdsConfig;
+import com.ads.yeknomadmob.utils.AdsNativePreload;
 import com.google.android.gms.ads.FullScreenContentCallback;
 
 import java.util.Timer;
@@ -37,7 +38,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashScreenBinding> {
     private void initAction(){
         initAds();
         showInterstialAds();
-        timer.schedule(new AfterLoading(), 4000); // Schedule to run after 8 seconds (8000 milliseconds)
+        timer.schedule(new AfterLoading(), 25000); // Schedule to run after 8 seconds (8000 milliseconds)
     }
     class AfterLoading extends TimerTask {
         public void run() {
@@ -79,6 +80,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashScreenBinding> {
                 });
                 AppOpenManager.getInstance().setSplashActivity(SplashActivity.class, BuildConfig.ad_open_splash, 25000);
                 AppOpenManager.getInstance().loadAndShowSplashAds(BuildConfig.ad_open_splash, 1000);
+//                AdsNativePreload.PreLoadNative(SplashActivity.this, BuildConfig.ad_native, "test");
             }
         });
     }

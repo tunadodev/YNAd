@@ -1152,7 +1152,13 @@ public class Admob {
         });
 
         if (AdmodHelper.getNumClickAdsPerDay(context, mInterstitialAd.getAdUnitId()) < maxClickAds) {
-            showInterstitialAd(context, mInterstitialAd, callback);
+            if (dialog != null && !dialog.isShowing()) {
+                dialog.dismiss();
+            }
+            dialog = new PrepareLoadingAdsDialog(context);
+            dialog.setCancelable(false);
+            dialog.show();
+            showInterstitialAd(context, mInterstitialAd, callback);// 1000ms = 1 second
             return;
         }
         if (callback != null) {
@@ -1185,8 +1191,8 @@ public class Admob {
         if (currentClicked >= numShowAds && mInterstitialAd != null) {
             if (ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
                 try {
-                    if (dialog != null && dialog.isShowing())
-                        dialog.dismiss();
+//                    if (dialog != null && dialog.isShowing())
+//                        dialog.dismiss();
                     try {
                         callback.onInterstitialShow();
                         AppOpenManager.getInstance().setInterstitialShowing(true);

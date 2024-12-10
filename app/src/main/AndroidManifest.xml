@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.YeknomAdmob"
-        tools:replace="android:fullBackupContent"
+        tools:replace="android:fullBackupContent,android:dataExtractionRules"
         tools:targetApi="31">
 
         <property
