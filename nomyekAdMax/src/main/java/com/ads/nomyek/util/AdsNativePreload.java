@@ -20,6 +20,7 @@ import java.util.Objects;
 public class AdsNativePreload {
     public interface NativeAdLoadListener {
         void onNativeAdLoaded();
+//        void onNativeAdImpression();
     }
     public static class NativeAdsModels{
         ApNativeAd nativeAd;
@@ -89,6 +90,12 @@ public class AdsNativePreload {
                 super.onNativeAdLoaded(nativeAd);
                 setNativeAd(nativeAd, identifyKey, listener);
                 //save or show native
+            }
+
+            @Override
+            public void onAdImpression() {
+                super.onAdImpression();
+//                listener.onNativeAdImpression();
             }
         });
     }

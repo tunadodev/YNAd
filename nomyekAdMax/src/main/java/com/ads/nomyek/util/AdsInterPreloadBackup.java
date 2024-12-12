@@ -5,7 +5,6 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
-import com.ads.nomyek.ads.YNAd;
 import com.ads.nomyek.ads.YNAdBackup;
 import com.ads.nomyek.ads.YNAdCallback;
 import com.ads.nomyek.ads.wrapper.ApAdError;
@@ -13,11 +12,11 @@ import com.ads.nomyek.ads.wrapper.ApInterstitialAd;
 
 import java.util.Map;
 
-public class AdsInterPreload {
+public class AdsInterPreloadBackup {
     public static Map<String, ApInterstitialAd> mapCaches = new java.util.HashMap<String, ApInterstitialAd>();
     public static void preloadInterAds(Context context, String id, String key) {
-        YNAd.getInstance().setInitCallback(() -> {
-            YNAd.getInstance().getInterstitialAds(context, id, new YNAdCallback() {
+        YNAdBackup.getInstance().setInitCallback(() -> {
+            YNAdBackup.getInstance().getInterstitialAds(context, id, new YNAdCallback() {
                 @Override
                 public void onInterstitialLoad(@Nullable ApInterstitialAd interstitialAd) {
                     mapCaches.put(key, interstitialAd);
@@ -33,17 +32,17 @@ public class AdsInterPreload {
     }
 
     public static void showPreloadInterAds(Context context, String key, String keyBackup, String adId, long timeOut, final YNAdCallback callback) {
-        YNAd.getInstance().setInitCallback(() -> {
+        YNAdBackup.getInstance().setInitCallback(() -> {
             ApInterstitialAd adsInterstitial = mapCaches.containsKey(key) ? mapCaches.get(key) : null;
             if (adsInterstitial != null && adsInterstitial.isReady()) {
                 Log.d("TAG", "showw 1: ");
-                YNAd.getInstance().forceShowInterstitial(context, adsInterstitial, callback);
+                YNAdBackup.getInstance().forceShowInterstitial(context, adsInterstitial, callback);
             } else {
                 ApInterstitialAd adsInterstitialBackup = mapCaches.containsKey(keyBackup) ? mapCaches.get(keyBackup) : null;
-                YNAd.getInstance().loadSplashInterstitialAds(context, adId, timeOut, 0, true, new YNAdCallback() {
+                YNAdBackup.getInstance().loadShowInterstitialAds(context, adId, timeOut, 0, true, new YNAdCallback() {
                     @Override
                     public void onInterstitialLoad(@Nullable ApInterstitialAd interstitialAd) {
-//                        YNAd.getInstance().forceShowInterstitial(context, interstitialAd, callback);
+//                        YNAdBackup.getInstance().forceShowInterstitial(context, interstitialAd, callback);
                     }
 
                     @Override
@@ -57,7 +56,7 @@ public class AdsInterPreload {
                         super.onAdFailedToLoad(adError);
                         if (adsInterstitialBackup != null && adsInterstitialBackup.isReady()) {
                             Log.d("TAG", "showw 2: ");
-                            YNAd.getInstance().forceShowInterstitial(context, adsInterstitialBackup, callback);
+                            YNAdBackup.getInstance().forceShowInterstitial(context, adsInterstitialBackup, callback);
                         } else {
                             if (callback != null) callback.onNextAction();
                         }
@@ -68,7 +67,7 @@ public class AdsInterPreload {
                         super.onAdFailedToShow(adError);
                         if (adsInterstitialBackup != null && adsInterstitialBackup.isReady()) {
                             Log.d("TAG", "showw 2: ");
-                            YNAd.getInstance().forceShowInterstitial(context, adsInterstitialBackup, callback);
+                            YNAdBackup.getInstance().forceShowInterstitial(context, adsInterstitialBackup, callback);
                         } else {
                             if (callback != null) callback.onNextAction();
                         }

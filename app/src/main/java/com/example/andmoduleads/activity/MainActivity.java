@@ -187,7 +187,6 @@ public class MainActivity extends AppCompatActivity {
             idInter = getString(R.string.applovin_test_inter);
             layoutNativeCustom = com.ads.nomyek.R.layout.custom_native_max_medium2;
         }
-        idInter = "454b11dbaaa79380";
     }
 
     private void loadAdInterstitial() {

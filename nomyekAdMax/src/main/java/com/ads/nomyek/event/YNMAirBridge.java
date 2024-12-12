@@ -117,5 +117,26 @@ public class YNMAirBridge {
     }
 
     public static void logCustomEvent(String eventName) {
+        Event event = new Event(eventName);
+//        Map<String, Object> admob = new HashMap<>();
+//        admob.put("value_micros", valueMicros);
+//        admob.put("currency_code", currencyCode);
+//        admob.put("precision", precision);
+//
+//        admob.put("ad_unit_id", adUnitId);
+//        admob.put("ad_network_adapter", adNetworkAdapter);
+//
+//        Map<String, Object> adPartners = new HashMap<>();
+//        adPartners.put("admob", admob);
+//        Map<String, Object> semanticAttributes = new HashMap<>();
+//        semanticAttributes.put("adPartners", adPartners);
+//        semanticAttributes.put("currency", currencyCode);
+//
+//        event.setAction(adUnitId);
+//        event.setLabel(adNetworkAdapter);
+//        event.setValue(valueMicros / 1000000.0);
+//        event.setSemanticAttributes(semanticAttributes);
+
+        Airbridge.trackEvent(event);
     }
 }

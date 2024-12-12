@@ -58,7 +58,7 @@ public class MyApplication extends AdsMultiDexApplication {
         YNAdConfig.setIdAdResume(BuildConfig.ads_open_app);
 
         // Optional: setup list device test - recommended to use
-        //listTestDevice.add("2635738a-f29d-43f5-95bf-10ca1ad1abe1");
+        listTestDevice.add("2635738a-f29d-43f5-95bf-10ca1ad1abe1");
         YNAdConfig.setListDeviceTest(listTestDevice);
         YNAdConfig.setIntervalInterstitialAd(15);
 
