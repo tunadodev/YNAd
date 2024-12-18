@@ -23,6 +23,7 @@ public class YNMAdsConfig {
      * airBridgeConfig enable airbridge and setup dev key
      */
     private AirBridgeConfig airBridgeConfig;
+    private SolarConfig solarConfig;
     /**
      * eventNamePurchase push event to adjust when user purchased
      */
@@ -127,5 +128,19 @@ public class YNMAdsConfig {
         if (airBridgeConfig == null)
             return false;
         return airBridgeConfig.isEnableAirBridge();
+    }
+
+    public SolarConfig getSolarConfig() {
+        return solarConfig;
+    }
+
+    public void setSolarConfig(SolarConfig solarConfig) {
+        this.solarConfig = solarConfig;
+    }
+
+    public boolean isEnableSolar() {
+        if (solarConfig == null)
+            return false;
+        return solarConfig.isEnable();
     }
 }

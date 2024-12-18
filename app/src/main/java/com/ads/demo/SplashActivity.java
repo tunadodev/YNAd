@@ -8,6 +8,7 @@ import com.ads.yeknomadmob.admobs.AppOpenManager;
 import com.ads.yeknomadmob.ads_components.YNMAds;
 import com.ads.yeknomadmob.ads_components.YNMInitCallback;
 import com.ads.yeknomadmob.config.AirBridgeConfig;
+import com.ads.yeknomadmob.config.SolarConfig;
 import com.ads.yeknomadmob.config.YNMAdsConfig;
 import com.ads.yeknomadmob.utils.AdsNativePreload;
 import com.google.android.gms.ads.FullScreenContentCallback;
@@ -96,6 +97,12 @@ public class SplashActivity extends BaseActivity<ActivitySplashScreenBinding> {
         airBridgeConfig.setAppNameAirBridge("calculator");
         airBridgeConfig.setTokenAirBridge("22e9f842075b4fb3a0412debe07f6cdd");
         app.ynmAdsConfig.setAirBridgeConfig(airBridgeConfig);
+
+        SolarConfig solarConfig = new SolarConfig();
+        solarConfig.setEnable(true);
+        solarConfig.setToken("1e25374deef8ab86");
+        solarConfig.setEnableDebug(false);
+        app.ynmAdsConfig.setSolarConfig(solarConfig);
         // Optional: enable ads resume
         app.ynmAdsConfig.setIdAdResume(BuildConfig.ads_open_app);
 

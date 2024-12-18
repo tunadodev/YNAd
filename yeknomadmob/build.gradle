@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.facebook)
     implementation(libs.applovin)
     implementation(libs.pangle)
+    implementation 'com.reyun.solar.engine.oversea:solar-engine-core:1.2.9.2'
 
 
 }

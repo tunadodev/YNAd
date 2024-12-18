@@ -8,14 +8,16 @@ import com.ads.yeknomadmob.utils.AppUtil;
 import com.ads.yeknomadmob.utils.SharePreferenceUtils;
 import com.ads.yeknomadmob.utils.TypeAds;
 import com.google.android.gms.ads.AdValue;
+import com.google.android.gms.ads.ResponseInfo;
 
 public class YNMLogEventManager {
 
     private static final String TAG = "YNMLogEventManager";
 
-    public static void logPaidAdImpression(Context context, AdValue adValue, String adUnitId, String mediationAdapterClassName, TypeAds TypeAds) {
-        logEventWithAds(context, (float) adValue.getValueMicros(), adValue.getPrecisionType(), adUnitId, mediationAdapterClassName, YNMAdsConfig.PROVIDER_ADMOB);
-        YNMAirBridge.logPaidAdImpressionValue(context, adValue, adUnitId, mediationAdapterClassName, TypeAds);
+    public static void logPaidAdImpression(Context context, AdValue adValue, String adUnitId, ResponseInfo responseInfo, TypeAds TypeAds) {
+        logEventWithAds(context, (float) adValue.getValueMicros(), adValue.getPrecisionType(), adUnitId, responseInfo.getMediationAdapterClassName(), YNMAdsConfig.PROVIDER_ADMOB);
+        YNMAirBridge.logPaidAdImpressionValue(context, adValue, adUnitId, responseInfo.getMediationAdapterClassName(), TypeAds);
+        YNMSolar.logPaidAdImpressionValue(context, adValue, adUnitId, responseInfo, TypeAds);
     }
 
     private static void logEventWithAds(Context context, float revenue, int precision, String adUnitId, String network, int mediationProvider) {

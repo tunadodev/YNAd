@@ -22,6 +22,9 @@ dependencyResolutionManagement {
             url 'https://artifact.bytedance.com/repository/pangle'
         }
         maven { url "https://sdk-download.airbridge.io/maven" }
+        maven {  url "https://maven-android.solar-engine.com/repository/se_sdk_for_android/"}
+        maven { url "https://developer.huawei.com/repo/" }
+        maven { url "https://developer.hihonor.com/repo/" }
     }
 }
 

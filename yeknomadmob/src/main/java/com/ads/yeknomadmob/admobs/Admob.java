@@ -683,8 +683,7 @@ public class Admob {
             YNMLogEventManager.logPaidAdImpression(context,
                     adValue,
                     mInterstitialSplash.getAdUnitId(),
-                    mInterstitialSplash.getResponseInfo()
-                            .getMediationAdapterClassName(), TypeAds.INTERSTITIAL);
+                    mInterstitialSplash.getResponseInfo(), TypeAds.INTERSTITIAL);
         });
 
         if (handlerTimeout != null && rdTimeout != null) {
@@ -818,8 +817,7 @@ public class Admob {
             YNMLogEventManager.logPaidAdImpression(context,
                     adValue,
                     mInterstitialSplash.getAdUnitId(),
-                    mInterstitialSplash.getResponseInfo()
-                            .getMediationAdapterClassName(), TypeAds.INTERSTITIAL);
+                    mInterstitialSplash.getResponseInfo(), TypeAds.INTERSTITIAL);
 
         });
 
@@ -987,8 +985,7 @@ public class Admob {
                         YNMLogEventManager.logPaidAdImpression(context,
                                 adValue,
                                 interstitialAd.getAdUnitId(),
-                                interstitialAd.getResponseInfo()
-                                        .getMediationAdapterClassName(), TypeAds.INTERSTITIAL);
+                                interstitialAd.getResponseInfo(), TypeAds.INTERSTITIAL);
                     });
                 }
             }
@@ -1051,8 +1048,7 @@ public class Admob {
                             YNMLogEventManager.logPaidAdImpression(context,
                                     adValue,
                                     interstitialAd.getAdUnitId(),
-                                    interstitialAd.getResponseInfo()
-                                            .getMediationAdapterClassName(), TypeAds.INTERSTITIAL);
+                                    interstitialAd.getResponseInfo(), TypeAds.INTERSTITIAL);
                         });
                         Log.i(TAG, "InterstitialAds onAdLoaded");
                     }
@@ -1467,8 +1463,7 @@ public class Admob {
                             YNMLogEventManager.logPaidAdImpression(context,
                                     adValue,
                                     adView.getAdUnitId(),
-                                    adView.getResponseInfo()
-                                            .getMediationAdapterClassName(), TypeAds.BANNER);
+                                    adView.getResponseInfo(), TypeAds.BANNER);
 
                         });
                     }
@@ -1544,8 +1539,7 @@ public class Admob {
                         YNMLogEventManager.logPaidAdImpression(context,
                                 adValue,
                                 adView.getAdUnitId(),
-                                adView.getResponseInfo()
-                                        .getMediationAdapterClassName(), TypeAds.BANNER);
+                                adView.getResponseInfo(), TypeAds.BANNER);
                     });
                     if (callback != null) {
                         callback.onAdLoaded();
@@ -1604,8 +1598,7 @@ public class Admob {
                         YNMLogEventManager.logPaidAdImpression(context,
                                 adValue,
                                 adView.getAdUnitId(),
-                                adView.getResponseInfo()
-                                        .getMediationAdapterClassName(), TypeAds.BANNER);
+                                adView.getResponseInfo(), TypeAds.BANNER);
                     });
                     if (callback != null) {
                         callback.onAdLoaded();
@@ -1692,7 +1685,7 @@ public class Admob {
                             YNMLogEventManager.logPaidAdImpression(context,
                                     adValue,
                                     id,
-                                    nativeAd.getResponseInfo().getMediationAdapterClassName(), TypeAds.NATIVE);
+                                    nativeAd.getResponseInfo(), TypeAds.NATIVE);
                         });
                     }
                 })
@@ -1749,7 +1742,7 @@ public class Admob {
                             YNMLogEventManager.logPaidAdImpression(context,
                                     adValue,
                                     id,
-                                    nativeAd.getResponseInfo().getMediationAdapterClassName(), TypeAds.NATIVE);
+                                    nativeAd.getResponseInfo(), TypeAds.NATIVE);
                         });
                     }
                 })
@@ -1808,7 +1801,7 @@ public class Admob {
                             YNMLogEventManager.logPaidAdImpression(context,
                                     adValue,
                                     id,
-                                    nativeAd.getResponseInfo().getMediationAdapterClassName(), TypeAds.NATIVE);
+                                    nativeAd.getResponseInfo(), TypeAds.NATIVE);
                         });
                         populateUnifiedNativeAdView(nativeAd, adView);
                         frameLayout.removeAllViews();
@@ -1871,7 +1864,7 @@ public class Admob {
                             YNMLogEventManager.logPaidAdImpression(context,
                                     adValue,
                                     id,
-                                    nativeAd.getResponseInfo().getMediationAdapterClassName(), TypeAds.NATIVE);
+                                    nativeAd.getResponseInfo(), TypeAds.NATIVE);
                         });
                         populateUnifiedNativeAdView(nativeAd, adView);
                         frameLayout.removeAllViews();
@@ -2109,7 +2102,7 @@ public class Admob {
 
                     YNMLogEventManager.logPaidAdImpression(context,
                             adValue,
-                            rewardedAd.getAdUnitId(), Admob.this.rewardedAd.getResponseInfo().getMediationAdapterClassName()
+                            rewardedAd.getAdUnitId(), Admob.this.rewardedAd.getResponseInfo()
                             , TypeAds.REWARDED);
 
 //                    if (tokenAdjust != null) {
@@ -2151,7 +2144,7 @@ public class Admob {
                     YNMLogEventManager.logPaidAdImpression(context,
                             adValue,
                             rewardedAd.getAdUnitId(),
-                            Admob.this.rewardedAd.getResponseInfo().getMediationAdapterClassName()
+                            Admob.this.rewardedAd.getResponseInfo()
                             , TypeAds.REWARDED);
 
 //                    if (tokenAdjust != null) {
@@ -2194,7 +2187,7 @@ public class Admob {
                     YNMLogEventManager.logPaidAdImpression(context,
                             adValue,
                             rewardedAd.getAdUnitId(),
-                            rewardedAd.getResponseInfo().getMediationAdapterClassName()
+                            rewardedAd.getResponseInfo()
                             , TypeAds.REWARDED);
 
 //                    if (tokenAdjust != null) {

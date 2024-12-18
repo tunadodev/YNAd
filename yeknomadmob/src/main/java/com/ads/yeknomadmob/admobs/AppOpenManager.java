@@ -226,8 +226,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                                 YNMLogEventManager.logPaidAdImpression(myApplication.getApplicationContext(),
                                         adValue,
                                         ad.getAdUnitId(),
-                                        ad.getResponseInfo()
-                                                .getMediationAdapterClassName(), TypeAds.APP_OPEN);
+                                        ad.getResponseInfo(), TypeAds.APP_OPEN);
 
                             });
                             AppOpenManager.this.appResumeLoadTime = (new Date()).getTime();
@@ -241,8 +240,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                                 YNMLogEventManager.logPaidAdImpression(myApplication.getApplicationContext(),
                                         adValue,
                                         ad.getAdUnitId(),
-                                        ad.getResponseInfo()
-                                                .getMediationAdapterClassName(), TypeAds.APP_OPEN);
+                                        ad.getResponseInfo(), TypeAds.APP_OPEN);
 
                             });
                             AppOpenManager.this.splashLoadTime = (new Date()).getTime();
@@ -620,8 +618,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                             YNMLogEventManager.logPaidAdImpression(myApplication.getApplicationContext(),
                                     adValue,
                                     appOpenAd.getAdUnitId(),
-                                    appOpenAd.getResponseInfo()
-                                            .getMediationAdapterClassName(), TypeAds.APP_OPEN);
+                                    appOpenAd.getResponseInfo(), TypeAds.APP_OPEN);
                         });
 
                         if (!isAppOpenShowed) {
@@ -727,8 +724,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                             YNMLogEventManager.logPaidAdImpression(myApplication.getApplicationContext(),
                                     adValue,
                                     appOpenAd.getAdUnitId(),
-                                    appOpenAd.getResponseInfo()
-                                            .getMediationAdapterClassName(), TypeAds.APP_OPEN);
+                                    appOpenAd.getResponseInfo(), TypeAds.APP_OPEN);
                         });
                     }
 
@@ -823,8 +819,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                             YNMLogEventManager.logPaidAdImpression(myApplication.getApplicationContext(),
                                     adValue,
                                     appOpenAd.getAdUnitId(),
-                                    appOpenAd.getResponseInfo()
-                                            .getMediationAdapterClassName(), TypeAds.APP_OPEN);
+                                    appOpenAd.getResponseInfo(), TypeAds.APP_OPEN);
                         });
                     }
 
@@ -885,8 +880,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                             YNMLogEventManager.logPaidAdImpression(myApplication.getApplicationContext(),
                                     adValue,
                                     appOpenAd.getAdUnitId(),
-                                    appOpenAd.getResponseInfo()
-                                            .getMediationAdapterClassName(), TypeAds.APP_OPEN);
+                                    appOpenAd.getResponseInfo(), TypeAds.APP_OPEN);
                         });
 
                         splashAdOpen = appOpenAd;
@@ -1020,8 +1014,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                             YNMLogEventManager.logPaidAdImpression(activity,
                                     adValue,
                                     interstitialAd.getAdUnitId(),
-                                    interstitialAd.getResponseInfo()
-                                            .getMediationAdapterClassName(), TypeAds.INTERSTITIAL);
+                                    interstitialAd.getResponseInfo(), TypeAds.INTERSTITIAL);
                         });
 
                         splashAdInter = interstitialAd;
@@ -1072,8 +1065,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                                 YNMLogEventManager.logPaidAdImpression(myApplication.getApplicationContext(),
                                         adValue,
                                         appOpenAd.getAdUnitId(),
-                                        appOpenAd.getResponseInfo()
-                                                .getMediationAdapterClassName(), TypeAds.APP_OPEN);
+                                        appOpenAd.getResponseInfo(), TypeAds.APP_OPEN);
                             });
 
                             (new Handler()).postDelayed(() -> {
@@ -1172,8 +1164,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                     YNMLogEventManager.logPaidAdImpression(myApplication.getApplicationContext(),
                             adValue,
                             appOpenAd.getAdUnitId(),
-                            appOpenAd.getResponseInfo()
-                                    .getMediationAdapterClassName(), TypeAds.APP_OPEN);
+                            appOpenAd.getResponseInfo(), TypeAds.APP_OPEN);
                 });
 
                 splashAdHigh = appOpenAd;
@@ -1263,8 +1254,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                             YNMLogEventManager.logPaidAdImpression(myApplication.getApplicationContext(),
                                     adValue,
                                     appOpenAd.getAdUnitId(),
-                                    appOpenAd.getResponseInfo()
-                                            .getMediationAdapterClassName(), TypeAds.APP_OPEN);
+                                    appOpenAd.getResponseInfo(), TypeAds.APP_OPEN);
                         });
 
                         splashAdAll = appOpenAd;

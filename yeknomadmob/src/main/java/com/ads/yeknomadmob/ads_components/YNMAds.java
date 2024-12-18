@@ -19,6 +19,7 @@ import com.ads.yeknomadmob.ads_components.wrappers.AdsReward;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsRewardItem;
 import com.ads.yeknomadmob.config.YNMAdsConfig;
 import com.ads.yeknomadmob.event.YNMAirBridge;
+import com.ads.yeknomadmob.event.YNMSolar;
 import com.ads.yeknomadmob.utils.AdsCallback;
 import com.ads.yeknomadmob.utils.AppUtil;
 import com.ads.yeknomadmob.utils.RewardCallback;
@@ -59,6 +60,11 @@ public class YNMAds {
             Log.i(TAG, "init airbridge");
             YNMAirBridge.enableAirBridge = true;
             YNMAirBridge.getInstance().init(context, adConfig.getAirBridgeConfig().getAppNameAirBridge(),adConfig.getAirBridgeConfig().getTokenAirBridge(), true);
+        }
+        if (adConfig.isEnableSolar()) {
+            Log.i(TAG, "init solar");
+            YNMSolar.enableSolar = true;
+            YNMSolar.getInstance().init(context, adConfig.getSolarConfig().getToken(), adConfig.getSolarConfig().isEnableDebug());
         }
         AppUtil.VARIANT_DEV = adConfig.isVariantDev();
         Log.i(TAG, "Config variant dev: " + AppUtil.VARIANT_DEV);
