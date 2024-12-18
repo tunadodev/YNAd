@@ -37,6 +37,7 @@ import com.ads.yeknomadmob.event.YNMLogEventManager;
 import com.ads.yeknomadmob.utils.AdmodHelper;
 import com.ads.yeknomadmob.utils.AdsCallback;
 import com.ads.yeknomadmob.utils.AppUtil;
+import com.ads.yeknomadmob.utils.RewardCallback;
 import com.ads.yeknomadmob.utils.SharePreferenceUtils;
 import com.ads.yeknomadmob.utils.TypeAds;
 import com.facebook.shimmer.ShimmerFrameLayout;
@@ -50,6 +51,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.FullScreenContentCallback;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.OnUserEarnedRewardListener;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.VideoOptions;
 import com.google.android.gms.ads.initialization.AdapterStatus;
@@ -58,14 +60,22 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.ads.nativead.NativeAd;
 import com.google.android.gms.ads.nativead.NativeAdOptions;
 import com.google.android.gms.ads.nativead.NativeAdView;
+import com.google.android.gms.ads.rewarded.RewardItem;
+import com.google.android.gms.ads.rewarded.RewardedAd;
+import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback;
 import com.google.android.ump.ConsentDebugSettings;
 import com.google.android.ump.ConsentForm;
 import com.google.android.ump.ConsentInformation;
 import com.google.android.ump.ConsentRequestParameters;
 import com.google.android.ump.UserMessagingPlatform;
+
+import java.lang.reflect.Type;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -506,7 +516,7 @@ public class Admob {
                         return;
                     }
                     if (adListener != null) {
-                        adListener.onNextAction();
+                        adListener.onTimeOut();
                         isShowLoadingSplash = false;
                     }
                 }
@@ -2069,6 +2079,332 @@ public class Admob {
 
     public PrepareLoadingAdsDialog getDialog() {
         return dialog;
+    }
+
+
+
+    private RewardedAd rewardedAd;
+    private String rewardId;
+    /**
+     * Khởi tạo quảng cáo reward
+     *
+     * @param context
+     * @param id
+     */
+    public void initRewardAds(Context context, String id, String tokenAdjust) {
+//        if (Arrays.asList(context.getResources().getStringArray(R.array.list_id_test)).contains(id)) {
+//            showTestIdAlert(context, REWARD_ADS, id);
+//        }
+//        if (AppPurchase.getInstance().isPurchased(context)) {
+//            return;
+//        }
+        this.rewardId = id;
+        RewardedAd.load(context, id, getAdRequest(), new RewardedAdLoadCallback() {
+            @Override
+            public void onAdLoaded(@NonNull RewardedAd rewardedAd) {
+                Admob.this.rewardedAd = rewardedAd;
+                Admob.this.rewardedAd.setOnPaidEventListener(adValue -> {
+
+                    Log.d(TAG, "OnPaidEvent Reward:" + adValue.getValueMicros());
+
+                    YNMLogEventManager.logPaidAdImpression(context,
+                            adValue,
+                            rewardedAd.getAdUnitId(), Admob.this.rewardedAd.getResponseInfo().getMediationAdapterClassName()
+                            , TypeAds.REWARDED);
+
+//                    if (tokenAdjust != null) {
+//                        YNMLogEventManager.logPaidAdjustWithToken(adValue, rewardedAd.getAdUnitId(), tokenAdjust);
+//                    }
+                });
+            }
+
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                super.onAdFailedToLoad(loadAdError);
+                Log.e(TAG, "RewardedAd onAdFailedToLoad: " + loadAdError.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Load ad Reward
+     *
+     * @param context
+     * @param id
+     */
+    public void initRewardAds(Context context, String id, AdsCallback callback, String tokenAdjust) {
+//        if (Arrays.asList(context.getResources().getStringArray(R.array.list_id_test)).contains(id)) {
+//            showTestIdAlert(context, REWARD_ADS, id);
+//        }
+//        if (AppPurchase.getInstance().isPurchased(context)) {
+//            return;
+//        }
+        this.rewardId = id;
+        RewardedAd.load(context, id, getAdRequest(), new RewardedAdLoadCallback() {
+            @Override
+            public void onAdLoaded(@NonNull RewardedAd rewardedAd) {
+                callback.onRewardAdLoaded(rewardedAd);
+                Admob.this.rewardedAd = rewardedAd;
+                Admob.this.rewardedAd.setOnPaidEventListener(adValue -> {
+                    Log.d(TAG, "OnPaidEvent Reward:" + adValue.getValueMicros());
+
+                    YNMLogEventManager.logPaidAdImpression(context,
+                            adValue,
+                            rewardedAd.getAdUnitId(),
+                            Admob.this.rewardedAd.getResponseInfo().getMediationAdapterClassName()
+                            , TypeAds.REWARDED);
+
+//                    if (tokenAdjust != null) {
+//                        YNLogEventManager.logPaidAdjustWithToken(adValue, rewardedAd.getAdUnitId(), tokenAdjust);
+//                    }
+                });
+
+            }
+
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                callback.onAdFailedToLoad(loadAdError);
+                Admob.this.rewardedAd = null;
+                Log.e(TAG, "RewardedAd onAdFailedToLoad: " + loadAdError.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Load ad Reward Interstitial
+     *
+     * @param context
+     * @param id
+     */
+    public void getRewardInterstitial(Context context, String id, AdsCallback callback, String tokenAdjust) {
+//        if (Arrays.asList(context.getResources().getStringArray(R.array.list_id_test)).contains(id)) {
+//            showTestIdAlert(context, REWARD_ADS, id);
+//        }
+//        if (AppPurchase.getInstance().isPurchased(context)) {
+//            return;
+//        }
+        this.rewardId = id;
+        RewardedInterstitialAd.load(context, id, getAdRequest(), new RewardedInterstitialAdLoadCallback() {
+            @Override
+            public void onAdLoaded(@NonNull RewardedInterstitialAd rewardedAd) {
+                callback.onRewardAdLoaded(rewardedAd);
+                Log.i(TAG, "RewardInterstitial onAdLoaded ");
+                rewardedAd.setOnPaidEventListener(adValue -> {
+                    Log.d(TAG, "OnPaidEvent Reward:" + adValue.getValueMicros());
+                    YNMLogEventManager.logPaidAdImpression(context,
+                            adValue,
+                            rewardedAd.getAdUnitId(),
+                            rewardedAd.getResponseInfo().getMediationAdapterClassName()
+                            , TypeAds.REWARDED);
+
+//                    if (tokenAdjust != null) {
+//                        YNLogEventManager.logPaidAdjustWithToken(adValue, rewardedAd.getAdUnitId(), tokenAdjust);
+//                    }
+                });
+            }
+
+            @Override
+            public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                callback.onAdFailedToLoad(loadAdError);
+                Log.e(TAG, "RewardInterstitial onAdFailedToLoad: " + loadAdError.getMessage());
+            }
+        });
+    }
+
+    public RewardedAd getRewardedAd() {
+
+        return rewardedAd;
+    }
+
+    /**
+     * Show Reward and callback
+     *
+     * @param context
+     * @param adCallback
+     */
+    public void showRewardAds(final Activity context, final RewardCallback adCallback, String tokenAdjust) {
+//        if (AppPurchase.getInstance().isPurchased(context)) {
+//            adCallback.onUserEarnedReward(null);
+//            return;
+//        }
+        if (rewardedAd == null) {
+            initRewardAds(context, this.rewardId, tokenAdjust);
+
+            adCallback.onRewardedAdFailedToShow(0);
+            return;
+        } else {
+            Admob.this.rewardedAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                @Override
+                public void onAdDismissedFullScreenContent() {
+                    super.onAdDismissedFullScreenContent();
+                    if (adCallback != null)
+                        adCallback.onRewardedAdClosed();
+
+                    AppOpenManager.getInstance().setInterstitialShowing(false);
+
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+                    super.onAdFailedToShowFullScreenContent(adError);
+                    if (adCallback != null)
+                        adCallback.onRewardedAdFailedToShow(adError.getCode());
+                }
+
+                @Override
+                public void onAdShowedFullScreenContent() {
+                    super.onAdShowedFullScreenContent();
+
+                    AppOpenManager.getInstance().setInterstitialShowing(true);
+                    rewardedAd = null;
+                }
+
+                public void onAdClicked() {
+                    super.onAdClicked();
+                    if (disableAdResumeWhenClickAds)
+                        AppOpenManager.getInstance().disableAdResumeByClickAction();
+                    YNMLogEventManager.logClickAdsEvent(context, rewardedAd.getAdUnitId());
+                }
+            });
+            rewardedAd.show(context, new OnUserEarnedRewardListener() {
+                @Override
+                public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
+                    if (adCallback != null) {
+                        adCallback.onUserEarnedReward(rewardItem);
+
+                    }
+                }
+            });
+        }
+    }
+
+    /**
+     * Show Reward Interstitial and callback
+     *
+     * @param activity
+     * @param rewardedInterstitialAd
+     * @param adCallback
+     */
+    public void showRewardInterstitial(final Activity activity, RewardedInterstitialAd rewardedInterstitialAd, final RewardCallback adCallback, String tokenAdjust) {
+//        if (AppPurchase.getInstance().isPurchased(activity)) {
+//            adCallback.onUserEarnedReward(null);
+//            return;
+//        }
+        if (rewardedInterstitialAd == null) {
+            initRewardAds(activity, this.rewardId, tokenAdjust);
+
+            adCallback.onRewardedAdFailedToShow(0);
+            return;
+        } else {
+            rewardedInterstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                @Override
+                public void onAdDismissedFullScreenContent() {
+                    super.onAdDismissedFullScreenContent();
+                    if (adCallback != null)
+                        adCallback.onRewardedAdClosed();
+
+                    AppOpenManager.getInstance().setInterstitialShowing(false);
+
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+                    super.onAdFailedToShowFullScreenContent(adError);
+                    if (adCallback != null)
+                        adCallback.onRewardedAdFailedToShow(adError.getCode());
+                }
+
+                @Override
+                public void onAdShowedFullScreenContent() {
+                    super.onAdShowedFullScreenContent();
+
+                    AppOpenManager.getInstance().setInterstitialShowing(true);
+
+                }
+
+                public void onAdClicked() {
+                    super.onAdClicked();
+                    YNMLogEventManager.logClickAdsEvent(activity, rewardedAd.getAdUnitId());
+                    if (disableAdResumeWhenClickAds)
+                        AppOpenManager.getInstance().disableAdResumeByClickAction();
+                }
+            });
+            rewardedInterstitialAd.show(activity, new OnUserEarnedRewardListener() {
+                @Override
+                public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
+                    if (adCallback != null) {
+                        adCallback.onUserEarnedReward(rewardItem);
+                    }
+                }
+            });
+        }
+    }
+
+
+    /**
+     * Show quảng cáo reward và nhận kết quả trả về
+     *
+     * @param context
+     * @param adCallback
+     */
+    public void showRewardAds(final Activity context, RewardedAd rewardedAd, final RewardCallback adCallback, String tokenAdjust) {
+//        if (AppPurchase.getInstance().isPurchased(context)) {
+//            adCallback.onUserEarnedReward(null);
+//            return;
+//        }
+        if (rewardedAd == null) {
+            initRewardAds(context, this.rewardId, tokenAdjust);
+
+            adCallback.onRewardedAdFailedToShow(0);
+            return;
+        } else {
+            rewardedAd.setFullScreenContentCallback(new FullScreenContentCallback() {
+                @Override
+                public void onAdDismissedFullScreenContent() {
+                    super.onAdDismissedFullScreenContent();
+                    if (adCallback != null)
+                        adCallback.onRewardedAdClosed();
+
+
+                    AppOpenManager.getInstance().setInterstitialShowing(false);
+
+                }
+
+                @Override
+                public void onAdFailedToShowFullScreenContent(@NonNull AdError adError) {
+                    super.onAdFailedToShowFullScreenContent(adError);
+                    if (adCallback != null)
+                        adCallback.onRewardedAdFailedToShow(adError.getCode());
+                }
+
+                @Override
+                public void onAdShowedFullScreenContent() {
+                    super.onAdShowedFullScreenContent();
+
+                    AppOpenManager.getInstance().setInterstitialShowing(true);
+                    initRewardAds(context, rewardId, tokenAdjust);
+                }
+
+                public void onAdClicked() {
+                    super.onAdClicked();
+                    if (disableAdResumeWhenClickAds)
+                        AppOpenManager.getInstance().disableAdResumeByClickAction();
+                    if (adCallback != null) {
+                        adCallback.onAdClicked();
+                    }
+                    YNMLogEventManager.logClickAdsEvent(context, rewardedAd.getAdUnitId());
+                }
+            });
+            rewardedAd.show(context, new OnUserEarnedRewardListener() {
+                @Override
+                public void onUserEarnedReward(@NonNull RewardItem rewardItem) {
+                    if (adCallback != null) {
+                        adCallback.onUserEarnedReward(rewardItem);
+
+                    }
+                }
+            });
+        }
     }
 
     public final static int SPLASH_ADS = 0;

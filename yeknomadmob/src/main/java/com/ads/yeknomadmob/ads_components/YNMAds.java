@@ -15,17 +15,26 @@ import com.ads.yeknomadmob.admobs.AppOpenManager;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsInterstitial;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsNative;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsReward;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsRewardItem;
 import com.ads.yeknomadmob.config.YNMAdsConfig;
 import com.ads.yeknomadmob.event.YNMAirBridge;
 import com.ads.yeknomadmob.utils.AdsCallback;
 import com.ads.yeknomadmob.utils.AppUtil;
+import com.ads.yeknomadmob.utils.RewardCallback;
 import com.ads.yeknomadmob.utils.SharePreferenceUtils;
+import com.applovin.mediation.MaxError;
+import com.applovin.mediation.MaxReward;
+import com.applovin.mediation.ads.MaxRewardedAd;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.nativead.NativeAd;
 import com.google.android.gms.ads.nativead.NativeAdView;
+import com.google.android.gms.ads.rewarded.RewardItem;
+import com.google.android.gms.ads.rewarded.RewardedAd;
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 
 public class YNMAds {
     public static final String TAG = "YKMAds";
@@ -271,6 +280,14 @@ public class YNMAds {
                     adListener.onAdClicked();
                 }
             }
+
+            @Override
+            public void onTimeOut() {
+                super.onTimeOut();
+                if (adListener != null) {
+                    adListener.onTimeOut();
+                }
+            }
         });
     }
 
@@ -491,5 +508,210 @@ public class YNMAds {
             }
         };
         Admob.getInstance().showInterstitialAdByTimes(context, mInterstitialAd.getInterstitialAd(), adCallback);
+    }
+
+    public AdsReward getRewardAd(Activity activity, String id) {
+        AdsReward apRewardAd = new AdsReward();
+        switch (adConfig.getMediationProvider()) {
+            case YNMAdsConfig.PROVIDER_ADMOB:
+                Admob.getInstance().initRewardAds(activity, id, new AdsCallback() {
+
+                    @Override
+                    public void onRewardAdLoaded(RewardedAd rewardedAd) {
+                        super.onRewardAdLoaded(rewardedAd);
+                        Log.i(TAG, "getRewardAd AdLoaded: ");
+                        apRewardAd.setAdmobReward(rewardedAd);
+                    }
+                }, null);
+                break;
+//            case YNAdConfig.PROVIDER_MAX:
+//                MaxRewardedAd maxRewardedAd = AppLovin.getInstance().getRewardAd(activity, id, new AppLovinCallback() {
+//                    @Override
+//                    public void onAdLoaded() {
+//                        super.onAdLoaded();
+//                    }
+//                });
+//                apRewardAd.setMaxReward(maxRewardedAd);
+        }
+        return apRewardAd;
+    }
+
+    public AdsReward getRewardAdInterstitial(Activity activity, String id) {
+        AdsReward apRewardAd = new AdsReward();
+        switch (adConfig.getMediationProvider()) {
+            case YNMAdsConfig.PROVIDER_ADMOB:
+                Admob.getInstance().getRewardInterstitial(activity, id, new AdsCallback() {
+
+                    @Override
+                    public void onRewardAdLoaded(RewardedInterstitialAd rewardedAd) {
+                        super.onRewardAdLoaded(rewardedAd);
+                        Log.i(TAG, "getRewardAdInterstitial AdLoaded: ");
+                        apRewardAd.setAdmobReward(rewardedAd);
+                    }
+                }, null);
+                break;
+//            case YNAdConfig.PROVIDER_MAX:
+//                MaxRewardedAd maxRewardedAd = AppLovin.getInstance().getRewardAd(activity, id, new AppLovinCallback() {
+//                    @Override
+//                    public void onAdLoaded() {
+//                        super.onAdLoaded();
+//                    }
+//                });
+//                apRewardAd.setMaxReward(maxRewardedAd);
+        }
+        return apRewardAd;
+    }
+
+    public AdsReward getRewardAd(Activity activity, String id, YNMAdsCallbacks callback) {
+        AdsReward apRewardAd = new AdsReward();
+        switch (adConfig.getMediationProvider()) {
+            case YNMAdsConfig.PROVIDER_ADMOB:
+                Admob.getInstance().initRewardAds(activity, id, new AdsCallback() {
+                    @Override
+                    public void onRewardAdLoaded(RewardedAd rewardedAd) {
+                        super.onRewardAdLoaded(rewardedAd);
+                        apRewardAd.setAdmobReward(rewardedAd);
+                        callback.onAdLoaded();
+                        callback.onRewardAdLoaded(apRewardAd);
+                    }
+                }, null);
+                return apRewardAd;
+//            case YNAdConfig.PROVIDER_MAX:
+//                MaxRewardedAd maxRewardedAd = AppLovin.getInstance().getRewardAd(activity, id, new AppLovinCallback() {
+//                    @Override
+//                    public void onAdLoaded() {
+//                        super.onAdLoaded();
+//                        callback.onAdLoaded();
+//                    }
+//                });
+//                apRewardAd.setMaxReward(maxRewardedAd);
+//                return apRewardAd;
+        }
+        return apRewardAd;
+    }
+
+    public AdsReward getRewardInterstitialAd(Activity activity, String id, YNMAdsCallbacks callback) {
+        AdsReward apRewardAd = new AdsReward();
+        switch (adConfig.getMediationProvider()) {
+            case YNMAdsConfig.PROVIDER_ADMOB:
+                Admob.getInstance().getRewardInterstitial(activity, id, new AdsCallback() {
+                    @Override
+                    public void onRewardAdLoaded(RewardedInterstitialAd rewardedAd) {
+                        super.onRewardAdLoaded(rewardedAd);
+                        apRewardAd.setAdmobReward(rewardedAd);
+                        callback.onAdLoaded();
+                    }
+                }, null);
+                return apRewardAd;
+//            case YNAdConfig.PROVIDER_MAX:
+//                MaxRewardedAd maxRewardedAd = AppLovin.getInstance().getRewardAd(activity, id, new AppLovinCallback() {
+//                    @Override
+//                    public void onAdLoaded() {
+//                        super.onAdLoaded();
+//                        callback.onAdLoaded();
+//                    }
+//                });
+//                apRewardAd.setMaxReward(maxRewardedAd);
+//                return apRewardAd;
+        }
+        return apRewardAd;
+    }
+
+    public void forceShowRewardAd(Activity activity, AdsReward apRewardAd, YNMAdsCallbacks
+            callback) {
+        if (!apRewardAd.isReady()) {
+            Log.e(TAG, "forceShowRewardAd fail: reward ad not ready");
+            callback.onNextAction();
+            return;
+        }
+        switch (adConfig.getMediationProvider()) {
+            case YNMAdsConfig.PROVIDER_ADMOB:
+                if (apRewardAd.isRewardInterstitial()) {
+                    Admob.getInstance().showRewardInterstitial(activity, apRewardAd.getAdmobRewardInter(), new RewardCallback() {
+
+                        @Override
+                        public void onUserEarnedReward(RewardItem var1) {
+                            callback.onUserEarnedReward(new AdsRewardItem(var1));
+                        }
+
+                        @Override
+                        public void onRewardedAdClosed() {
+                            apRewardAd.clean();
+                            callback.onNextAction();
+                        }
+
+                        @Override
+                        public void onRewardedAdFailedToShow(int codeError) {
+                            apRewardAd.clean();
+                            callback.onAdFailedToShow(new AdsError(new AdError(codeError, "note msg", "Reward")));
+                        }
+
+                        @Override
+                        public void onAdClicked() {
+                            if (callback != null) {
+                                callback.onAdClicked();
+                            }
+                        }
+                    }, null);
+                } else {
+                    Admob.getInstance().showRewardAds(activity, apRewardAd.getAdmobReward(), new RewardCallback() {
+
+                        @Override
+                        public void onUserEarnedReward(RewardItem var1) {
+                            callback.onUserEarnedReward(new AdsRewardItem(var1));
+                        }
+
+                        @Override
+                        public void onRewardedAdClosed() {
+                            apRewardAd.clean();
+                            callback.onNextAction();
+                        }
+
+                        @Override
+                        public void onRewardedAdFailedToShow(int codeError) {
+                            apRewardAd.clean();
+                            callback.onAdFailedToShow(new AdsError(new AdError(codeError, "note msg", "Reward")));
+                        }
+
+                        @Override
+                        public void onAdClicked() {
+                            if (callback != null) {
+                                callback.onAdClicked();
+                            }
+                        }
+                    }, null);
+                }
+                break;
+//            case YNAdConfig.PROVIDER_MAX:
+//                AppLovin.getInstance().showRewardAd(activity, apRewardAd.getMaxReward(), new AppLovinCallback() {
+//                    @Override
+//                    public void onUserRewarded(MaxReward reward) {
+//                        super.onUserRewarded(reward);
+//                        callback.onUserEarnedReward(new ApRewardItem(reward));
+//                    }
+//
+//                    @Override
+//                    public void onAdClosed() {
+//                        super.onAdClosed();
+//                        apRewardAd.clean();
+//                        callback.onNextAction();
+//                    }
+//
+//                    @Override
+//                    public void onAdFailedToShow(@Nullable MaxError adError) {
+//                        super.onAdFailedToShow(adError);
+//                        apRewardAd.clean();
+//                        callback.onAdFailedToShow(new ApAdError(adError));
+//                    }
+//
+//                    @Override
+//                    public void onAdClicked() {
+//                        super.onAdClicked();
+//                        if (callback != null) {
+//                            callback.onAdClicked();
+//                        }
+//                    }
+//                });
+        }
     }
 }

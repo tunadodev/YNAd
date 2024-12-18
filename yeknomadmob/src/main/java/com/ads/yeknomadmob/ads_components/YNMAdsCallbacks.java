@@ -6,8 +6,14 @@ import androidx.annotation.Nullable;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsInterstitial;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsNative;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsReward;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsRewardItem;
+import com.google.android.gms.ads.rewarded.RewardedAd;
+import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 
 public class YNMAdsCallbacks {
+    public void onTimeOut() {
+    }
     public void onNextAction() {
     }
 
@@ -49,5 +55,14 @@ public class YNMAdsCallbacks {
 
     public void onInterstitialShow() {
 
+    }
+    public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
+
+    }
+
+    public void onRewardAdLoaded(AdsReward rewardedAd) {
+    }
+
+    public void onRewardAdLoaded(RewardedInterstitialAd rewardedAd) {
     }
 }

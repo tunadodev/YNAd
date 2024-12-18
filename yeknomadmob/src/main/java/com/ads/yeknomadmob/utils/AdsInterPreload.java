@@ -15,6 +15,23 @@ import java.util.Map;
 
 public class AdsInterPreload {
     public static Map<String, AdsInterstitial> mapCaches = new java.util.HashMap<String, AdsInterstitial>();
+    public static void preloadInterAds(Context context, String id, String key, final YNMAdsCallbacks callback) {
+        YNMAds.getInstance().setInitCallback(() -> {
+            YNMAds.getInstance().getInterstitialAds(context, id, new YNMAdsCallbacks() {
+                @Override
+                public void onInterstitialLoad(@Nullable AdsInterstitial interstitialAd) {
+                    mapCaches.put(key, interstitialAd);
+                }
+                @Override
+                public void onAdFailedToLoad(@Nullable AdsError adError) {
+                    super.onAdFailedToLoad(adError);
+                    if (callback != null) callback.onAdFailedToLoad(adError);
+                }
+            });
+        });
+
+    }
+
     public static void preloadInterAds(Context context, String id, String key) {
         YNMAds.getInstance().setInitCallback(() -> {
             YNMAds.getInstance().getInterstitialAds(context, id, new YNMAdsCallbacks() {
@@ -59,6 +76,17 @@ public class AdsInterPreload {
                         if (adsInterstitialBackup != null && adsInterstitialBackup.isReady()) {
                             Log.d("TAG", "showw 2: ");
                             YNMAds.getInstance().forceShowInterstitial(context, adsInterstitialBackup, callback);
+                        }
+                    }
+
+                    @Override
+                    public void onTimeOut() {
+                        super.onTimeOut();
+                        if (adsInterstitialBackup != null && adsInterstitialBackup.isReady()) {
+                            Log.d("TAG", "showw 2: ");
+                            YNMAds.getInstance().forceShowInterstitial(context, adsInterstitialBackup, callback);
+                        } else {
+                            if (callback != null) callback.onNextAction();
                         }
                     }
                 });
