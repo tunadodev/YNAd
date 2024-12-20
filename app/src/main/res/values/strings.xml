@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">YeknomAdmob</string>
+    <string name="app_name">NekyomAdmob</string>
 
     <string name="loading_ads">Loading Ads…</string>
     <string name="admod_app_id">ca-app-pub-3940256099942544~3347511713</string>

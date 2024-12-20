@@ -28,6 +28,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "YeknomAdmob"
+rootProject.name = "NekMob"
 include ':app'
-include ':yeknomadmob'
+include ':nekyomadmob'

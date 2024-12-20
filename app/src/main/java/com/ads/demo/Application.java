@@ -1,6 +1,6 @@
 package com.ads.demo;
 
-import com.ads.yeknomadmob.application.AdsApplication;
+import com.ads.nekyomadmob.application.AdsApplication;
 
 public class Application extends AdsApplication{
     private static Application globalApp;

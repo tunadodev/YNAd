@@ -24,7 +24,7 @@
                 android:text="Show inters Ads"
                 />
 
-            <com.ads.yeknomadmob.ads_components.ads_native.YNMNativeAdView
+            <com.ads.nekyomadmob.ads_components.ads_native.YNMNativeAdView
                 android:id="@+id/ykmNativeAds"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_150sdp"
@@ -44,7 +44,7 @@
                 android:layout_marginBottom="0dp"
                 android:text="Banner ads" />
 
-            <com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerAdView
+            <com.ads.nekyomadmob.ads_components.ads_banner.YNMBannerAdView
                 android:id="@+id/bannerView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

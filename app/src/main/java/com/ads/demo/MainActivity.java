@@ -4,15 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ads.demo.databinding.ActivityMainBinding;
-import com.ads.yeknomadmob.ads_components.YNMAds;
-import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
-import com.ads.yeknomadmob.ads_components.ads_native.YNMNativeAdView;
-import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
-import com.ads.yeknomadmob.ads_components.wrappers.AdsInterstitial;
-import com.ads.yeknomadmob.ads_components.wrappers.AdsRewardItem;
-import com.ads.yeknomadmob.utils.AdsInterPreload;
-import com.ads.yeknomadmob.utils.AdsNativePreload;
-import com.ads.yeknomadmob.utils.AdsRewardPreload;
+import com.ads.nekyomadmob.ads_components.YNMAdsCallbacks;
+import com.ads.nekyomadmob.ads_components.ads_native.YNMNativeAdView;
+import com.ads.nekyomadmob.ads_components.wrappers.AdsError;
+import com.ads.nekyomadmob.ads_components.wrappers.AdsRewardItem;
+import com.ads.nekyomadmob.utils.AdsInterPreload;
+import com.ads.nekyomadmob.utils.AdsNativePreload;
+import com.ads.nekyomadmob.utils.AdsRewardPreload;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding>{
     private YNMNativeAdView ynmAdNative = null;
@@ -30,7 +28,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>{
 //        YNMAds.getInstance().setInitCallback(() -> {
 //            viewBinding.ykmNativeAds.loadNativeAd(this, BuildConfig.ad_native);
 //        }) ;
-        AdsNativePreload.flexPreloadedShowNativeAds(this, viewBinding.ykmNativeAds, "test", com.ads.yeknomadmob.R.layout.custom_native_admob_medium, com.ads.yeknomadmob.R.layout.custom_native_admob_large, BuildConfig.ad_interstitial_splash, BuildConfig.ad_native);
+        AdsNativePreload.flexPreloadedShowNativeAds(this, viewBinding.ykmNativeAds, "test", com.ads.nekyomadmob.R.layout.custom_native_admob_medium, com.ads.nekyomadmob.R.layout.custom_native_admob_large, BuildConfig.ad_interstitial_splash, BuildConfig.ad_native);
 
 
         viewBinding.showInter.setOnClickListener(view -> {
