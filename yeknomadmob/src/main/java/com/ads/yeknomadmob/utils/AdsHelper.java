@@ -49,7 +49,7 @@ public class AdsHelper {
                         // Your code here
                         nativeAdView.populateNativeAdView((Activity) context, apNativeAd);
                     }
-                }, preLoaded ? 1000 : 0);
+                }, preLoaded ? 0 : 0);
             }
 
             @Override
@@ -67,7 +67,7 @@ public class AdsHelper {
                         // Your code here
                         nativeAdView.populateNativeAdView((Activity) context, apNativeAd);
                     }
-                }, preLoaded ? 1000 : 0);
+                }, preLoaded ? 0 : 0);
             }
         });
         //set delay so it will have load effect even though the ads is preloaded
@@ -82,6 +82,6 @@ public class AdsHelper {
                 // Your code here
                 nativeAdView.populateNativeAdView((Activity) context, apNativeAd);
             }
-        }, preLoaded ? 1000 : 0);
+        }, preLoaded ? 0 : 0);
     }
 }

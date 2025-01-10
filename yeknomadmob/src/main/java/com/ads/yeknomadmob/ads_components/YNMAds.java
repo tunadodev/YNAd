@@ -51,6 +51,10 @@ public class YNMAds {
         return INSTANCE;
     }
 
+    public YNMAdsConfig getAdConfig() {
+        return adConfig;
+    }
+
     public void init(Activity activity, Application context, YNMAdsConfig adConfig) {
         if (adConfig == null) {
             throw new RuntimeException("cant not set YNMAdConfig null");

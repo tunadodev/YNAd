@@ -51,8 +51,13 @@ public class AdsInterPreload {
                 Log.d("TAG", "showw 1: ");
                 YNMAds.getInstance().forceShowInterstitial(context, adsInterstitial, callback);
             } else {
+                if (System.currentTimeMillis() - SharePreferenceUtils.getLastImpressionInterstitialTime(context)
+                        < YNMAds.getInstance().getAdConfig().getIntervalInterstitialAd() * 1000L
+                ) {
+                    callback.onNextAction();
+                    return;
+                }
                 AdsInterstitial adsInterstitialBackup = mapCaches.containsKey(keyBackup) ? mapCaches.get(keyBackup) : null;
-
                 YNMAds.getInstance().loadInterstitialAds(context, adId, timeOut, 0, true, new YNMAdsCallbacks()
                 {
                     @Override
@@ -89,6 +94,13 @@ public class AdsInterPreload {
                             if (callback != null) callback.onNextAction();
                         }
                     }
+
+                    @Override
+                    public void onAdLoaded() {
+                        super.onAdLoaded();
+                        SharePreferenceUtils.setLastImpressionInterstitialTime(context);
+                    }
+
                 });
             }
         });
