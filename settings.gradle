@@ -30,4 +30,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "YeknomAdmob"
 include ':app'
-include ':yeknomadmob'
+include ':nomyek_admob'

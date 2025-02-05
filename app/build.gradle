@@ -70,7 +70,7 @@ dependencies {
     implementation libs.activity
     implementation libs.constraintlayout
     implementation libs.play.services.ads
-    implementation project(path: ':yeknomadmob')
+    implementation project(path: ':nomyek_admob')
     implementation(libs.facebook)
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit

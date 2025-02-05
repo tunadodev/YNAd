@@ -3,14 +3,13 @@ package com.ads.demo;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import com.ads.demo.databinding.ActivitySplashScreenBinding;
-import com.ads.yeknomadmob.admobs.Admob;
-import com.ads.yeknomadmob.admobs.AppOpenManager;
-import com.ads.yeknomadmob.ads_components.YNMAds;
-import com.ads.yeknomadmob.ads_components.YNMInitCallback;
-import com.ads.yeknomadmob.config.AirBridgeConfig;
-import com.ads.yeknomadmob.config.SolarConfig;
-import com.ads.yeknomadmob.config.YNMAdsConfig;
-import com.ads.yeknomadmob.utils.AdsNativePreload;
+import com.ads.nomyek_admob.admobs.Admob;
+import com.ads.nomyek_admob.admobs.AppOpenManager;
+import com.ads.nomyek_admob.ads_components.YNMAds;
+import com.ads.nomyek_admob.ads_components.YNMInitCallback;
+import com.ads.nomyek_admob.config.AirBridgeConfig;
+import com.ads.nomyek_admob.config.SolarConfig;
+import com.ads.nomyek_admob.config.YNMAdsConfig;
 import com.google.android.gms.ads.FullScreenContentCallback;
 
 import java.util.Timer;
@@ -80,7 +79,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashScreenBinding> {
                     }
                 });
                 AppOpenManager.getInstance().setSplashActivity(SplashActivity.class, BuildConfig.ad_open_splash, 25000);
-                AppOpenManager.getInstance().loadAndShowSplashAds(BuildConfig.ad_open_splash, 1000);
+//                AppOpenManager.getInstance().loadAndShowSplashAds(BuildConfig.ad_open_splash, 1000);
 //                AdsNativePreload.PreLoadNative(SplashActivity.this, BuildConfig.ad_native, "test");
             }
         });
@@ -104,8 +103,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashScreenBinding> {
         solarConfig.setEnableDebug(false);
         app.ynmAdsConfig.setSolarConfig(solarConfig);
         // Optional: enable ads resume
-        app.ynmAdsConfig.setIdAdResume(BuildConfig.ads_open_app);
-
+        //app.ynmAdsConfig.setIdAdResume(BuildConfig.ads_open_app);
         // Optional: setup list device test - recommended to use
         app.listTestDevice.add("EC25F576DA9B6CE74778B268CB87E431");
         app.ynmAdsConfig.setListDeviceTest(app.listTestDevice);
