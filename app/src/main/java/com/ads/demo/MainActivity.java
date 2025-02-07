@@ -24,7 +24,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>{
     @Override
     protected void initViews() {
         viewBinding.bannerView.loadBanner(this, BuildConfig.ad_banner);
-        AdsInterPreload.preloadInterAds(this, BuildConfig.ad_interstitial_splash, "test");
+        AdsInterPreload.preloadInterAds(this,"Main_screen", BuildConfig.ad_interstitial_splash, "test");
         AdsRewardPreload.preloadRewardAds(this, BuildConfig.ad_reward, "test_reward");
         //AdsInterPreload.preloadInterAds(this, BuildConfig.ad_interstitial_splash, "test2");
 //        YNMAds.getInstance().setInitCallback(() -> {
