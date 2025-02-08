@@ -10,6 +10,7 @@ import com.ads.yeknomadmob.ads_components.ads_native.YNMNativeAdView;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsInterstitial;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsRewardItem;
+import com.ads.yeknomadmob.event.YNMAirBridge;
 import com.ads.yeknomadmob.utils.AdsInterPreload;
 import com.ads.yeknomadmob.utils.AdsNativePreload;
 import com.ads.yeknomadmob.utils.AdsRewardPreload;
@@ -24,7 +25,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>{
     @Override
     protected void initViews() {
         viewBinding.bannerView.loadBanner(this, BuildConfig.ad_banner);
-        AdsInterPreload.preloadInterAds(this,"Main_screen", BuildConfig.ad_interstitial_splash, "test");
+        AdsInterPreload.preloadInterAds(this,new YNMAirBridge.AppData(), BuildConfig.ad_interstitial_splash, "test");
         AdsRewardPreload.preloadRewardAds(this, BuildConfig.ad_reward, "test_reward");
         //AdsInterPreload.preloadInterAds(this, BuildConfig.ad_interstitial_splash, "test2");
 //        YNMAds.getInstance().setInitCallback(() -> {

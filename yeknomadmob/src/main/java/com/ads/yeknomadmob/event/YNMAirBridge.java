@@ -113,4 +113,32 @@ public class YNMAirBridge {
                 ", customAttrs=" + event.getCustomAttributes() +
                 '}';
     }
+
+    public static class AppData{
+        String viewName, adUnit;
+
+        public AppData() {
+        }
+
+        public AppData(String viewName, String adUnit) {
+            this.viewName = viewName;
+            this.adUnit = adUnit;
+        }
+
+        public String getViewName() {
+            return viewName;
+        }
+
+        public void setViewName(String viewName) {
+            this.viewName = viewName;
+        }
+
+        public String getAdUnit() {
+            return adUnit;
+        }
+
+        public void setAdUnit(String adUnit) {
+            this.adUnit = adUnit;
+        }
+    }
 }

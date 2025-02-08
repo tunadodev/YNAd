@@ -2,17 +2,21 @@ package com.ads.yeknomadmob.utils;
 
 import android.app.Activity;
 import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.ads.yeknomadmob.admobs.Admob;
 import com.ads.yeknomadmob.ads_components.YNMAds;
 import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
 import com.ads.yeknomadmob.ads_components.YNMInitCallback;
 import com.ads.yeknomadmob.ads_components.ads_native.YNMNativeAdView;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
+import com.ads.yeknomadmob.event.YNMAirBridge;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.nativead.NativeAd;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -83,8 +87,8 @@ public class AdsNativePreload {
         return null;
     }
 
-    public static void PreLoadNative(Context context, String viewName, String adId, String identifyKey) {
-        YNMAdsCallbacks listener = new YNMAdsCallbacks(viewName, adId, YNMAds.NATIVE);
+    public static void PreLoadNative(Context context, String adId, String identifyKey, YNMAirBridge.AppData appData) {
+        YNMAdsCallbacks listener = new YNMAdsCallbacks(appData, YNMAds.NATIVE);
         Admob.getInstance().loadNativeAd(context, adId, new AdsCallback() {
             @Override
             public void onUnifiedNativeAdLoaded(@NonNull NativeAd unifiedNativeAd) {
@@ -107,8 +111,8 @@ public class AdsNativePreload {
     }
 
     //with listener
-    public static void PreLoadNative(Context context, String viewName, String adId, String identifyKey, NativeAdLoadListener listener) {
-        YNMAdsCallbacks ynmAdsCallbacks = new YNMAdsCallbacks(viewName, adId, YNMAds.NATIVE);
+    public static void PreLoadNative(Context context, String adId, String identifyKey, YNMAirBridge.AppData appData, NativeAdLoadListener listener) {
+        YNMAdsCallbacks ynmAdsCallbacks = new YNMAdsCallbacks(appData, YNMAds.NATIVE);
         Admob.getInstance().loadNativeAd(context, adId, new AdsCallback() {
             @Override
             public void onUnifiedNativeAdLoaded(@NonNull NativeAd unifiedNativeAd) {
@@ -135,7 +139,7 @@ public class AdsNativePreload {
     }
 
     //load from preload native, if not available, reload, show an auto resized ads
-    public static void flexPreloadedShowNativeAds(Context context, String viewName, YNMNativeAdView adView, String key, int mediumLayout, int largeLayout, String adsId) {
+    public static void flexPreloadedShowNativeAds(Context context, YNMNativeAdView adView, String key, int mediumLayout, int largeLayout, String adsId, YNMAirBridge.AppData appData) {
         YNMAds.getInstance().setInitCallback(new YNMInitCallback() {
             @Override
             public void initAdsSuccess() {
@@ -145,20 +149,19 @@ public class AdsNativePreload {
                     AdsHelper.initAutoResizeAds(context, adView, nativeAd, mediumLayout, largeLayout, true);
                 } else {
                     //Khong thi load lai
-                    AdsNativePreload.PreLoadNative(context, viewName, adsId, key, () -> {
+                    AdsNativePreload.PreLoadNative(context, adsId, key, appData, () -> {
                         NativeAd nativeAd = AdsNativePreload.getNativeAd(key);
                         if (!((Activity) context).isFinishing() && !((Activity) context).isDestroyed()) {
                             AdsHelper.initAutoResizeAds(context, adView, nativeAd, mediumLayout, largeLayout, false);
                         }
                     });
                 }
-                ;
             }
         });
     }
 
     //fixed size preloaded ads
-    public static void fixedPreloadedShowNativeAds(Context context, String viewName, YNMNativeAdView adView, String key, int layout, String adsId) {
+    public static void fixedPreloadedShowNativeAds(Context context, String viewName, YNMNativeAdView adView, String key, int layout, String adsId, YNMAirBridge.AppData appData) {
         YNMAds.getInstance().setInitCallback(new YNMInitCallback() {
             @Override
             public void initAdsSuccess() {
@@ -168,14 +171,13 @@ public class AdsNativePreload {
                     AdsHelper.initFixedSizeAds(context, adView, nativeAd, layout, true);
                 } else {
                     //Khong thi load lai
-                    AdsNativePreload.PreLoadNative(context, viewName, adsId, key, () -> {
+                    AdsNativePreload.PreLoadNative(context, viewName, adsId, appData, () -> {
                         NativeAd nativeAd = AdsNativePreload.getNativeAd(key);
                         if (!((Activity) context).isFinishing() && !((Activity) context).isDestroyed()) {
                             AdsHelper.initFixedSizeAds(context, adView, nativeAd, layout, false);
                         }
                     });
                 }
-                ;
             }
         });
     }

@@ -7,6 +7,8 @@ import com.ads.yeknomadmob.ads_components.YNMAds;
 import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsInterstitial;
+import com.ads.yeknomadmob.event.YNMAirBridge;
+
 import java.util.Map;
 
 public class AdsInterPreload {
@@ -14,7 +16,7 @@ public class AdsInterPreload {
 
     public static void preloadInterAds(Context context, String id, String key, final YNMAdsCallbacks callback) {
         YNMAds.getInstance().setInitCallback(() -> {
-            YNMAds.getInstance().getInterstitialAds(context, id, new YNMAdsCallbacks(callback.getViewName(), id, YNMAds.INTERSTITIAL) {
+            YNMAds.getInstance().getInterstitialAds(context, id, new YNMAdsCallbacks(callback.getAppData()) {
                 @Override
                 public void onInterstitialLoad(@Nullable AdsInterstitial interstitialAd) {
                     mapCaches.put(key, interstitialAd);
@@ -30,9 +32,9 @@ public class AdsInterPreload {
 
     }
 
-    public static void preloadInterAds(Context context, String viewName, String id, String key) {
+    public static void preloadInterAds(Context context, YNMAirBridge.AppData appData, String id, String key) {
         YNMAds.getInstance().setInitCallback(() -> {
-            YNMAds.getInstance().getInterstitialAds(context, id, new YNMAdsCallbacks(viewName, id, YNMAds.INTERSTITIAL) {
+            YNMAds.getInstance().getInterstitialAds(context, id, new YNMAdsCallbacks(appData, YNMAds.INTERSTITIAL) {
                 @Override
                 public void onInterstitialLoad(@Nullable AdsInterstitial interstitialAd) {
                     mapCaches.put(key, interstitialAd);
@@ -56,7 +58,7 @@ public class AdsInterPreload {
                     return;
                 }
                 AdsInterstitial adsInterstitialBackup = mapCaches.containsKey(keyBackup) ? mapCaches.get(keyBackup) : null;
-                YNMAds.getInstance().loadInterstitialAds(context, adId, timeOut, 0, true, new YNMAdsCallbacks(callback.getViewName(), adId, YNMAds.INTERSTITIAL) {
+                YNMAds.getInstance().loadInterstitialAds(context, adId, timeOut, 0, true, new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.INTERSTITIAL) {
                     @Override
                     public void onAdFailedToLoad(@Nullable AdsError adError) {
                         super.onAdFailedToLoad(adError);

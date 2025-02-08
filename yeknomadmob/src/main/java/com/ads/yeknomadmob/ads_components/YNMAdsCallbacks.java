@@ -7,32 +7,42 @@ import com.ads.yeknomadmob.ads_components.wrappers.AdsInterstitial;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsNative;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsReward;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsRewardItem;
+import com.ads.yeknomadmob.event.YNMAirBridge;
 import com.ads.yeknomadmob.event.YNMAirBridgeDefaultEvent;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 
 public class YNMAdsCallbacks {
-    private String viewName, adsId, format;
+    private String format;
+    
+    private YNMAirBridge.AppData appData;
     private double loadStartTime; // Field to track the start time
 
     public YNMAdsCallbacks() {
     }
 
-    public YNMAdsCallbacks(String viewName) {
-        this.viewName = viewName;
+    public YNMAdsCallbacks(YNMAirBridge.AppData appData) {
+        this.appData = appData;
     }
 
-    public YNMAdsCallbacks(String viewName, String adsId, String format) {
-        this.viewName = viewName;
-        this.adsId = adsId;
+    public YNMAdsCallbacks(YNMAirBridge.AppData appData, String format) {
         this.format = format;
+        this.appData = appData;
     }
 
-    public String getViewName() {
-        return viewName;
+    public YNMAirBridge.AppData getAppData() {
+        return appData;
     }
 
-    public void setViewName(String viewName) {
-        this.viewName = viewName;
+    public void setAppData(YNMAirBridge.AppData appData) {
+        this.appData = appData;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
     }
 
     public void onTimeOut() {
@@ -45,13 +55,13 @@ public class YNMAdsCallbacks {
     }
 
     public void onAdStartLoad() {
-        YNMAirBridgeDefaultEvent.pushEventFormatRequestStart(adsId, viewName, format);
+        YNMAirBridgeDefaultEvent.pushEventFormatRequestStart(appData, format);
         loadStartTime = System.currentTimeMillis(); // Record the start time
     }
 
     public void onAdFailedToLoad(@Nullable AdsError adError) {
         double loadTime = System.currentTimeMillis() - loadStartTime; // Calculate load time
-        YNMAirBridgeDefaultEvent.pushEventFormatRequestFail(adsId, viewName, format, Math.ceil(loadTime) / 1000);
+        YNMAirBridgeDefaultEvent.pushEventFormatRequestFail(appData, format, Math.ceil(loadTime) / 1000);
     }
 
     public void onAdFailedToShow(@Nullable AdsError adError) {
@@ -63,7 +73,7 @@ public class YNMAdsCallbacks {
     public void onAdLoaded() {
         double loadTime = System.currentTimeMillis() - loadStartTime; // Calculate load time
         loadStartTime = System.currentTimeMillis();
-        YNMAirBridgeDefaultEvent.pushEventFormatRequestSuccess(adsId, viewName, format, Math.ceil(loadTime) / 1000);
+        YNMAirBridgeDefaultEvent.pushEventFormatRequestSuccess(appData, format, Math.ceil(loadTime) / 1000);
     }
 
     // ad splash loaded when showSplashIfReady = false
@@ -76,30 +86,30 @@ public class YNMAdsCallbacks {
     }
 
     public void onAdClicked() {
-        YNMAirBridgeDefaultEvent.pushEventScreenAdFormatClick(adsId, viewName, format);
+        YNMAirBridgeDefaultEvent.pushEventScreenAdFormatClick(appData, format);
         switch (format) {
             case YNMAds.BANNER:
-                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatClickBanner(adsId, viewName);
+                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatClickBanner(appData);
                 break;
             case YNMAds.NATIVE:
-                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatClickNative(adsId, viewName);
+                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatClickNative(appData);
                 break;
             case YNMAds.INTERSTITIAL:
-                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatClickInter(adsId, viewName);
+                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatClickInter(appData);
         }
     }
 
     public void onAdImpression() {
-        YNMAirBridgeDefaultEvent.pushEventScreenAdFormatView(adsId, viewName, format);
+        YNMAirBridgeDefaultEvent.pushEventScreenAdFormatView(appData, format);
         switch (format) {
             case YNMAds.BANNER:
-                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatViewBanner(adsId, viewName);
+                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatViewBanner(appData);
                 break;
             case YNMAds.NATIVE:
-                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatViewNative(adsId, viewName);
+                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatViewNative(appData);
                 break;
             case YNMAds.INTERSTITIAL:
-                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatViewInter(adsId, viewName);
+                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatViewInter(appData);
         }
     }
 
