@@ -101,7 +101,13 @@ public class YNMAirBridge {
             event.setAction(tagTest);
         }
         Log.d("AirbridgeEventLog", viewEvent(event));
-        Airbridge.trackEvent(event);
+        try {
+            if (enableAirBridge) {
+                Airbridge.trackEvent(event);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String viewEvent(Event event) {
