@@ -1547,6 +1547,12 @@ public class Admob {
                 }
 
                 @Override
+                public void onAdImpression() {
+                    super.onAdImpression();
+                    callback.onAdImpression();
+                }
+
+                @Override
                 public void onAdClicked() {
                     super.onAdClicked();
                     YNMLogEventManager.logClickAdsEvent(context, id);
