@@ -41,6 +41,11 @@ public class YNMAds {
     private YNMInitCallback initCallback;
     private Boolean initAdSuccess = false;
 
+    //format
+    public final static String BANNER = "Banner";
+    public final static String NATIVE = "Native";
+    public final static String INTERSTITIAL = "Interstitial";
+
     public static synchronized YNMAds getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new YNMAds();
@@ -83,6 +88,7 @@ public class YNMAds {
     public void loadBanner(final Activity mActivity, String id, final YNMAdsCallbacks adCallback) {
         switch (adConfig.getMediationProvider()) {
             case YNMAdsConfig.PROVIDER_ADMOB:
+                adCallback.onAdStartLoad();
                 Admob.getInstance().loadBanner(mActivity, id, new AdsCallback() {
                     @Override
                     public void onAdLoaded() {
@@ -117,6 +123,7 @@ public class YNMAds {
                                      containerShimmerLoading, YNMAdsCallbacks callback) {
         switch (adConfig.getMediationProvider()) {
             case YNMAdsConfig.PROVIDER_ADMOB:
+                callback.onAdStartLoad();
                 Admob.getInstance().loadNativeAd(((Context) activity), id, new AdsCallback() {
                     @Override
                     public void onUnifiedNativeAdLoaded(@NonNull NativeAd unifiedNativeAd) {
@@ -173,8 +180,27 @@ public class YNMAds {
         }
     }
 
-    public void loadCollapsibleBanner(final Activity activity, String id, String gravity, AdsCallback adCallback) {
-        Admob.getInstance().loadCollapsibleBanner(activity, id, gravity, adCallback);
+    public void loadCollapsibleBanner(final Activity activity, String id, String gravity, YNMAdsCallbacks adCallback) {
+        adCallback.onAdStartLoad();
+        Admob.getInstance().loadCollapsibleBanner(activity, id, gravity, new AdsCallback(){
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                adCallback.onAdLoaded();
+            }
+
+            @Override
+            public void onAdImpression() {
+                super.onAdImpression();
+                adCallback.onAdImpression();
+            }
+
+            @Override
+            public void onAdClicked() {
+                super.onAdClicked();
+                adCallback.onAdClicked();
+            }
+        });
     }
 
     public void setInitCallback(YNMInitCallback initCallback) {
@@ -186,6 +212,7 @@ public class YNMAds {
 
     public AdsInterstitial getInterstitialAds(Context context, String id, YNMAdsCallbacks adListener) {
         AdsInterstitial apInterstitialAd = new AdsInterstitial();
+        adListener.onAdStartLoad();
         Admob.getInstance().getInterstitialAds(context, id, new AdsCallback() {
             @Override
             public void onInterstitialLoad(@Nullable InterstitialAd interstitialAd) {
@@ -193,6 +220,7 @@ public class YNMAds {
                 Log.d(TAG, "Admob onInterstitialLoad");
                 apInterstitialAd.setInterstitialAd(interstitialAd);
                 adListener.onInterstitialLoad(apInterstitialAd);
+                adListener.onAdLoaded();
             }
 
             @Override
@@ -208,7 +236,6 @@ public class YNMAds {
                 Log.d(TAG, "Admob onAdFailedToShow");
                 adListener.onAdFailedToShow(new AdsError(adError));
             }
-
         });
         return apInterstitialAd;
     }
@@ -240,6 +267,7 @@ public class YNMAds {
     }
 
     public void loadInterstitialAds(final Context context, String id, long timeOut, long timeDelay, boolean showSplashIfReady, YNMAdsCallbacks adListener) {
+        adListener.onAdStartLoad();
         Admob.getInstance().loadSplashInterstitialAds(context, id, timeOut, timeDelay, showSplashIfReady, new AdsCallback() {
             @Override
             public void onAdClosed() {
@@ -335,6 +363,7 @@ public class YNMAds {
                 Log.d(TAG, "onAdClosed: ");
                 callback.onAdClosed();
                 if (shouldReloadAds) {
+                    callback.onAdStartLoad();
                     Admob.getInstance().getInterstitialAds(context, mInterstitialAd.getInterstitialAd().getAdUnitId(), new AdsCallback() {
                         @Override
                         public void onInterstitialLoad(@Nullable InterstitialAd interstitialAd) {
@@ -342,6 +371,7 @@ public class YNMAds {
                             Log.d(TAG, "Admob shouldReloadAds success");
                             mInterstitialAd.setInterstitialAd(interstitialAd);
                             callback.onInterstitialLoad(mInterstitialAd);
+                            callback.onAdLoaded();
                         }
 
                         @Override
@@ -349,6 +379,12 @@ public class YNMAds {
                             super.onAdFailedToLoad(i);
                             mInterstitialAd.setInterstitialAd(null);
                             callback.onAdFailedToLoad(new AdsError(i));
+                        }
+
+                        @Override
+                        public void onAdImpression() {
+                            super.onAdImpression();
+                            callback.onAdImpression();
                         }
 
                         @Override
@@ -413,6 +449,7 @@ public class YNMAds {
             public void onInterstitialShow() {
                 super.onInterstitialShow();
                 callback.onInterstitialShow();
+                callback.onAdImpression();
             }
         };
         Admob.getInstance().forceShowInterstitial(context, mInterstitialAd.getInterstitialAd(), adCallback);

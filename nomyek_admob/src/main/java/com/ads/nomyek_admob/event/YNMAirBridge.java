@@ -20,6 +20,7 @@ public class YNMAirBridge {
     private Context context;
     private static YNMAirBridge tnmAirBridge;
     public static boolean enableAirBridge = false;
+    private String tagTest;
 
     public YNMAirBridge() {
     }
@@ -86,8 +87,64 @@ public class YNMAirBridge {
         }
     }
 
+    public void setTagTest(String tagTest){
+        YNMAirBridge.getInstance().tagTest = tagTest;
+    }
+
     public static void logCustomEvent(String eventName) {
         Event event = new Event(eventName);
         Airbridge.trackEvent(event);
+    }
+
+    public void logCustomEvent(Event event) {
+        if(tagTest != null){
+            event.setAction(tagTest);
+        }
+        Log.d("AirbridgeEventLog", viewEvent(event));
+        try {
+            if (enableAirBridge) {
+                Airbridge.trackEvent(event);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String viewEvent(Event event) {
+        return "Event{" +
+                "category='" + event.getCategory() + '\'' +
+                ", label='" + event.getLabel() + '\'' +
+                ", action='" + event.getAction() + '\'' +
+                ", value=" + event.getValue() +
+                ", customAttrs=" + event.getCustomAttributes() +
+                '}';
+    }
+
+    public static class AppData{
+        String viewName, adUnit;
+
+        public AppData() {
+        }
+
+        public AppData(String viewName, String adUnit) {
+            this.viewName = viewName;
+            this.adUnit = adUnit;
+        }
+
+        public String getViewName() {
+            return viewName;
+        }
+
+        public void setViewName(String viewName) {
+            this.viewName = viewName;
+        }
+
+        public String getAdUnit() {
+            return adUnit;
+        }
+
+        public void setAdUnit(String adUnit) {
+            this.adUnit = adUnit;
+        }
     }
 }
