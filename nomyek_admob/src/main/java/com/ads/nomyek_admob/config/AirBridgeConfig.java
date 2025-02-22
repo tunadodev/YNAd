@@ -8,6 +8,8 @@ public class AirBridgeConfig {
     private String tokenAirBridge;
     private String eventAdClick;
     private String eventAdImpression;
+    private String userState;
+    private String tagTest;
 
     public boolean isEnableAirBridge() {
         return enableAirBridge;
@@ -47,5 +49,21 @@ public class AirBridgeConfig {
 
     public void setAppNameAirBridge(String appNameAirBridge) {
         this.appNameAirBridge = appNameAirBridge;
+    }
+
+    public String getUserState() {
+        return userState;
+    }
+
+    public void setUserState(String state) {
+        this.userState = state;
+    }
+
+    public String getTagTest() {
+        return tagTest;
+    }
+
+    public void setTagTest(String state) {
+        this.tagTest = state;
     }
 }
