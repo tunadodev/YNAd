@@ -12,12 +12,13 @@ import com.ads.yeknomadmob.event.YNMAirBridgeDefaultEvent;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 
 public class YNMAdsCallbacks {
-    private String format;
+    private String format = "";
     
     private YNMAirBridge.AppData appData;
     private double loadStartTime; // Field to track the start time
 
     public YNMAdsCallbacks() {
+        appData = new YNMAirBridge.AppData();
     }
 
     public YNMAdsCallbacks(YNMAirBridge.AppData appData) {

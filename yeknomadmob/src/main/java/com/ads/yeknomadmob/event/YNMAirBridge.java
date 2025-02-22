@@ -20,7 +20,8 @@ public class YNMAirBridge {
     private Context context;
     private static YNMAirBridge tnmAirBridge;
     public static boolean enableAirBridge = false;
-    private String tagTest;
+    private static String tagTest;
+    private static String userState = "";
 
     public YNMAirBridge() {
     }
@@ -84,11 +85,17 @@ public class YNMAirBridge {
             event.setSemanticAttributes(semanticAttributes);
 
             Airbridge.trackEvent(event);
+            Event eventCustom = new Event("custom_ad_impression");
+            YNMAirBridge.getInstance().logCustomEvent(eventCustom);
         }
     }
 
-    public void setTagTest(String tagTest){
-        YNMAirBridge.getInstance().tagTest = tagTest;
+    public static void setTagTest(String tagTest){
+        YNMAirBridge.tagTest = tagTest;
+    }
+
+    public static void setUserState(String userState){
+        YNMAirBridge.userState = userState;
     }
 
     public static void logCustomEvent(String eventName) {
@@ -98,7 +105,9 @@ public class YNMAirBridge {
 
     public void logCustomEvent(Event event) {
         if(tagTest != null){
-            event.setAction(tagTest);
+            event.setAction(userState + "_" + tagTest);
+        } else {
+            event.setAction(userState);
         }
         Log.d("AirbridgeEventLog", viewEvent(event));
         try {
@@ -121,9 +130,12 @@ public class YNMAirBridge {
     }
 
     public static class AppData{
-        String viewName, adUnit;
+        String viewName = "";
+        String adUnit = "";
 
         public AppData() {
+            viewName = "";
+            adUnit = "";
         }
 
         public AppData(String viewName, String adUnit) {
