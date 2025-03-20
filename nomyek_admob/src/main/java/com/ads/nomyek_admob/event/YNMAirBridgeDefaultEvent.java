@@ -6,6 +6,8 @@ import com.ads.nomyek_admob.event.YNMAirBridge;
 import java.util.HashMap;
 import java.util.Map;
 
+import co.ab180.airbridge.event.Event;
+
 public class YNMAirBridgeDefaultEvent {
     private static String getViewName(YNMAirBridge.AppData appData) {
         if (appData == null) return "";
