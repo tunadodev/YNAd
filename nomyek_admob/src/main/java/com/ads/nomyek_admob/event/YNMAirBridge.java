@@ -86,6 +86,7 @@ public class YNMAirBridge {
 
             Airbridge.trackEvent(event);
             Event eventCustom = new Event("custom_ad_impression");
+            eventCustom.setLabel(adType.toString());
             YNMAirBridge.getInstance().logCustomEvent(eventCustom);
         }
     }

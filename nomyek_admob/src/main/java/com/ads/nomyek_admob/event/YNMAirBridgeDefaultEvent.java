@@ -2,6 +2,7 @@ package com.ads.nomyek_admob.event;
 
 import com.ads.nomyek_admob.ads_components.YNMAds;
 import com.ads.nomyek_admob.event.YNMAirBridge;
+import co.ab180.airbridge.event.Event;
 
 import java.util.HashMap;
 import java.util.Map;

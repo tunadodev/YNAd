@@ -512,6 +512,8 @@ public class Admob {
                     }
                     if (adListener != null) {
                         adListener.onTimeOut();
+                        if (dialog != null && dialog.isShowing())
+                            dialog.dismiss();
                         isShowLoadingSplash = false;
                     }
                 }
