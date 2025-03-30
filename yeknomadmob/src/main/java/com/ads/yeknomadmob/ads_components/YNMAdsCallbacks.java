@@ -135,4 +135,7 @@ public class YNMAdsCallbacks {
 
     public void onRewardAdLoaded(RewardedInterstitialAd rewardedAd) {
     }
+    public void onCheckSkipInter(boolean isSkip) {
+
+    }
 }

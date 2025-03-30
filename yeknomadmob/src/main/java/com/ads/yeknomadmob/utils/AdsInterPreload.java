@@ -100,7 +100,7 @@ public class AdsInterPreload {
                 return;
             }
             // If loaded or failed, remove old model to start fresh
-            mapCaches.remove(key);
+            destroyInterstitial(key);
         }
 
         // Create new model with LOADING state
@@ -152,6 +152,79 @@ public class AdsInterPreload {
     }
 
     /**
+     * Load new interstitial ad with timeout
+     */
+    private static void loadNewInterstitial(Context context, String adId, String key, long timeOut, final YNMAdsCallbacks callback) {
+        YNMAds.getInstance().loadInterstitialAds(context, adId, timeOut, 0, true, new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.INTERSTITIAL) {
+            @Override
+            public void onInterstitialLoad(@Nullable AdsInterstitial interstitialAd) {
+                super.onInterstitialLoad(interstitialAd);
+                if (interstitialAd != null) {
+                    YNMAds.getInstance().forceShowInterstitial(context, interstitialAd, new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.INTERSTITIAL) {
+                        @Override
+                        public void onAdClosed() {
+                            super.onAdClosed();
+                            if (callback != null) callback.onAdClosed();
+                        }
+
+                        @Override
+                        public void onNextAction() {
+                            super.onNextAction();
+                            if (callback != null) callback.onNextAction();
+                        }
+
+                        @Override
+                        public void onCheckSkipInter(boolean isSkip) {
+                            super.onCheckSkipInter(isSkip);
+                            if (!isSkip) {
+                                // Remove from cache after showing
+                                destroyInterstitial(key);
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onAdFailedToLoad(@Nullable AdsError adError) {
+                super.onAdFailedToLoad(adError);
+                if (callback != null) {
+                    callback.onAdFailedToLoad(adError);
+                }
+                // Remove from cache on load fail
+                destroyInterstitial(key);
+            }
+
+            @Override
+            public void onNextAction() {
+                super.onNextAction();
+                if (callback != null) callback.onNextAction();
+            }
+
+            @Override
+            public void onAdFailedToShow(@Nullable AdsError adError) {
+                super.onAdFailedToShow(adError);
+                // Remove from cache on show fail
+                destroyInterstitial(key);
+            }
+
+            @Override
+            public void onTimeOut() {
+                super.onTimeOut();
+                if (callback != null) callback.onNextAction();
+                // Remove from cache on timeout
+                destroyInterstitial(key);
+            }
+
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                SharePreferenceUtils.setLastImpressionInterstitialTime(context);
+            }
+        });
+    }
+
+    /**
      * Show preloaded interstitial ad or load new one if needed
      */
     public static void showPreloadInterAds(Context context, String key, String adId, long timeOut, final YNMAdsCallbacks callback) {
@@ -175,14 +248,26 @@ public class AdsInterPreload {
                                 public void onAdClosed() {
                                     super.onAdClosed();
                                     if (callback != null) callback.onAdClosed();
-                                    // Remove from cache after showing
+                                }
 
+                                @Override
+                                public void onNextAction() {
+                                    super.onNextAction();
+                                    if (callback != null) callback.onNextAction();
+                                }
+
+                                @Override
+                                public void onCheckSkipInter(boolean isSkip) {
+                                    super.onCheckSkipInter(isSkip);
+                                    if (!isSkip) {
+                                        // Remove from cache after showing
+                                        destroyInterstitial(key);
+                                    }
                                 }
                             });
-                            destroyInterstitial(key);
                         } else {
                             // Preloaded ad is not ready, load new one
-                            loadNewInterstitial(context, adId, timeOut, callback);
+                            loadNewInterstitial(context, adId, key, timeOut, callback);
                         }
                         break;
                         
@@ -203,12 +288,25 @@ public class AdsInterPreload {
                                         public void onAdClosed() {
                                             super.onAdClosed();
                                             if (callback != null) callback.onAdClosed();
-                                            // Remove from cache after showing
+                                        }
+
+                                        @Override
+                                        public void onNextAction() {
+                                            super.onNextAction();
+                                            if (callback != null) callback.onNextAction();
+                                        }
+
+                                        @Override
+                                        public void onCheckSkipInter(boolean isSkip) {
+                                            super.onCheckSkipInter(isSkip);
+                                            if (!isSkip) {
+                                                // Remove from cache after showing
+                                                destroyInterstitial(key);
+                                            }
                                         }
                                     });
-                                    destroyInterstitial(key);
                                 } else {
-                                    loadNewInterstitial(context, adId, timeOut, callback);
+                                    loadNewInterstitial(context, adId, key, timeOut, callback);
                                 }
                             }
 
@@ -217,65 +315,19 @@ public class AdsInterPreload {
                                 if (dialog != null && dialog.isShowing()) {
                                     dialog.dismiss();
                                 }
-                                loadNewInterstitial(context, adId, timeOut, callback);
+                                loadNewInterstitial(context, adId, key, timeOut, callback);
                             }
                         });
                         break;
                         
                     case FAIL:
                         // Preload failed, load new one
-                        loadNewInterstitial(context, adId, timeOut, callback);
+                        loadNewInterstitial(context, adId, key, timeOut, callback);
                         break;
                 }
             } else {
                 // No preload exists, load new one
-                loadNewInterstitial(context, adId, timeOut, callback);
-            }
-        });
-    }
-
-    /**
-     * Load new interstitial ad with timeout
-     */
-    private static void loadNewInterstitial(Context context, String adId, long timeOut, final YNMAdsCallbacks callback) {
-        YNMAds.getInstance().loadInterstitialAds(context, adId, timeOut, 0, true, new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.INTERSTITIAL) {
-            @Override
-            public void onInterstitialLoad(@Nullable AdsInterstitial interstitialAd) {
-                super.onInterstitialLoad(interstitialAd);
-            }
-
-            @Override
-            public void onAdFailedToLoad(@Nullable AdsError adError) {
-                super.onAdFailedToLoad(adError);
-            }
-
-            @Override
-            public void onNextAction() {
-                super.onNextAction();
-                if (callback != null) callback.onNextAction();
-            }
-
-            @Override
-            public void onAdFailedToShow(@Nullable AdsError adError) {
-                super.onAdFailedToShow(adError);
-            }
-
-            @Override
-            public void onTimeOut() {
-                super.onTimeOut();
-                if (callback != null) callback.onNextAction();
-            }
-
-            @Override
-            public void onAdLoaded() {
-                super.onAdLoaded();
-                SharePreferenceUtils.setLastImpressionInterstitialTime(context);
-            }
-
-            @Override
-            public void onAdClosed() {
-                super.onAdClosed();
-                if (callback != null) callback.onAdClosed();
+                loadNewInterstitial(context, adId, key, timeOut, callback);
             }
         });
     }
