@@ -100,6 +100,11 @@ public class AdsInterPreload {
                         SharePreferenceUtils.setLastImpressionInterstitialTime(context);
                     }
 
+                    @Override
+                    public void onAdClosed() {
+                        super.onAdClosed();
+                        if (callback != null) callback.onAdClosed();
+                    }
                 });
             }
         });

@@ -5,6 +5,8 @@ import co.ab180.airbridge.event.Event;
 import java.util.HashMap;
 import java.util.Map;
 
+import co.ab180.airbridge.event.Event;
+
 public class YNMAirBridgeDefaultEvent {
     //screen_view
     public static void pushEventScreenView(YNMAirBridge.AppData appData) {
