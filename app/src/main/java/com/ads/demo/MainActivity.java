@@ -25,29 +25,29 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>{
     @Override
     protected void initViews() {
         viewBinding.bannerView.loadBanner(this, BuildConfig.ad_banner);
-        AdsInterPreload.preloadInterAds(this,new YNMAirBridge.AppData(), BuildConfig.ad_interstitial_splash, "test");
-        AdsRewardPreload.preloadRewardAds(this, BuildConfig.ad_reward, "test_reward");
+        AdsInterPreload.preloadInterAds(this,new YNMAirBridge.AppData(), BuildConfig.ad_interstitial_splash, "test", 5000);
+        AdsRewardPreload.preloadRewardAds(this,new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 5000);
         //AdsInterPreload.preloadInterAds(this, BuildConfig.ad_interstitial_splash, "test2");
 //        YNMAds.getInstance().setInitCallback(() -> {
 //            viewBinding.ykmNativeAds.loadNativeAd(this, BuildConfig.ad_native);
 //        }) ;
-        AdsNativePreload.flexPreloadedShowNativeAds(this, viewBinding.ykmNativeAds, "test", com.ads.yeknomadmob.R.layout.custom_native_admob_medium, com.ads.yeknomadmob.R.layout.custom_native_admob_large, BuildConfig.ad_interstitial_splash, BuildConfig.ad_native);
+//        AdsNativePreload.flexPreloadedShowNativeAds(this, viewBinding.ykmNativeAds, com.ads.yeknomadmob.R.layout.custom_native_admob_medium, com.ads.yeknomadmob.R.layout.custom_native_admob_large, BuildConfig.ad_interstitial_splash, BuildConfig.ad_native);
 
 
         viewBinding.showInter.setOnClickListener(view -> {
-//            AdsInterPreload.showPreloadInterAds(this, "test", "test2", BuildConfig.ad_interstitial_splash, 0001, new YNMAdsCallbacks() {
+//            AdsInterPreload.showPreloadInterAds(this, "test", BuildConfig.ad_interstitial_splash, 5000, new YNMAdsCallbacks() {
 //                @Override
 //                public void onNextAction() {
 //                    super.onNextAction();
-//
-//                    AdsInterPreload.preloadInterAds(MainActivity.this, BuildConfig.ad_interstitial_splash, "test");
-//                    AdsInterPreload.preloadInterAds(MainActivity.this, BuildConfig.ad_interstitial_splash, "test2");
+//                    AdsInterPreload.preloadInterAds(MainActivity.this,new YNMAirBridge.AppData(), BuildConfig.ad_interstitial_splash, "test", 5000);
 //                }
 //            });
             AdsRewardPreload.showRewardPreload(this,"test_reward", BuildConfig.ad_reward, 5000, new YNMAdsCallbacks() {
                 @Override
                 public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
                     super.onUserEarnedReward(rewardItem);
+                    AdsRewardPreload.preloadRewardAds(MainActivity.this,new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 5000);
+
                 }
 
                 @Override

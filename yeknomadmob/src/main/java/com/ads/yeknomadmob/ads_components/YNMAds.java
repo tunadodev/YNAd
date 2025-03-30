@@ -45,6 +45,7 @@ public class YNMAds {
     public final static String BANNER = "Banner";
     public final static String NATIVE = "Native";
     public final static String INTERSTITIAL = "Interstitial";
+    public final static String REWARD = "Reward";
 
     public static synchronized YNMAds getInstance() {
         if (INSTANCE == null) {
