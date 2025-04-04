@@ -14,6 +14,10 @@ import com.ads.yeknomadmob.event.YNMAirBridge;
 import com.ads.yeknomadmob.utils.AdsInterPreload;
 import com.ads.yeknomadmob.utils.AdsNativePreload;
 import com.ads.yeknomadmob.utils.AdsRewardPreload;
+import com.ads.yeknomadmob.utils.AdsUnitItem;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding>{
     private YNMNativeAdView ynmAdNative = null;
@@ -25,7 +29,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>{
     @Override
     protected void initViews() {
         viewBinding.bannerView.loadBanner(this, BuildConfig.ad_banner);
-        AdsInterPreload.preloadInterAds(this,new YNMAirBridge.AppData(), BuildConfig.ad_interstitial_splash, "test", 5000);
+//        AdsInterPreload.preloadInterAds(this,new YNMAirBridge.AppData(), BuildConfig.ad_interstitial_splash, "test", 5000);
         AdsRewardPreload.preloadRewardAds(this,new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 5000);
         //AdsInterPreload.preloadInterAds(this, BuildConfig.ad_interstitial_splash, "test2");
 //        YNMAds.getInstance().setInitCallback(() -> {
@@ -42,20 +46,41 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>{
 //                    AdsInterPreload.preloadInterAds(MainActivity.this,new YNMAirBridge.AppData(), BuildConfig.ad_interstitial_splash, "test", 5000);
 //                }
 //            });
-            AdsRewardPreload.showRewardPreload(this,"test_reward", BuildConfig.ad_reward, 5000, new YNMAdsCallbacks() {
+//            AdsRewardPreload.showRewardPreload(this,"test_reward", BuildConfig.ad_reward, 5000, new YNMAdsCallbacks() {
+//                @Override
+//                public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
+//                    super.onUserEarnedReward(rewardItem);
+//                    AdsRewardPreload.preloadRewardAds(MainActivity.this,new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 5000);
+//
+//                }
+//
+//                @Override
+//                public void onAdFailedToLoad(@Nullable AdsError adError) {
+//                    super.onAdFailedToLoad(adError);
+//                }
+//            });
+            List<AdsUnitItem> adUnits = new ArrayList<>();
+            adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key1"));
+            adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3"));
+            AdsInterPreload.showPreloadMultipleInterAds(this, adUnits, 10000, new YNMAdsCallbacks() {
                 @Override
-                public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
-                    super.onUserEarnedReward(rewardItem);
-                    AdsRewardPreload.preloadRewardAds(MainActivity.this,new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 5000);
-
+                public void onAdClosed() {
+                    // Xử lý khi quảng cáo đóng
                 }
 
                 @Override
-                public void onAdFailedToLoad(@Nullable AdsError adError) {
-                    super.onAdFailedToLoad(adError);
+                public void onNextAction() {
+                    // Tiếp tục luồng
                 }
             });
         });
+        List<AdsUnitItem> adUnits = new ArrayList<>();
+        adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key1"));
+        adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3"));
+        AdsInterPreload.preloadMultipleInterAds(this, new YNMAirBridge.AppData("","list"), adUnits, 10000);
+
+// Khi cần hiển thị quảng cáo
+
     }
 
 }
