@@ -18,6 +18,7 @@ import com.ads.yeknomadmob.dialogs.PrepareLoadingAdsDialog;
 import com.ads.yeknomadmob.event.YNMAirBridge;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AdsRewardPreload {
@@ -315,5 +316,281 @@ public class AdsRewardPreload {
     public static boolean isAdReady(String key) {
         RewardModel model = mapCaches.get(key);
         return model != null && model.isReady();
+    }
+
+    /**
+     * Preload multiple reward ads with fallback mechanism.
+     * Loads ads sequentially and stops when one ad loads successfully.
+     * @param activity Activity context
+     * @param appData AppData
+     * @param adUnits List of ad units to preload
+     * @param timeout Timeout for each ad unit
+     */
+    public static void preloadMultipleRewardAds(Activity activity, YNMAirBridge.AppData appData, List<AdsUnitItem> adUnits, long timeout) {
+        if (adUnits == null || adUnits.isEmpty()) {
+            Log.e("AdsRewardPreload", "Ad units list is empty");
+            return;
+        }
+
+        // Start with first ad unit
+        preloadSequentially(activity, appData, adUnits, 0, timeout);
+    }
+
+    private static void preloadSequentially(Activity activity, YNMAirBridge.AppData appData, List<AdsUnitItem> adUnits, int currentIndex, long timeout) {
+        // Check if we've tried all ad units
+        if (currentIndex >= adUnits.size()) {
+            Log.d("AdsRewardPreload", "All reward ad units have been attempted without success");
+            return;
+        }
+
+        // Get current ad unit
+        AdsUnitItem currentAdUnit = adUnits.get(currentIndex);
+        String adId = currentAdUnit.getAdUnitId();
+        String key = currentAdUnit.getKey();
+        
+        // Check if already loading or loaded
+        RewardModel existingModel = mapCaches.get(key);
+        if (existingModel != null) {
+            // If already SUCCESS, no need to continue
+            if (existingModel.getState() == PreloadState.SUCCESS && existingModel.isReady()) {
+                Log.d("AdsRewardPreload", "Reward ad already loaded successfully for key: " + key);
+                return;
+            }
+            if (existingModel.getState() == PreloadState.LOADING) {
+                Log.d("AdsRewardPreload", "Reward ad with key " + key + " is already loading");
+                return;
+            }
+            // If failed, remove old model
+            destroyReward(key);
+        }
+
+        // Create new model with LOADING state
+        RewardModel model = new RewardModel(null, PreloadState.LOADING);
+        mapCaches.put(key, model);
+        
+        // Set custom callback
+        model.setCallback(new YNMAdsCallbacks(appData, YNMAds.REWARD) {
+            @Override
+            public void onRewardAdLoaded(AdsReward rewardedAd) {
+                // Success! We loaded an ad, so no need to try next one
+                RewardModel currentModel = mapCaches.get(key);
+                if (currentModel != null) {
+                    currentModel.setRewardAd(rewardedAd);
+                    currentModel.setState(PreloadState.SUCCESS);
+                }
+                Log.d("AdsRewardPreload", "Reward ad loaded successfully for key: " + key + ", stopping sequence");
+                // No need to continue with next ad unit
+            }
+            
+            @Override
+            public void onAdFailedToLoad(@Nullable AdsError adError) {
+                RewardModel currentModel = mapCaches.get(key);
+                if (currentModel != null) {
+                    currentModel.setState(PreloadState.FAIL);
+                }
+                // Remove on load fail
+                destroyReward(key);
+                
+                // Try next ad unit
+                Log.d("AdsRewardPreload", "Reward ad failed to load for key: " + key + ", trying next one");
+                preloadSequentially(activity, appData, adUnits, currentIndex + 1, timeout);
+            }
+        });
+
+        // Set timeout handler
+        mainHandler.postDelayed(() -> {
+            RewardModel currentModel = mapCaches.get(key);
+            if (currentModel != null && currentModel.getState() == PreloadState.LOADING) {
+                currentModel.setState(PreloadState.FAIL);
+                if (currentModel.getCallback() != null) {
+                    currentModel.getCallback().onAdFailedToLoad(new AdsError("Preload timeout"));
+                }
+                destroyReward(key);
+                
+                // Try next ad unit on timeout
+                Log.d("AdsRewardPreload", "Reward ad timeout for key: " + key + ", trying next one");
+                preloadSequentially(activity, appData, adUnits, currentIndex + 1, timeout);
+            }
+        }, timeout);
+
+        // Start loading
+        YNMAds.getInstance().setInitCallback(() -> {
+            YNMAds.getInstance().getRewardAd(activity, adId, model.getCallback());
+        });
+    }
+
+    /**
+     * Shows preloaded reward ads from a list with sequential checking:
+     * 1. Checks each ad from start to end, shows first ready ad immediately
+     * 2. If an ad is loading, waits for result and shows if successful
+     * 3. If loading fails or times out, continues to next ad
+     * 4. If no ads are ready in the list, loads a new ad using the last item
+     * 
+     * @param activity Activity context
+     * @param adUnits List of ad units to try showing
+     * @param timeOut Timeout for loading operations
+     * @param callback Callbacks for ad events
+     */
+    public static void showPreloadMultipleRewardAds(Activity activity, List<AdsUnitItem> adUnits, long timeOut, final YNMAdsCallbacks callback) {
+        if (adUnits == null || adUnits.isEmpty()) {
+            if (callback != null) {
+                callback.onAdFailedToLoad(new AdsError("Ad units list is empty"));
+            }
+            return;
+        }
+
+        YNMAds.getInstance().setInitCallback(() -> {
+            // Start checking from the first ad
+            checkAndShowAdSequentially(activity, adUnits, 0, timeOut, callback);
+        });
+    }
+    
+    /**
+     * Helper method to check and show reward ads sequentially
+     */
+    private static void checkAndShowAdSequentially(Activity activity, List<AdsUnitItem> adUnits, int currentIndex,
+                                                  long timeOut, final YNMAdsCallbacks callback) {
+        // Check if we've reached the end of the list
+        if (currentIndex >= adUnits.size()) {
+            Log.d("AdsRewardPreload", "No ready reward ads found in the list");
+            // Load the last ad unit as a fallback
+            if (!adUnits.isEmpty()) {
+                AdsUnitItem lastAdUnit = adUnits.get(adUnits.size() - 1);
+                Log.d("AdsRewardPreload", "Loading new reward ad for the last key: " + lastAdUnit.getKey());
+                loadNewReward(activity, lastAdUnit.getAdUnitId(), lastAdUnit.getKey(), timeOut, callback);
+            } else {
+                if (callback != null) {
+                    callback.onAdFailedToLoad(new AdsError("No ads to show"));
+                }
+            }
+            return;
+        }
+
+        // Get current ad unit
+        AdsUnitItem currentAdUnit = adUnits.get(currentIndex);
+        String key = currentAdUnit.getKey();
+        String adId = currentAdUnit.getAdUnitId();
+        
+        Log.d("AdsRewardPreload", "Checking reward ad with key: " + key + " (index: " + currentIndex + ")");
+        
+        // Get model from cache
+        RewardModel model = mapCaches.get(key);
+        
+        if (model == null) {
+            // No preload exists for this key, move to next
+            Log.d("AdsRewardPreload", "No preload exists for key: " + key + ", moving to next");
+            checkAndShowAdSequentially(activity, adUnits, currentIndex + 1, timeOut, callback);
+            return;
+        }
+        
+        // Check ad state
+        switch (model.getState()) {
+            case SUCCESS:
+                if (model.isReady()) {
+                    // Found ready ad, show it
+                    Log.d("AdsRewardPreload", "Found ready reward ad for key: " + key + ", showing it");
+                    YNMAds.getInstance().forceShowRewardAd(activity, model.getRewardAd(), new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.REWARD) {
+                        @Override
+                        public void onAdClosed() {
+                            super.onAdClosed();
+                            if (callback != null) callback.onAdClosed();
+                        }
+
+                        @Override
+                        public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
+                            super.onUserEarnedReward(rewardItem);
+                            if (callback != null) callback.onUserEarnedReward(rewardItem);
+                        }
+                    });
+                    // Remove from cache after showing
+                    destroyReward(key);
+                } else {
+                    // Ad not ready despite SUCCESS state, move to next
+                    Log.d("AdsRewardPreload", "Reward ad marked as SUCCESS but not ready for key: " + key + ", moving to next");
+                    checkAndShowAdSequentially(activity, adUnits, currentIndex + 1, timeOut, callback);
+                }
+                break;
+                
+            case LOADING:
+                // Ad is still loading, wait for result
+                Log.d("AdsRewardPreload", "Reward ad is loading for key: " + key + ", waiting for result");
+                PrepareLoadingAdsDialog dialog = new PrepareLoadingAdsDialog(activity);
+                dialog.setCancelable(false);
+                dialog.show();
+                
+                // Set a timeout for waiting
+                final Handler timeoutHandler = new Handler(Looper.getMainLooper());
+                final Runnable timeoutRunnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        // Timeout waiting for this ad
+                        Log.d("AdsRewardPreload", "Timeout waiting for loading reward ad with key: " + key);
+                        if (dialog != null && dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
+                        // Check next ad
+                        checkAndShowAdSequentially(activity, adUnits, currentIndex + 1, timeOut, callback);
+                    }
+                };
+                timeoutHandler.postDelayed(timeoutRunnable, timeOut);
+                
+                // Set callback to get load result
+                model.setCallback(new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.REWARD) {
+                    @Override
+                    public void onAdLoaded() {
+                        // Cancel timeout
+                        timeoutHandler.removeCallbacks(timeoutRunnable);
+                        
+                        if (dialog != null && dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
+                        
+                        // Check if ad is ready
+                        if (model.isReady()) {
+                            Log.d("AdsRewardPreload", "Reward ad finished loading and is ready for key: " + key + ", showing it");
+                            YNMAds.getInstance().forceShowRewardAd(activity, model.getRewardAd(), new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.REWARD) {
+                                @Override
+                                public void onAdClosed() {
+                                    super.onAdClosed();
+                                    if (callback != null) callback.onAdClosed();
+                                }
+
+                                @Override
+                                public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
+                                    super.onUserEarnedReward(rewardItem);
+                                    if (callback != null) callback.onUserEarnedReward(rewardItem);
+                                }
+                            });
+                            // Remove from cache after showing
+                            destroyReward(key);
+                        } else {
+                            // Ad finished loading but is not ready
+                            Log.d("AdsRewardPreload", "Reward ad finished loading but is not ready for key: " + key + ", moving to next");
+                            checkAndShowAdSequentially(activity, adUnits, currentIndex + 1, timeOut, callback);
+                        }
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@Nullable AdsError adError) {
+                        // Cancel timeout
+                        timeoutHandler.removeCallbacks(timeoutRunnable);
+                        
+                        if (dialog != null && dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
+                        
+                        // Ad failed to load, try next
+                        Log.d("AdsRewardPreload", "Reward ad failed to load for key: " + key + ", moving to next");
+                        checkAndShowAdSequentially(activity, adUnits, currentIndex + 1, timeOut, callback);
+                    }
+                });
+                break;
+                
+            case FAIL:
+                // Preload failed, move to next
+                Log.d("AdsRewardPreload", "Reward ad is in FAIL state for key: " + key + ", moving to next");
+                checkAndShowAdSequentially(activity, adUnits, currentIndex + 1, timeOut, callback);
+                break;
+        }
     }
 }

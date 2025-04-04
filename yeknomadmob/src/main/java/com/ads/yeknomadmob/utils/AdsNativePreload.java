@@ -2,6 +2,8 @@ package com.ads.yeknomadmob.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +20,7 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.nativead.NativeAd;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -104,6 +107,7 @@ public class AdsNativePreload {
 
     // Single map to store all Native Ads with their states and listeners
     private static final Map<String, NativeAdsModels> adsMap = new HashMap<>();
+    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     /**
      * Check if an ad with the given key is currently loading
@@ -419,5 +423,232 @@ public class AdsNativePreload {
      */
     public static void destroyAllNativeAds() {
         destroyAllNativeAds(true);
+    }
+
+    // ----------------- MULTIPLE ADS PRELOAD IMPLEMENTATION -----------------
+
+    /**
+     * Preload multiple native ads with fallback mechanism.
+     * Loads ads sequentially and stops when one ad loads successfully.
+     * 
+     * @param context Context
+     * @param appData AppData
+     * @param adUnits List of ad units to preload
+     * @param timeout Timeout for each ad unit in milliseconds
+     */
+    public static void preloadMultipleNativeAds(Context context, YNMAirBridge.AppData appData, 
+                                                List<AdsUnitItem> adUnits, long timeout) {
+        if (adUnits == null || adUnits.isEmpty()) {
+            return;
+        }
+
+        // Start with first ad unit
+        preloadSequentially(context, appData, adUnits, 0, timeout);
+    }
+
+    /**
+     * Internal method to preload ads sequentially with fallback
+     */
+    private static void preloadSequentially(Context context, YNMAirBridge.AppData appData, 
+                                           List<AdsUnitItem> adUnits, int currentIndex, long timeout) {
+        // Check if we've tried all ad units
+        if (currentIndex >= adUnits.size()) {
+            return;
+        }
+
+        // Get current ad unit
+        AdsUnitItem currentAdUnit = adUnits.get(currentIndex);
+        String adId = currentAdUnit.getAdUnitId();
+        String key = currentAdUnit.getKey();
+        
+        // Check if already loading or loaded
+        NativeAdsModels existingModel = adsMap.get(key);
+        if (existingModel != null) {
+            // If already SUCCESS, no need to continue
+            if (existingModel.isLoaded()) {
+                return;
+            }
+            if (existingModel.isLoading()) {
+                return;
+            }
+            // If failed, remove old model
+            destroyNativeAd(key, true);
+        }
+
+        // Create new model with LOAD state
+        NativeAdsModels model = new NativeAdsModels(null, null, State.LOAD);
+        adsMap.put(key, model);
+        
+        // Set custom load listener
+        NativeAdLoadListener successListener = () -> {
+            // Success! We loaded an ad, so no need to try next one
+        };
+        
+        model.setNativeAdLoadListener(successListener);
+        
+        // Set timeout handler
+        mainHandler.postDelayed(() -> {
+            NativeAdsModels currentModel = adsMap.get(key);
+            if (currentModel != null && currentModel.isLoading()) {
+                // If still loading after timeout, consider it failed and try next ad unit
+                destroyNativeAd(key, true);
+                preloadSequentially(context, appData, adUnits, currentIndex + 1, timeout);
+            }
+        }, timeout);
+
+        // Start loading the ad
+        Admob.getInstance().loadNativeAd(context, adId, new AdsCallback() {
+            @Override
+            public void onUnifiedNativeAdLoaded(@NonNull NativeAd nativeAd) {
+                // Success! Store the ad
+                NativeAdsModels currentModel = adsMap.get(key);
+                if (currentModel != null) {
+                    currentModel.setNativeAd(nativeAd);
+                    currentModel.setState(State.LOADED);
+                    
+                    // Notify listener if exists
+                    if (successListener != null) {
+                        successListener.onNativeAdLoaded();
+                    }
+                }
+                // No need to continue with next ad unit
+            }
+
+            @Override
+            public void onAdFailedToLoad(@Nullable LoadAdError error) {
+                // Failed to load, remove from map and try next
+                destroyNativeAd(key, true);
+                preloadSequentially(context, appData, adUnits, currentIndex + 1, timeout);
+            }
+        });
+    }
+
+    /**
+     * Show the first available ad from a list of preloaded native ads
+     * Checks each ad in the list in order and shows the first one that's ready
+     * 
+     * @param context Context
+     * @param adView The native ad view to display the ad in
+     * @param adUnits List of ad units to try
+     * @param mediumLayout Layout resource for medium ads
+     * @param largeLayout Layout resource for large ads
+     * @param appData App data for callbacks
+     * @param timeout Timeout for loading operations
+     */
+    public static void showPreloadMultipleNativeAds(Context context, YNMNativeAdView adView,
+                                                  List<AdsUnitItem> adUnits, int mediumLayout, 
+                                                  int largeLayout, YNMAirBridge.AppData appData, 
+                                                  long timeout) {
+        if (adUnits == null || adUnits.isEmpty()) {
+            return;
+        }
+
+        YNMAds.getInstance().setInitCallback(new YNMInitCallback() {
+            @Override
+            public void initAdsSuccess() {
+                // Start checking from the first ad
+                checkAndShowAdSequentially(context, adView, adUnits, 0, mediumLayout, 
+                                          largeLayout, appData, timeout);
+            }
+        });
+    }
+
+    /**
+     * Helper method to check and show ads sequentially
+     */
+    private static void checkAndShowAdSequentially(Context context, YNMNativeAdView adView,
+                                                List<AdsUnitItem> adUnits, int currentIndex,
+                                                int mediumLayout, int largeLayout, 
+                                                YNMAirBridge.AppData appData, long timeout) {
+        // Check if we've reached the end of the list
+        if (currentIndex >= adUnits.size()) {
+            // If reached the end, try to load the last ad unit as fallback
+            if (!adUnits.isEmpty()) {
+                AdsUnitItem lastAdUnit = adUnits.get(adUnits.size() - 1);
+                String lastKey = lastAdUnit.getKey();
+                String lastAdId = lastAdUnit.getAdUnitId();
+                
+                // Create a new listener for loading and showing
+                NativeAdLoadListener listener = createShowListener(context, adView, lastKey, mediumLayout, largeLayout);
+                
+                // Create a new model and set to LOAD state
+                adsMap.put(lastKey, new NativeAdsModels(null, listener, State.LOAD));
+                
+                // Start loading the last ad
+                loadNativeAdInternal(context, lastAdId, lastKey, appData, listener);
+            }
+            return;
+        }
+
+        // Get current ad unit
+        AdsUnitItem currentAdUnit = adUnits.get(currentIndex);
+        String key = currentAdUnit.getKey();
+        String adId = currentAdUnit.getAdUnitId();
+        
+        // Get model from cache
+        NativeAdsModels model = adsMap.get(key);
+        
+        // CASE 1: Ad is loaded and ready to show
+        if (model != null && model.isLoaded()) {
+            showAdIfActivityActive(context, adView, model, mediumLayout, largeLayout, true);
+            return;
+        }
+        
+        // CASE 2: Ad is currently loading - wait for it
+        if (model != null && model.isLoading()) {
+            // Set a timeout for waiting
+            final Handler timeoutHandler = new Handler(Looper.getMainLooper());
+            final Runnable timeoutRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    // Timeout waiting for this ad, check next ad
+                    checkAndShowAdSequentially(context, adView, adUnits, currentIndex + 1, 
+                                             mediumLayout, largeLayout, appData, timeout);
+                }
+            };
+            timeoutHandler.postDelayed(timeoutRunnable, timeout);
+            
+            // Set up load listener
+            NativeAdLoadListener listener = new NativeAdLoadListener() {
+                @Override
+                public void onNativeAdLoaded() {
+                    // Cancel timeout
+                    timeoutHandler.removeCallbacks(timeoutRunnable);
+                    
+                    // Show the loaded ad
+                    NativeAdsModels loadedModel = adsMap.get(key);
+                    if (loadedModel != null && loadedModel.isLoaded()) {
+                        showAdIfActivityActive(context, adView, loadedModel, mediumLayout, largeLayout, true);
+                    } else {
+                        // Ad finished loading but is not ready, try next
+                        checkAndShowAdSequentially(context, adView, adUnits, currentIndex + 1, 
+                                                 mediumLayout, largeLayout, appData, timeout);
+                    }
+                }
+            };
+            model.setNativeAdLoadListener(listener);
+            
+            // Also handle case where loading fails
+            mainHandler.postDelayed(() -> {
+                NativeAdsModels currentModel = adsMap.get(key);
+                if (currentModel != null && currentModel.isFailed()) {
+                    timeoutHandler.removeCallbacks(timeoutRunnable);
+                    checkAndShowAdSequentially(context, adView, adUnits, currentIndex + 1, 
+                                             mediumLayout, largeLayout, appData, timeout);
+                }
+            }, 1000); // Check after 1 second
+            
+            return;
+        }
+        
+        // CASE 3: Ad doesn't exist, failed to load, or is in an invalid state
+        // Remove failed entry if exists
+        if (model != null && model.isFailed()) {
+            destroyNativeAd(key, true);
+        }
+        
+        // Try next ad unit
+        checkAndShowAdSequentially(context, adView, adUnits, currentIndex + 1, 
+                                 mediumLayout, largeLayout, appData, timeout);
     }
 }
