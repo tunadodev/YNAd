@@ -45,6 +45,7 @@ public class YNMAds {
     public final static String BANNER = "Banner";
     public final static String NATIVE = "Native";
     public final static String INTERSTITIAL = "Interstitial";
+    public final static String REWARD = "Reward";
 
     public static synchronized YNMAds getInstance() {
         if (INSTANCE == null) {
@@ -346,9 +347,10 @@ public class YNMAds {
      */
     public void forceShowInterstitial(@NonNull Context context, AdsInterstitial mInterstitialAd,
                                       @NonNull final YNMAdsCallbacks callback, boolean shouldReloadAds) {
-        if (System.currentTimeMillis() - SharePreferenceUtils.getLastImpressionInterstitialTime(context)
-                < YNMAds.getInstance().adConfig.getIntervalInterstitialAd() * 1000L
-        ) {
+        boolean isSkip = System.currentTimeMillis() - SharePreferenceUtils.getLastImpressionInterstitialTime(context)
+                < YNMAds.getInstance().adConfig.getIntervalInterstitialAd() * 1000L;
+        callback.onCheckSkipInter(isSkip);
+        if (isSkip) {
             Log.i(TAG, "forceShowInterstitial: ignore by interval impression interstitial time");
             callback.onNextAction();
             return;
