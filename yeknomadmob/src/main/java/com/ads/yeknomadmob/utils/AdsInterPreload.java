@@ -430,19 +430,38 @@ public class AdsInterPreload {
      * @param timeout Timeout for each ad unit
      */
     public static void preloadMultipleInterAds(Context context, YNMAirBridge.AppData appData, List<AdsUnitItem> adUnits, long timeout) {
+        preloadMultipleInterAds(context, appData, adUnits, timeout, null);
+    }
+
+    /**
+     * Preload multiple interstitial ads with fallback mechanism.
+     * Loads ads sequentially and stops when one ad loads successfully.
+     * @param context Context
+     * @param appData AppData
+     * @param adUnits List of ad units to preload
+     * @param timeout Timeout for each ad unit
+     * @param callback Callback to be called when preload is complete (optional)
+     */
+    public static void preloadMultipleInterAds(Context context, YNMAirBridge.AppData appData, List<AdsUnitItem> adUnits, long timeout, final YNMAdsCallbacks callback) {
         if (adUnits == null || adUnits.isEmpty()) {
             Log.e("AdsInterPreload", "Ad units list is empty");
+            if (callback != null) {
+                callback.onAdFailedToLoad(new AdsError("Ad units list is empty"));
+            }
             return;
         }
 
         // Start with first ad unit
-        preloadSequentially(context, appData, adUnits, 0, timeout);
+        preloadSequentially(context, appData, adUnits, 0, timeout, callback);
     }
 
-    private static void preloadSequentially(Context context, YNMAirBridge.AppData appData, List<AdsUnitItem> adUnits, int currentIndex, long timeout) {
+    private static void preloadSequentially(Context context, YNMAirBridge.AppData appData, List<AdsUnitItem> adUnits, int currentIndex, long timeout, final YNMAdsCallbacks callback) {
         // Check if we've tried all ad units
         if (currentIndex >= adUnits.size()) {
             Log.d("AdsInterPreload", "All ad units have been attempted without success");
+            if (callback != null) {
+                callback.onAdFailedToLoad(new AdsError("All ad units have been attempted without success"));
+            }
             return;
         }
 
@@ -457,6 +476,9 @@ public class AdsInterPreload {
             // If already SUCCESS, no need to continue
             if (existingModel.getState() == PreloadState.SUCCESS && existingModel.isReady()) {
                 Log.d("AdsInterPreload", "Ad already loaded successfully for key: " + key);
+                if (callback != null) {
+                    callback.onAdLoaded();
+                }
                 return;
             }
             if (existingModel.getState() == PreloadState.LOADING) {
@@ -482,21 +504,24 @@ public class AdsInterPreload {
                     currentModel.setState(PreloadState.SUCCESS);
                 }
                 Log.d("AdsInterPreload", "Ad loaded successfully for key: " + key + ", stopping sequence");
+                // Call the callback to notify success
+                if (callback != null) {
+                    callback.onAdLoaded();
+                }
                 // No need to continue with next ad unit
             }
             
             @Override
             public void onAdFailedToLoad(@Nullable AdsError adError) {
                 InterstitialModel currentModel = mapCaches.get(key);
-                if (currentModel != null) {
+                if (currentModel != null && currentModel.getState() == PreloadState.LOADING) {
                     currentModel.setState(PreloadState.FAIL);
+                    destroyInterstitial(key);
+
+                    // Try next ad unit on timeout
+                    Log.d("AdsInterPreload", "Ad timeout for key: " + key + ", trying next one");
+                    preloadSequentially(context, appData, adUnits, currentIndex + 1, timeout, callback);
                 }
-                // Remove on load fail
-                destroyInterstitial(key);
-                
-                // Try next ad unit
-                Log.d("AdsInterPreload", "Ad failed to load for key: " + key + ", trying next one");
-                preloadSequentially(context, appData, adUnits, currentIndex + 1, timeout);
             }
         });
 
@@ -512,7 +537,7 @@ public class AdsInterPreload {
                 
                 // Try next ad unit on timeout
                 Log.d("AdsInterPreload", "Ad timeout for key: " + key + ", trying next one");
-                preloadSequentially(context, appData, adUnits, currentIndex + 1, timeout);
+                preloadSequentially(context, appData, adUnits, currentIndex + 1, timeout, callback);
             }
         }, timeout);
 

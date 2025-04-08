@@ -34,6 +34,8 @@ import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 
+import java.util.List;
+
 public class YNMAds {
     public static final String TAG = "YKMAds";
     private static volatile YNMAds INSTANCE;
@@ -109,6 +111,74 @@ public class YNMAds {
                     public void onAdFailedToLoad(@Nullable LoadAdError i) {
                         super.onAdFailedToLoad(i);
                         adCallback.onAdFailedToLoad(new AdsError(i));
+                    }
+
+                    @Override
+                    public void onAdImpression() {
+                        super.onAdImpression();
+                        adCallback.onAdImpression();
+                    }
+                });
+                break;
+        }
+    }
+
+    /**
+     * Load banner with multiple ad unit IDs.
+     * Tries to load each ad unit ID sequentially until one succeeds.
+     * If all fail, the last failure callback will be triggered.
+     * 
+     * @param mActivity Activity context
+     * @param adUnitIds List of ad unit IDs to try
+     * @param adCallback Callback for ad events
+     */
+    public void loadMultiIdBanner(final Activity mActivity, final List<String> adUnitIds, final YNMAdsCallbacks adCallback) {
+        if (adUnitIds == null || adUnitIds.isEmpty()) {
+            adCallback.onAdFailedToLoad(new AdsError("Ad unit IDs list is empty"));
+            return;
+        }
+
+        // Start with the first ad unit ID
+        loadMultiIdBannerSequentially(mActivity, adUnitIds, 0, adCallback);
+    }
+
+    /**
+     * Helper method to load banner ads sequentially
+     */
+    private void loadMultiIdBannerSequentially(final Activity mActivity, final List<String> adUnitIds, 
+                                              final int currentIndex, final YNMAdsCallbacks adCallback) {
+        // Check if we've tried all ad unit IDs
+        if (currentIndex >= adUnitIds.size()) {
+            adCallback.onAdFailedToLoad(new AdsError("All ad units have been attempted without success"));
+            return;
+        }
+
+        // Get current ad unit ID
+        final String currentAdUnitId = adUnitIds.get(currentIndex);
+        
+        // Try to load the current ad unit
+        switch (adConfig.getMediationProvider()) {
+            case YNMAdsConfig.PROVIDER_ADMOB:
+                adCallback.onAdStartLoad();
+                Admob.getInstance().loadBanner(mActivity, currentAdUnitId, new AdsCallback() {
+                    @Override
+                    public void onAdLoaded() {
+                        super.onAdLoaded();
+                        adCallback.onAdLoaded();
+                        // Success! No need to try next ad unit
+                    }
+
+                    @Override
+                    public void onAdClicked() {
+                        super.onAdClicked();
+                        adCallback.onAdClicked();
+                    }
+
+                    @Override
+                    public void onAdFailedToLoad(@Nullable LoadAdError i) {
+                        super.onAdFailedToLoad(i);
+                        // Try next ad unit
+                        loadMultiIdBannerSequentially(mActivity, adUnitIds, currentIndex + 1, adCallback);
                     }
 
                     @Override
