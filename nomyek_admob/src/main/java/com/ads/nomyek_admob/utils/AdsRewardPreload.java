@@ -159,6 +159,13 @@ public class AdsRewardPreload {
      * Load new reward ad with timeout
      */
     private static void loadNewReward(Activity context, String adId, String key, long timeOut, final YNMAdsCallbacks callback) {
+        if (context == null || context.isFinishing() || context.isDestroyed()) {
+            if (callback != null) {
+                callback.onAdFailedToLoad(new AdsError("Activity is not available"));
+            }
+            return;
+        }
+        
         PrepareLoadingAdsDialog dialog = new PrepareLoadingAdsDialog(context);
         dialog.setCancelable(false);
         dialog.show();
@@ -166,8 +173,12 @@ public class AdsRewardPreload {
         // Add timeout handler
         Handler timeoutHandler = new Handler(Looper.getMainLooper());
         Runnable timeoutRunnable = () -> {
-            if (dialog.isShowing()) {
-                dialog.dismiss();
+            if (dialog != null && dialog.isShowing() && !isActivityDestroyed(context)) {
+                try {
+                    dialog.dismiss();
+                } catch (IllegalArgumentException e) {
+                    Log.e("AdsRewardPreload", "Failed to dismiss dialog: " + e.getMessage());
+                }
                 if (callback != null) {
                     callback.onAdFailedToLoad(new AdsError("Ad load timeout"));
                 }
@@ -179,9 +190,22 @@ public class AdsRewardPreload {
             @Override
             public void onRewardAdLoaded(AdsReward rewardedAd) {
                 timeoutHandler.removeCallbacks(timeoutRunnable);
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
+                if (dialog != null && dialog.isShowing() && !isActivityDestroyed(context)) {
+                    try {
+                        dialog.dismiss();
+                    } catch (IllegalArgumentException e) {
+                        Log.e("AdsRewardPreload", "Failed to dismiss dialog: " + e.getMessage());
+                    }
                 }
+                
+                if (isActivityDestroyed(context)) {
+                    if (callback != null) {
+                        callback.onAdFailedToLoad(new AdsError("Activity is not available"));
+                    }
+                    destroyReward(key);
+                    return;
+                }
+                
                 YNMAds.getInstance().forceShowRewardAd(context, rewardedAd, new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.REWARD) {
                     @Override
                     public void onAdClosed() {
@@ -202,8 +226,12 @@ public class AdsRewardPreload {
             @Override
             public void onAdFailedToLoad(@Nullable AdsError adError) {
                 timeoutHandler.removeCallbacks(timeoutRunnable);
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
+                if (dialog != null && dialog.isShowing() && !isActivityDestroyed(context)) {
+                    try {
+                        dialog.dismiss();
+                    } catch (IllegalArgumentException e) {
+                        Log.e("AdsRewardPreload", "Failed to dismiss dialog: " + e.getMessage());
+                    }
                 }
                 if (callback != null) {
                     callback.onAdFailedToLoad(adError);
@@ -215,9 +243,23 @@ public class AdsRewardPreload {
     }
 
     /**
+     * Helper method to check if activity is destroyed or finishing
+     */
+    private static boolean isActivityDestroyed(Activity activity) {
+        return activity == null || activity.isFinishing() || activity.isDestroyed();
+    }
+
+    /**
      * Show preloaded reward ad or load new one if needed
      */
     public static void showRewardPreload(Activity context, String key, String adId, long timeOut, final YNMAdsCallbacks callback) {
+        if (isActivityDestroyed(context)) {
+            if (callback != null) {
+                callback.onAdFailedToLoad(new AdsError("Activity is not available"));
+            }
+            return;
+        }
+        
         YNMAds.getInstance().setInitCallback(() -> {
             RewardModel model = mapCaches.get(key);
             
@@ -249,15 +291,36 @@ public class AdsRewardPreload {
                         
                     case LOADING:
                         // Wait for preload result
+                        if (isActivityDestroyed(context)) {
+                            if (callback != null) {
+                                callback.onAdFailedToLoad(new AdsError("Activity is not available"));
+                            }
+                            return;
+                        }
+                        
                         PrepareLoadingAdsDialog dialog = new PrepareLoadingAdsDialog(context);
                         dialog.setCancelable(false);
                         dialog.show();
+                        
                         model.setCallback(new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.REWARD) {
                             @Override
                             public void onAdLoaded() {
-                                if (dialog != null && dialog.isShowing()) {
-                                    dialog.dismiss();
+                                if (dialog != null && dialog.isShowing() && !isActivityDestroyed(context)) {
+                                    try {
+                                        dialog.dismiss();
+                                    } catch (IllegalArgumentException e) {
+                                        Log.e("AdsRewardPreload", "Failed to dismiss dialog: " + e.getMessage());
+                                    }
                                 }
+                                
+                                if (isActivityDestroyed(context)) {
+                                    if (callback != null) {
+                                        callback.onAdFailedToLoad(new AdsError("Activity is not available"));
+                                    }
+                                    destroyReward(key);
+                                    return;
+                                }
+                                
                                 if (model.isReady()) {
                                     YNMAds.getInstance().forceShowRewardAd(context, model.getRewardAd(), new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.REWARD) {
                                         @Override
@@ -281,8 +344,12 @@ public class AdsRewardPreload {
 
                             @Override
                             public void onAdFailedToLoad(@Nullable AdsError adError) {
-                                if (dialog != null && dialog.isShowing()) {
-                                    dialog.dismiss();
+                                if (dialog != null && dialog.isShowing() && !isActivityDestroyed(context)) {
+                                    try {
+                                        dialog.dismiss();
+                                    } catch (IllegalArgumentException e) {
+                                        Log.e("AdsRewardPreload", "Failed to dismiss dialog: " + e.getMessage());
+                                    }
                                 }
                                 loadNewReward(context, adId, key, timeOut, callback);
                             }
@@ -449,6 +516,13 @@ public class AdsRewardPreload {
      */
     private static void checkAndShowAdSequentially(Activity activity, List<AdsUnitItem> adUnits, int currentIndex,
                                                   long timeOut, final YNMAdsCallbacks callback) {
+        if (isActivityDestroyed(activity)) {
+            if (callback != null) {
+                callback.onAdFailedToLoad(new AdsError("Activity is not available"));
+            }
+            return;
+        }
+                                                  
         // Check if we've reached the end of the list
         if (currentIndex >= adUnits.size()) {
             Log.d("AdsRewardPreload", "No ready reward ads found in the list");
@@ -513,6 +587,14 @@ public class AdsRewardPreload {
             case LOADING:
                 // Ad is still loading, wait for result
                 Log.d("AdsRewardPreload", "Reward ad is loading for key: " + key + ", waiting for result");
+                
+                if (isActivityDestroyed(activity)) {
+                    if (callback != null) {
+                        callback.onAdFailedToLoad(new AdsError("Activity is not available"));
+                    }
+                    return;
+                }
+                
                 PrepareLoadingAdsDialog dialog = new PrepareLoadingAdsDialog(activity);
                 dialog.setCancelable(false);
                 dialog.show();
@@ -524,8 +606,12 @@ public class AdsRewardPreload {
                     public void run() {
                         // Timeout waiting for this ad
                         Log.d("AdsRewardPreload", "Timeout waiting for loading reward ad with key: " + key);
-                        if (dialog != null && dialog.isShowing()) {
-                            dialog.dismiss();
+                        if (dialog != null && dialog.isShowing() && !isActivityDestroyed(activity)) {
+                            try {
+                                dialog.dismiss();
+                            } catch (IllegalArgumentException e) {
+                                Log.e("AdsRewardPreload", "Failed to dismiss dialog: " + e.getMessage());
+                            }
                         }
                         // Check next ad
                         checkAndShowAdSequentially(activity, adUnits, currentIndex + 1, timeOut, callback);
@@ -540,8 +626,19 @@ public class AdsRewardPreload {
                         // Cancel timeout
                         timeoutHandler.removeCallbacks(timeoutRunnable);
                         
-                        if (dialog != null && dialog.isShowing()) {
-                            dialog.dismiss();
+                        if (dialog != null && dialog.isShowing() && !isActivityDestroyed(activity)) {
+                            try {
+                                dialog.dismiss();
+                            } catch (IllegalArgumentException e) {
+                                Log.e("AdsRewardPreload", "Failed to dismiss dialog: " + e.getMessage());
+                            }
+                        }
+                        
+                        if (isActivityDestroyed(activity)) {
+                            if (callback != null) {
+                                callback.onAdFailedToLoad(new AdsError("Activity is not available"));
+                            }
+                            return;
                         }
                         
                         // Check if ad is ready
@@ -574,8 +671,12 @@ public class AdsRewardPreload {
                         // Cancel timeout
                         timeoutHandler.removeCallbacks(timeoutRunnable);
                         
-                        if (dialog != null && dialog.isShowing()) {
-                            dialog.dismiss();
+                        if (dialog != null && dialog.isShowing() && !isActivityDestroyed(activity)) {
+                            try {
+                                dialog.dismiss();
+                            } catch (IllegalArgumentException e) {
+                                Log.e("AdsRewardPreload", "Failed to dismiss dialog: " + e.getMessage());
+                            }
                         }
                         
                         // Ad failed to load, try next

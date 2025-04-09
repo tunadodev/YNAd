@@ -1,8 +1,11 @@
 package com.ads.nomyek_admob.dialogs;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 
 import com.ads.nomyek_admob.R;
@@ -21,4 +24,30 @@ public class PrepareLoadingAdsDialog extends Dialog {
         getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
     }
 
+    @Override
+    public void dismiss() {
+        try {
+            Context context = getContext();
+            if (context instanceof Activity) {
+                Activity activity = (Activity) context;
+                if (!activity.isFinishing() && !activity.isDestroyed()) {
+                    // Activity still exists, safe to dismiss
+                    super.dismiss();
+                }
+                // Otherwise, the activity is no longer valid, no need to dismiss
+            } else {
+                // Context is not an activity, still try to dismiss normally
+                super.dismiss();
+            }
+        } catch (Exception e) {
+            // Log exception for debugging
+            Log.e("PrepareLoadingAdsDialog", "Error dismissing dialog: " + e.getMessage());
+            // Attempt to dismiss anyway as a last resort
+            try {
+                super.dismiss();
+            } catch (Exception ignored) {
+                // Nothing more we can do
+            }
+        }
+    }
 }

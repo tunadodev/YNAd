@@ -12,6 +12,8 @@ import com.ads.nomyek_admob.R;
 import com.ads.nomyek_admob.ads_components.YNMAds;
 import com.ads.nomyek_admob.ads_components.YNMAdsCallbacks;
 
+import java.util.List;
+
 public class YNMBannerAdView extends RelativeLayout {
 
     private String TAG = "YNMBannerAdView";
@@ -50,5 +52,9 @@ public class YNMBannerAdView extends RelativeLayout {
 
     public void loadBanner(Activity activity, String idBanner, YNMAdsCallbacks ynmAdsCallbacks) {
         YNMAds.getInstance().loadBanner(activity, idBanner, ynmAdsCallbacks);
+    }
+
+    public void loadMultiIdBanner(Activity activity, List<String> idBanner, YNMAdsCallbacks ynmAdsCallbacks) {
+        YNMAds.getInstance().loadMultiIdBanner(activity, idBanner, ynmAdsCallbacks);
     }
 }
