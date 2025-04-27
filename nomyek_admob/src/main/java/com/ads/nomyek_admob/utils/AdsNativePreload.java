@@ -428,6 +428,27 @@ public class AdsNativePreload {
     // ----------------- MULTIPLE ADS PRELOAD IMPLEMENTATION -----------------
 
     /**
+     * Model class to hold ad unit ID and key information
+     */
+    public static class AdsUnitItem {
+        private String adUnitId;
+        private String key;
+
+        public AdsUnitItem(String adUnitId, String key) {
+            this.adUnitId = adUnitId;
+            this.key = key;
+        }
+
+        public String getAdUnitId() {
+            return adUnitId;
+        }
+
+        public String getKey() {
+            return key;
+        }
+    }
+
+    /**
      * Preload multiple native ads with fallback mechanism.
      * Loads ads sequentially and stops when one ad loads successfully.
      * 
@@ -444,6 +465,32 @@ public class AdsNativePreload {
 
         // Start with first ad unit
         preloadSequentially(context, appData, adUnits, 0, timeout);
+    }
+
+    /**
+     * Preload multiple native ads with a list of ad unit IDs
+     * Uses a default timeout of 10 seconds per ad unit
+     * 
+     * @param context Context
+     * @param appData AppData
+     * @param adUnitIds List of ad unit IDs to preload
+     */
+    public static void preloadMultipleNativeAds(Context context, YNMAirBridge.AppData appData,
+                                               List<String> adUnitIds) {
+        if (adUnitIds == null || adUnitIds.isEmpty()) {
+            return;
+        }
+
+        // Convert list of IDs to list of AdsUnitItem
+        List<AdsUnitItem> adUnits = new java.util.ArrayList<>();
+        for (int i = 0; i < adUnitIds.size(); i++) {
+            String adId = adUnitIds.get(i);
+            String key = "native_ad_" + i + "_" + adId;
+            adUnits.add(new AdsUnitItem(adId, key));
+        }
+
+        // Call existing implementation with 10 seconds (10000ms) timeout
+        preloadMultipleNativeAds(context, appData, adUnits, 10000);
     }
 
     /**
@@ -650,5 +697,161 @@ public class AdsNativePreload {
         // Try next ad unit
         checkAndShowAdSequentially(context, adView, adUnits, currentIndex + 1, 
                                  mediumLayout, largeLayout, appData, timeout);
+    }
+
+    public static void showPreloadMultipleNativeAds(Context context, YNMNativeAdView adView,
+                                                  List<String> adUnitIds, int mediumLayout, 
+                                                  int largeLayout, YNMAirBridge.AppData appData) {
+        if (adUnitIds == null || adUnitIds.isEmpty()) {
+            return;
+        }
+
+        // Convert list of IDs to list of AdsUnitItem
+        List<AdsUnitItem> adUnits = new java.util.ArrayList<>();
+        for (int i = 0; i < adUnitIds.size(); i++) {
+            String adId = adUnitIds.get(i);
+            String key = "native_ad_" + i + "_" + adId;
+            adUnits.add(new AdsUnitItem(adId, key));
+        }
+
+        // Call existing implementation with 10 seconds (10000ms) timeout
+        showPreloadMultipleNativeAds(context, adView, adUnits, mediumLayout, 
+                                    largeLayout, appData, 10000);
+    }
+
+    /**
+     * Directly load and show native ads from a list of ad unit IDs.
+     * Tries to load each ID for the specified timeout duration, if successful shows it, 
+     * otherwise tries the next ID, continuing until the end of the list.
+     *
+     * @param context Context
+     * @param adView The native ad view to display the ad in
+     * @param adUnitIds List of ad unit IDs to try
+     * @param mediumLayout Layout resource for medium ads
+     * @param largeLayout Layout resource for large ads
+     * @param appData App data for callbacks
+     * @param timeout Timeout duration in milliseconds for each ad loading attempt
+     */
+    public static void loadAndShowNativeAds(Context context, YNMNativeAdView adView,
+                                           List<String> adUnitIds, int mediumLayout, 
+                                           int largeLayout, YNMAirBridge.AppData appData,
+                                           long timeout) {
+        if (adUnitIds == null || adUnitIds.isEmpty()) {
+            return;
+        }
+
+        YNMAds.getInstance().setInitCallback(new YNMInitCallback() {
+            @Override
+            public void initAdsSuccess() {
+                // Start trying from the first ad ID
+                tryLoadAndShowAd(context, adView, adUnitIds, 0, mediumLayout, 
+                                largeLayout, appData, timeout);
+            }
+        });
+    }
+
+    /**
+     * Directly load and show native ads from a list of ad unit IDs with default timeout of 10 seconds.
+     *
+     * @param context Context
+     * @param adView The native ad view to display the ad in
+     * @param adUnitIds List of ad unit IDs to try
+     * @param mediumLayout Layout resource for medium ads
+     * @param largeLayout Layout resource for large ads
+     * @param appData App data for callbacks
+     */
+    public static void loadAndShowNativeAds(Context context, YNMNativeAdView adView,
+                                           List<String> adUnitIds, int mediumLayout, 
+                                           int largeLayout, YNMAirBridge.AppData appData) {
+        loadAndShowNativeAds(context, adView, adUnitIds, mediumLayout, largeLayout, appData, 10000);
+    }
+
+    /**
+     * Helper method to try loading and showing ads sequentially
+     */
+    private static void tryLoadAndShowAd(Context context, YNMNativeAdView adView,
+                                       List<String> adUnitIds, int currentIndex,
+                                       int mediumLayout, int largeLayout, 
+                                       YNMAirBridge.AppData appData, long timeout) {
+        // Check if we've reached the end of the list
+        if (currentIndex >= adUnitIds.size()) {
+            return;
+        }
+
+        // Get current ad unit ID
+        String adId = adUnitIds.get(currentIndex);
+        String key = "direct_native_ad_" + currentIndex + "_" + adId;
+        
+        // Create callbacks for this ad attempt
+        YNMAdsCallbacks ynmCallbacks = new YNMAdsCallbacks(appData, YNMAds.NATIVE);
+        
+        // Create a flag to track if this attempt has already moved to the next ID
+        final boolean[] movedToNext = {false};
+        
+        // Set timeout handler
+        final Handler timeoutHandler = new Handler(Looper.getMainLooper());
+        final Runnable timeoutRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (!movedToNext[0]) {
+                    movedToNext[0] = true;
+                    // Timeout reached, move to next ad
+                    destroyNativeAd(key, true);
+                    tryLoadAndShowAd(context, adView, adUnitIds, currentIndex + 1, 
+                                   mediumLayout, largeLayout, appData, timeout);
+                }
+            }
+        };
+        
+        // Set timeout with specified duration
+        timeoutHandler.postDelayed(timeoutRunnable, timeout);
+        
+        // Start loading the ad
+        Admob.getInstance().loadNativeAd(context, adId, new AdsCallback() {
+            @Override
+            public void onUnifiedNativeAdLoaded(@NonNull NativeAd nativeAd) {
+                // Cancel timeout
+                timeoutHandler.removeCallbacks(timeoutRunnable);
+                
+                // Update callbacks
+                ynmCallbacks.onAdLoaded();
+                
+                // Show the ad if activity is active
+                if (context instanceof Activity) {
+                    Activity activity = (Activity) context;
+                    if (!activity.isFinishing() && !activity.isDestroyed()) {
+                        AdsHelper.initAutoResizeAds(context, adView, nativeAd, 
+                                                 mediumLayout, largeLayout, false);
+                    }
+                }
+                
+                // Store the ad in map for reference
+                setNativeAd(nativeAd, key);
+            }
+
+            @Override
+            public void onAdImpression() {
+                super.onAdImpression();
+                ynmCallbacks.onAdImpression();
+            }
+
+            @Override
+            public void onAdFailedToLoad(@Nullable LoadAdError error) {
+                super.onAdFailedToLoad(error);
+                ynmCallbacks.onAdFailedToLoad(new AdsError("Ad load error: " + error));
+                
+                // Only move to next if timeout hasn't already triggered a move
+                if (!movedToNext[0]) {
+                    movedToNext[0] = true;
+                    
+                    // Cancel timeout
+                    timeoutHandler.removeCallbacks(timeoutRunnable);
+                    
+                    // Try next ad unit immediately
+                    tryLoadAndShowAd(context, adView, adUnitIds, currentIndex + 1, 
+                                   mediumLayout, largeLayout, appData, timeout);
+                }
+            }
+        });
     }
 }
