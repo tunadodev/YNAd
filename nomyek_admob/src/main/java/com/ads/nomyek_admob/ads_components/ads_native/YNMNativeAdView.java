@@ -64,6 +64,12 @@ public class YNMNativeAdView extends RelativeLayout {
 
     private void init() {
         layoutPlaceHolder = new FrameLayout(getContext());
+        LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        // Check if parent view has MATCH_PARENT height
+        if (getLayoutParams() != null && getLayoutParams().height == LayoutParams.MATCH_PARENT) {
+            params.height = LayoutParams.MATCH_PARENT;
+        }
+        layoutPlaceHolder.setLayoutParams(params);
         addView(layoutPlaceHolder);
         if (layoutLoading != null)
             addView(layoutLoading);
