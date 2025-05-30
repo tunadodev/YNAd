@@ -349,9 +349,9 @@ public class YNMAds {
             }
 
             @Override
-            public void onNextAction() {
-                super.onNextAction();
-                adListener.onNextAction();
+            public void onNextAction(boolean isShown) {
+                super.onNextAction(isShown);
+                adListener.onNextAction(false);
             }
 
             @Override
@@ -422,12 +422,12 @@ public class YNMAds {
         callback.onCheckSkipInter(isSkip);
         if (isSkip) {
             Log.i(TAG, "forceShowInterstitial: ignore by interval impression interstitial time");
-            callback.onNextAction();
+            callback.onNextAction(false);
             return;
         }
         if (mInterstitialAd == null || mInterstitialAd.isNotReady()) {
             Log.e(TAG, "forceShowInterstitial: AdsInterstitial is not ready");
-            callback.onNextAction();
+            callback.onNextAction(false);
             return;
         }
         AdsCallback adCallback = new AdsCallback() {
@@ -474,10 +474,10 @@ public class YNMAds {
             }
 
             @Override
-            public void onNextAction() {
-                super.onNextAction();
+            public void onNextAction(boolean isShown) {
+                super.onNextAction(isShown);
                 Log.d(TAG, "onNextAction: ");
-                callback.onNextAction();
+                callback.onNextAction(true);
             }
 
             @Override
@@ -571,10 +571,10 @@ public class YNMAds {
             }
 
             @Override
-            public void onNextAction() {
-                super.onNextAction();
+            public void onNextAction(boolean isShown) {
+                super.onNextAction(isShown);
                 Log.d(TAG, "onNextAction: ");
-                callback.onNextAction();
+                callback.onNextAction(false);
             }
 
             @Override
@@ -739,7 +739,7 @@ public class YNMAds {
             callback) {
         if (!apRewardAd.isReady()) {
             Log.e(TAG, "forceShowRewardAd fail: reward ad not ready");
-            callback.onNextAction();
+            callback.onNextAction(false);
             return;
         }
         switch (adConfig.getMediationProvider()) {
@@ -755,13 +755,14 @@ public class YNMAds {
                         @Override
                         public void onRewardedAdClosed() {
                             apRewardAd.clean();
-                            callback.onNextAction();
+                            callback.onNextAction(true);
                         }
 
                         @Override
                         public void onRewardedAdFailedToShow(int codeError) {
                             apRewardAd.clean();
                             callback.onAdFailedToShow(new AdsError(new AdError(codeError, "note msg", "Reward")));
+                            callback.onNextAction(false);
                         }
 
                         @Override
@@ -782,13 +783,14 @@ public class YNMAds {
                         @Override
                         public void onRewardedAdClosed() {
                             apRewardAd.clean();
-                            callback.onNextAction();
+                            callback.onNextAction(true);
                         }
 
                         @Override
                         public void onRewardedAdFailedToShow(int codeError) {
                             apRewardAd.clean();
                             callback.onAdFailedToShow(new AdsError(new AdError(codeError, "note msg", "Reward")));
+                            callback.onNextAction(false);
                         }
 
                         @Override

@@ -49,7 +49,7 @@ public class YNMAdsCallbacks {
     public void onTimeOut() {
     }
 
-    public void onNextAction() {
+    public void onNextAction(boolean adsShown) {
     }
 
     public void onAdClosed() {
