@@ -14,7 +14,7 @@ import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 public class AdsCallback {
     public void onTimeOut() {
     }
-    public void onNextAction() {
+    public void onNextAction(boolean isShown) {
     }
 
     public void onAdClosed() {
