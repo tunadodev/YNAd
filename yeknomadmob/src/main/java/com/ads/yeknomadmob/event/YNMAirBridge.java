@@ -20,7 +20,7 @@ public class YNMAirBridge {
     private Context context;
     private static YNMAirBridge tnmAirBridge;
     public static boolean enableAirBridge = false;
-    private static boolean enableDebugEventLogOnly = false;
+    private static boolean disableAirBridgeLog = false;
     private static String tagTest;
     private static String userState = "";
 
@@ -92,12 +92,12 @@ public class YNMAirBridge {
         }
     }
 
-    public static boolean isEnableDebugEventLogOnly() {
-        return enableDebugEventLogOnly;
+    public static boolean isDisableAirBridgeLog() {
+        return disableAirBridgeLog;
     }
 
-    public static void setEnableDebugEventLogOnly(boolean enableDebugEventLogOnly) {
-        YNMAirBridge.enableDebugEventLogOnly = enableDebugEventLogOnly;
+    public static void setDisableAirBridgeLog(boolean disableAirBridgeLog) {
+        YNMAirBridge.disableAirBridgeLog = disableAirBridgeLog;
     }
 
     public static void setTagTest(String tagTest){
@@ -121,7 +121,7 @@ public class YNMAirBridge {
         }
         Log.d("DEBUG_AirbridgeEventLog", viewEvent(event));
         try {
-            if (!enableDebugEventLogOnly && enableAirBridge) {
+            if (!disableAirBridgeLog && enableAirBridge) {
                 Airbridge.trackEvent(event);
                 Log.d("AirbridgeEventLog", viewEvent(event));
             }

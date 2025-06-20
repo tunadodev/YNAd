@@ -4,7 +4,7 @@ package com.ads.yeknomadmob.config;
  */
 public class AirBridgeConfig {
     private boolean enableAirBridge;
-    private boolean enableDebugEventLogOnly = false;
+    private boolean disableAirbridgeLog = false;
     private String appNameAirBridge;
     private String tokenAirBridge;
     private String eventAdClick;
@@ -20,12 +20,12 @@ public class AirBridgeConfig {
         this.enableAirBridge = enableAirBridge;
     }
 
-    public void setEnableDebugEventLogOnly(boolean enableDebugEventLogOnly) {
-        this.enableDebugEventLogOnly = enableDebugEventLogOnly;
+    public void setDisableAirbridgeLog(boolean disableAirbridgeLog) {
+        this.disableAirbridgeLog = disableAirbridgeLog;
     }
 
-    public boolean isEnableDebugEventLogOnly() {
-        return enableDebugEventLogOnly;
+    public boolean isDisableAirbridgeLog() {
+        return disableAirbridgeLog;
     }
 
     public String getTokenAirBridge() {
