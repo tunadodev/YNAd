@@ -220,6 +220,12 @@ public class AdsRewardPreload {
                         super.onUserEarnedReward(rewardItem);
                         if (callback != null) callback.onUserEarnedReward(rewardItem);
                     }
+
+                    @Override
+                    public void onNextAction() {
+                        super.onNextAction();
+                        if (callback != null) callback.onNextAction();
+                    }
                 });
                 destroyReward(key);
             }
@@ -281,6 +287,12 @@ public class AdsRewardPreload {
                                     super.onUserEarnedReward(rewardItem);
                                     if (callback != null) callback.onUserEarnedReward(rewardItem);
                                 }
+
+                                @Override
+                                public void onNextAction() {
+                                    super.onNextAction();
+                                    if (callback != null) callback.onNextAction();
+                                }
                             });
                             // Remove from cache after showing
                             destroyReward(key);
@@ -334,6 +346,12 @@ public class AdsRewardPreload {
                                         public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
                                             super.onUserEarnedReward(rewardItem);
                                             if (callback != null) callback.onUserEarnedReward(rewardItem);
+                                        }
+
+                                        @Override
+                                        public void onNextAction() {
+                                            super.onNextAction();
+                                            if (callback != null) callback.onNextAction();
                                         }
                                     });
                                     // Remove from cache after showing
@@ -575,6 +593,12 @@ public class AdsRewardPreload {
                             super.onUserEarnedReward(rewardItem);
                             if (callback != null) callback.onUserEarnedReward(rewardItem);
                         }
+
+                        @Override
+                        public void onNextAction() {
+                            super.onNextAction();
+                            if (callback != null) callback.onNextAction();
+                        }
                     });
                     // Remove from cache after showing
                     destroyReward(key);
@@ -656,6 +680,11 @@ public class AdsRewardPreload {
                                 public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
                                     super.onUserEarnedReward(rewardItem);
                                     if (callback != null) callback.onUserEarnedReward(rewardItem);
+                                }
+                                @Override
+                                public void onNextAction() {
+                                    super.onNextAction();
+                                    if (callback != null) callback.onNextAction();
                                 }
                             });
                             // Remove from cache after showing
