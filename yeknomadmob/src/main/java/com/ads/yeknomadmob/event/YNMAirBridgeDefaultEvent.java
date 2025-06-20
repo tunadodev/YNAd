@@ -19,6 +19,7 @@ public class YNMAirBridgeDefaultEvent {
         if (appData == null || appData.getViewName() == null || appData.getAdUnit() == null || format == null) return;
         Map<String, Object> custom = new HashMap<>();
         custom.put("tag_format", format);
+        custom.put("tag_screen", appData.getViewName());
         YNMAirBridge.getInstance().logCustomEvent(new Event("screen_ad_format_view", null, appData.getAdUnit() + "_" + appData.getViewName(), 0, custom));
     }
 
@@ -26,6 +27,7 @@ public class YNMAirBridgeDefaultEvent {
         if (appData == null || appData.getViewName() == null || appData.getAdUnit() == null || format == null) return;
         Map<String, Object> custom = new HashMap<>();
         custom.put("tag_format", format);
+        custom.put("tag_screen", appData.getViewName());
         YNMAirBridge.getInstance().logCustomEvent(new Event("screen_ad_format_click", null, appData.getAdUnit() + "_" + appData.getViewName(), 0, custom));
     }
 
@@ -33,6 +35,7 @@ public class YNMAirBridgeDefaultEvent {
         if (appData == null || appData.getViewName() == null || appData.getAdUnit() == null || format == null) return;
         Map<String, Object> custom = new HashMap<>();
         custom.put("tag_format", format);
+        custom.put("tag_screen", appData.getViewName());
         YNMAirBridge.getInstance().logCustomEvent(new Event("screen_ad_format_request_start", null, appData.getAdUnit() + "_" + appData.getViewName(), 0, custom));
     }
 
@@ -40,6 +43,7 @@ public class YNMAirBridgeDefaultEvent {
         if (appData == null || appData.getViewName() == null || appData.getAdUnit() == null || format == null) return;
         Map<String, Object> custom = new HashMap<>();
         custom.put("tag_format", format);
+        custom.put("tag_screen", appData.getViewName());
         YNMAirBridge.getInstance().logCustomEvent(new Event("screen_ad_format_request_success", null, appData.getAdUnit() + "_" + appData.getViewName(), timeRequest, custom));
     }
 
@@ -47,48 +51,7 @@ public class YNMAirBridgeDefaultEvent {
         if (appData == null || appData.getViewName() == null || appData.getAdUnit() == null || format == null) return;
         Map<String, Object> custom = new HashMap<>();
         custom.put("tag_format", format);
+        custom.put("tag_screen", appData.getViewName());
         YNMAirBridge.getInstance().logCustomEvent(new Event("screen_ad_format_request_fail", null, appData.getAdUnit() + "_" + appData.getViewName(), timeRequest, custom));
-    }
-
-    public static void pushEventScreenAdFormatViewBanner(YNMAirBridge.AppData appData) {
-        if (appData == null || appData.getViewName() == null || appData.getAdUnit() == null) return;
-        Map<String, Object> custom = new HashMap<>();
-        custom.put("tag_format", YNMAds.BANNER);
-        YNMAirBridge.getInstance().logCustomEvent(new Event("screen_ad_format_view_banner", null, appData.getAdUnit() + "_" + appData.getViewName(), 0, custom));
-    }
-
-    public static void pushEventScreenAdFormatViewNative(YNMAirBridge.AppData appData) {
-        if (appData == null || appData.getViewName() == null || appData.getAdUnit() == null) return;
-        Map<String, Object> custom = new HashMap<>();
-        custom.put("tag_format", YNMAds.NATIVE);
-        YNMAirBridge.getInstance().logCustomEvent(new Event("screen_ad_format_view_native", null, appData.getAdUnit() + "_" + appData.getViewName(), 0, custom));
-    }
-
-    public static void pushEventScreenAdFormatViewInter(YNMAirBridge.AppData appData) {
-        if (appData == null || appData.getViewName() == null || appData.getAdUnit() == null) return;
-        Map<String, Object> custom = new HashMap<>();
-        custom.put("tag_format", YNMAds.INTERSTITIAL);
-        YNMAirBridge.getInstance().logCustomEvent(new Event("screen_ad_format_view_inter", null, appData.getAdUnit() + "_" + appData.getViewName(), 0, custom));
-    }
-
-    public static void pushEventScreenAdFormatClickBanner(YNMAirBridge.AppData appData) {
-        if (appData == null || appData.getViewName() == null || appData.getAdUnit() == null) return;
-        Map<String, Object> custom = new HashMap<>();
-        custom.put("tag_format", YNMAds.BANNER);
-        YNMAirBridge.getInstance().logCustomEvent(new Event("screen_ad_format_click_banner", null, appData.getAdUnit() + "_" + appData.getViewName(), 0, custom));
-    }
-
-    public static void pushEventScreenAdFormatClickNative(YNMAirBridge.AppData appData) {
-        if (appData == null || appData.getViewName() == null || appData.getAdUnit() == null) return;
-        Map<String, Object> custom = new HashMap<>();
-        custom.put("tag_format", YNMAds.NATIVE);
-        YNMAirBridge.getInstance().logCustomEvent(new Event("screen_ad_format_click_native", null, appData.getAdUnit() + "_" + appData.getViewName(), 0, custom));
-    }
-
-    public static void pushEventScreenAdFormatClickInter(YNMAirBridge.AppData appData) {
-        if (appData == null || appData.getViewName() == null || appData.getAdUnit() == null) return;
-        Map<String, Object> custom = new HashMap<>();
-        custom.put("tag_format", YNMAds.INTERSTITIAL);
-        YNMAirBridge.getInstance().logCustomEvent(new Event("screen_ad_format_click_inter", null, appData.getAdUnit() + "_" + appData.getViewName(), 0, custom));
     }
 }

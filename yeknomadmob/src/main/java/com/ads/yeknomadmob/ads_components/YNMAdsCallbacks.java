@@ -88,30 +88,10 @@ public class YNMAdsCallbacks {
 
     public void onAdClicked() {
         YNMAirBridgeDefaultEvent.pushEventScreenAdFormatClick(appData, format);
-        switch (format) {
-            case YNMAds.BANNER:
-                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatClickBanner(appData);
-                break;
-            case YNMAds.NATIVE:
-                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatClickNative(appData);
-                break;
-            case YNMAds.INTERSTITIAL:
-                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatClickInter(appData);
-        }
     }
 
     public void onAdImpression() {
         YNMAirBridgeDefaultEvent.pushEventScreenAdFormatView(appData, format);
-        switch (format) {
-            case YNMAds.BANNER:
-                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatViewBanner(appData);
-                break;
-            case YNMAds.NATIVE:
-                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatViewNative(appData);
-                break;
-            case YNMAds.INTERSTITIAL:
-                YNMAirBridgeDefaultEvent.pushEventScreenAdFormatViewInter(appData);
-        }
     }
 
     public void onNativeAdLoaded(@NonNull AdsNative nativeAd) {
