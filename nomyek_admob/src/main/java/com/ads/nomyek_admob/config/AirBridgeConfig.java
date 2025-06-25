@@ -4,6 +4,7 @@ package com.ads.nomyek_admob.config;
  */
 public class AirBridgeConfig {
     private boolean enableAirBridge;
+    private boolean disableAirbridgeLog = false;
     private String appNameAirBridge;
     private String tokenAirBridge;
     private String eventAdClick;
@@ -17,6 +18,14 @@ public class AirBridgeConfig {
 
     public void setEnableAirBridge(boolean enableAirBridge) {
         this.enableAirBridge = enableAirBridge;
+    }
+
+    public void setDisableAirbridgeLog(boolean disableAirbridgeLog) {
+        this.disableAirbridgeLog = disableAirbridgeLog;
+    }
+
+    public boolean isDisableAirbridgeLog() {
+        return disableAirbridgeLog;
     }
 
     public String getTokenAirBridge() {

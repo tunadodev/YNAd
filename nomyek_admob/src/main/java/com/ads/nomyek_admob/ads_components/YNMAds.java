@@ -68,6 +68,7 @@ public class YNMAds {
         if (adConfig.isEnableAirBridge()) {
             Log.i(TAG, "init airbridge");
             YNMAirBridge.enableAirBridge = true;
+            YNMAirBridge.setDisableAirBridgeLog(adConfig.getAirBridgeConfig().isDisableAirbridgeLog());
             YNMAirBridge.setTagTest(adConfig.getAirBridgeConfig().getTagTest());
             YNMAirBridge.setUserState(adConfig.getAirBridgeConfig().getUserState());
             YNMAirBridge.getInstance().init(context, adConfig.getAirBridgeConfig().getAppNameAirBridge(),adConfig.getAirBridgeConfig().getTokenAirBridge(), true);
