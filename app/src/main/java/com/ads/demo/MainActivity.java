@@ -67,11 +67,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>{
                 public void onAdClosed() {
                     // Xử lý khi quảng cáo đóng
                 }
-
-                @Override
-                public void onNextAction() {
-                    // Tiếp tục luồng
-                }
             });
         });
         List<AdsUnitItem> adUnits = new ArrayList<>();
