@@ -24,7 +24,9 @@ public class AdsCallback {
     }
 
     public void onAdFailedToLoad(@Nullable LoadAdError i) {
-        Admob.getInstance().getDialog().dismiss();
+        if (Admob.getInstance().getDialog() != null) {
+            Admob.getInstance().getDialog().dismiss();
+        }
     }
 
     public void onAdFailedToLoadHigh(@Nullable LoadAdError i) {

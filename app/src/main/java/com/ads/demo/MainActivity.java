@@ -64,11 +64,6 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>{
                 public void onAdClosed() {
                     // Xử lý khi quảng cáo đóng
                 }
-
-                @Override
-                public void onNextAction() {
-                    // Tiếp tục luồng
-                }
             });
 //            AdsRewardPreload.showRewardPreload(this,"test_reward", BuildConfig.ad_reward, 5000, new YNMAdsCallbacks() {
 //                @Override
