@@ -37,30 +37,82 @@ import java.util.concurrent.ConcurrentHashMap;
  * - Highest-Floor-First Serving: When an ad is requested, it serves the available ad with the highest floor price.
  * - Pending Request Handling: If an ad is requested while all floors are loading, it queues the request and serves an ad as soon as one becomes available.
  * - Thread Safety: Uses thread-safe collections and synchronized blocks to manage state across multiple threads, ensuring safe execution.
+ * - Timeout Safety: Includes a timeout to prevent the ad loading flow from blocking the application indefinitely.
  */
 public class YNMMultiFloorInterAds {
 
     private static final String TAG = "YNMMultiFloorInterAds";
+    // Defines the maximum time to wait for the entire ad waterfall to complete.
+    // This prevents the ad loading process from blocking the application indefinitely if ad networks are unresponsive.
+    private static final long WATERFALL_TIMEOUT_MS = 30000; // 30s
 
     // Singleton instance. `volatile` ensures that changes are visible across all threads immediately.
     private static volatile YNMMultiFloorInterAds instance;
 
+    // Holds the application context, required for initializing the AdMob SDK and loading ads
+    // without being tied to a specific Activity's lifecycle.
     private Context applicationContext;
+    // Stores the list of ad units for the waterfall, ordered from highest to lowest floor price.
+    // This list is central to the waterfall logic.
     private List<AdsUnitItem> highAdsIds;
-    // A Handler to ensure that any operations that might interact with the UI are posted on the main thread.
+
+    /**
+     * handler: A Handler tied to the main UI thread (Looper.getMainLooper()).
+     * Its purpose is to safely execute UI operations from background threads. For example, when an ad is
+     * successfully loaded on a background thread, this handler is used to post the `show` operation
+     * back onto the main thread, which is a requirement for any UI manipulation in Android.
+     * <p>
+     * timeoutHandler: While functionally identical to `handler`, this instance is dedicated solely to
+     * managing the ad waterfall timeout. Using a separate handler for this specific task improves
+     * code clarity and separates the timeout logic from general UI operations.
+     * <p>
+     * waterfallTimeoutRunnable: This is the task that gets executed by the `timeoutHandler`.
+     * It contains the logic to reset the loading state (`isWaterfallLoading = false`) and handle
+     * any pending ad requests if the waterfall process takes too long, preventing the app from getting stuck.
+     */
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler timeoutHandler = new Handler(Looper.getMainLooper());
+    private Runnable waterfallTimeoutRunnable;
+
 
     // --- State Management ---
-    // A thread-safe cache for preloaded ads. Key is the Ad ID, value is the InterstitialAd object.
+    /**
+     * The adCache holds successfully preloaded interstitial ads.
+     * It's a ConcurrentHashMap for thread safety, as loading and showing can happen on different threads.
+     * Key: Ad Unit ID (String)
+     * Value: The loaded InterstitialAd object.
+     * This is essential for the core feature: having ads ready to be shown instantly.
+     */
     private static final Map<String, InterstitialAd> adCache = new ConcurrentHashMap<>();
-    // A thread-safe map to track ads that are currently in the process of being loaded to prevent duplicate requests.
-    private static final Map<String, Boolean> loadingAds = new ConcurrentHashMap<>();
+
+    /**
+     * This flag prevents multiple waterfall preloading processes from running simultaneously.
+     * It is marked as `volatile` to ensure that changes made by one thread are immediately visible to others.
+     */
+    private volatile boolean isWaterfallLoading = false;
+
 
     // --- Pending Show Request State ---
-    // These fields hold the details of a show request that is made while no ads are ready.
-    private boolean isShowRequestPending = false;
+    // These fields manage a show request that arrives while the waterfall is still loading.
+    // They work together to "queue" a request and fulfill it once an ad becomes available.
+
+    /**
+     * A flag that is set to `true` if `showMFInterAds` is called when no ad is ready, but
+     * the waterfall is currently in progress (`isWaterfallLoading` is true).
+     * It signals that there is a pending request to be fulfilled as soon as an ad loads.
+     */
+    private volatile boolean isShowRequestPending = false;
+
+    /**
+     * Stores the Activity context from a pending show request. This is necessary to show the
+     * ad in the correct context once it's loaded. It is only non-null when `isShowRequestPending` is true.
+     */
     private Activity pendingActivity;
-    private AdsUnitItem pendingBaseAd;
+
+    /**
+     * Stores the callback from a pending show request. This ensures that the original caller is
+     * notified of the ad's lifecycle events. It is only non-null when `isShowRequestPending` is true.
+     */
     private YNMAdsCallbacks pendingCallback;
 
     /**
@@ -101,7 +153,7 @@ public class YNMMultiFloorInterAds {
 
     /**
      * Kicks off the waterfall preloading process.
-     * It only starts if no ads are cached and none are currently loading.
+     * It only starts if no ads are cached and a waterfall is not already in progress.
      */
     private void startWaterfallPreload() {
         if (applicationContext == null || highAdsIds == null || highAdsIds.isEmpty()) {
@@ -109,12 +161,39 @@ public class YNMMultiFloorInterAds {
             return;
         }
         // To prevent starting a new waterfall if one is already in progress or an ad is ready.
-        if (!adCache.isEmpty() || !loadingAds.isEmpty()) {
-            Log.d(TAG, "Waterfall preload skipped: ad cache not empty or an ad is already loading.");
+        if (isWaterfallLoading) {
+            Log.d(TAG, "Waterfall preload skipped: a waterfall is already in progress.");
             return;
         }
-        Log.d(TAG, "Starting waterfall preload.");
+        if (!adCache.isEmpty()) {
+            Log.d(TAG, "Waterfall preload skipped: ad cache is not empty.");
+            return;
+        }
+
+        isWaterfallLoading = true;
+        Log.d(TAG, "Starting waterfall preload with a " + WATERFALL_TIMEOUT_MS + "ms timeout.");
+
+        // Define a timeout mechanism to prevent the app from getting stuck.
+        waterfallTimeoutRunnable = () -> {
+            if (isWaterfallLoading) {
+                isWaterfallLoading = false;
+                Log.e(TAG, "Waterfall loading timed out after " + WATERFALL_TIMEOUT_MS + "ms. Forcing state reset.");
+                handlePendingShowRequestIfLastAdFailed();
+            }
+        };
+        timeoutHandler.postDelayed(waterfallTimeoutRunnable, WATERFALL_TIMEOUT_MS);
+
         loadAdInWaterfall(0); // Start from the highest floor (index 0)
+    }
+
+    /**
+     * Cancels the waterfall timeout handler.
+     */
+    private void cancelWaterfallTimeout() {
+        if (waterfallTimeoutRunnable != null) {
+            timeoutHandler.removeCallbacks(waterfallTimeoutRunnable);
+            waterfallTimeoutRunnable = null;
+        }
     }
 
     /**
@@ -126,8 +205,9 @@ public class YNMMultiFloorInterAds {
     private void loadAdInWaterfall(final int index) {
         // Base case: If we've tried all ad IDs and none have loaded.
         if (index >= highAdsIds.size()) {
+            isWaterfallLoading = false; // Mark waterfall as finished.
+            cancelWaterfallTimeout();
             Log.w(TAG, "Waterfall finished. No ad was loaded.");
-            // If a show request was pending, this is the last point to trigger the fallback.
             handlePendingShowRequestIfLastAdFailed();
             return;
         }
@@ -136,33 +216,33 @@ public class YNMMultiFloorInterAds {
 
         if (adUnit == null || adUnit.getAdUnitId() == null || adUnit.getAdUnitId().isEmpty()) {
             Log.w(TAG, "Skipping invalid ad unit at index " + index + ". Proceeding to next.");
-            // Immediately try the next ad in the waterfall.
             loadAdInWaterfall(index + 1);
             return;
         }
 
-        // Safeguard: check if an ad is already cached or being loaded.
-        if (adCache.containsKey(adUnit.getAdUnitId()) || loadingAds.containsKey(adUnit.getAdUnitId())) {
-            Log.d(TAG, "Ad " + adUnit.getKey() + " is already cached or loading. Stopping waterfall.");
+        if (adCache.containsKey(adUnit.getAdUnitId())) {
+            isWaterfallLoading = false; // Mark waterfall as finished.
+            cancelWaterfallTimeout();
+            Log.d(TAG, "Ad " + adUnit.getKey() + " is already cached. Stopping waterfall.");
+            // An ad is ready, check for pending requests.
+            handlePendingShowRequest();
             return;
         }
 
-        loadingAds.put(adUnit.getAdUnitId(), true);
         Log.d(TAG, "Waterfall loading ad at index " + index + ": " + adUnit.getKey());
 
         Admob.getInstance().getInterstitialAds(applicationContext, adUnit.getAdUnitId(), new AdsCallback() {
             @Override
             public void onInterstitialLoad(InterstitialAd interstitialAd) {
                 super.onInterstitialLoad(interstitialAd);
-                loadingAds.remove(adUnit.getAdUnitId());
-
                 if (interstitialAd != null) {
+                    isWaterfallLoading = false; // Mark waterfall as finished.
+                    cancelWaterfallTimeout();
                     adCache.put(adUnit.getAdUnitId(), interstitialAd);
                     Log.d(TAG, "Successfully preloaded ad from waterfall: " + adUnit.getKey());
-                    // Waterfall successful, stop here.
                     handlePendingShowRequest();
                 } else {
-                    // This case is unlikely but handled as a failure.
+                    // This case is unlikely but handled as a failure. Treat as a load failure.
                     Log.e(TAG, "InterstitialAd was null for " + adUnit.getKey() + ". Proceeding to next in waterfall.");
                     loadAdInWaterfall(index + 1);
                 }
@@ -171,11 +251,8 @@ public class YNMMultiFloorInterAds {
             @Override
             public void onAdFailedToLoad(LoadAdError adError) {
                 super.onAdFailedToLoad(adError);
-                loadingAds.remove(adUnit.getAdUnitId());
                 Log.e(TAG, "Failed to load ad: " + adUnit.getKey() + ". Error: " + (adError != null ? adError.getMessage() : "Unknown") + ". Proceeding to next in waterfall.");
-
-                // --- Waterfall Logic ---
-                // On failure, immediately try the next ad in the sequence.
+                // On failure, immediately try the next ad in the sequence. The isWaterfallLoading flag remains true.
                 loadAdInWaterfall(index + 1);
             }
         });
@@ -192,7 +269,10 @@ public class YNMMultiFloorInterAds {
                 // Post the show call to the main thread to ensure UI safety.
                 handler.post(() -> {
                     if (pendingActivity != null && !pendingActivity.isDestroyed()) {
-                        showMFInterAds(pendingActivity, pendingBaseAd, pendingCallback);
+                        // Check if there was a base ad in the pending request
+                         if (pendingCallback != null) {
+                            showMFInterAds(pendingActivity, pendingCallback);
+                        }
                     }
                     clearPendingShowRequest();
                 });
@@ -206,12 +286,15 @@ public class YNMMultiFloorInterAds {
      */
     private void handlePendingShowRequestIfLastAdFailed() {
         synchronized (this) {
-            // Check if the show request is pending AND the waterfall is truly finished (no more ads loading).
-            if (isShowRequestPending && loadingAds.isEmpty()) {
+            // Check if the show request is pending AND the waterfall is truly finished.
+            if (isShowRequestPending && !isWaterfallLoading) {
                 Log.d(TAG, "Last loading ad failed, fulfilling pending show request with fallback.");
                 handler.post(() -> {
                     if (pendingActivity != null && !pendingActivity.isDestroyed()) {
-                        loadAndShowBaseAd(pendingActivity, pendingBaseAd, pendingCallback);
+                        Log.d(TAG, "No high ad ready, fallback to onNextAction");
+                        if (pendingCallback != null) {
+                            pendingCallback.onNextAction(false);
+                        }
                     }
                     clearPendingShowRequest();
                 });
@@ -225,23 +308,22 @@ public class YNMMultiFloorInterAds {
     private void clearPendingShowRequest() {
         isShowRequestPending = false;
         pendingActivity = null;
-        pendingBaseAd = null;
         pendingCallback = null;
     }
 
     /**
-     * Attempts to show a multi-floor interstitial ad.
+     * Attempts to show a multi-floor interstitial ad without a fallback ad unit.
+     * If no high-floor ad is available, it will simply proceed via the callback.
      * The logic is as follows:
      * 1. Iterate through the high-floor ads from highest to lowest.
      * 2. If a ready ad is found in the cache, show it immediately and start reloading a replacement.
-     * 3. If no ads are ready but some are loading, queue the request to be shown when one loads.
-     * 4. If no ads are ready and none are loading, proceed to load and show the fallback (base) ad.
+     * 3. If no ads are ready but a waterfall is loading, queue the request to be shown when one loads.
+     * 4. If no ads are ready and none are loading, invoke the onNextAction callback.
      *
      * @param activity The activity context required to show the ad.
-     * @param base_ad  A fallback Ad ID to use if no high-floor ads are available.
      * @param callback A callback to be invoked for ad lifecycle events.
      */
-    public void showMFInterAds(@NonNull final Activity activity, @NonNull final AdsUnitItem base_ad, @NonNull final YNMAdsCallbacks callback) {
+    public void showMFInterAds(@NonNull final Activity activity, @NonNull final YNMAdsCallbacks callback) {
         // First, check if enough time has passed since the last interstitial ad was shown.
         long lastImpressionTime = SharePreferenceUtils.getLastImpressionInterstitialTime(activity);
         long interval = YNMAds.getInstance().getAdConfig().getIntervalInterstitialAd();
@@ -255,7 +337,7 @@ public class YNMMultiFloorInterAds {
 
         if (highAdsIds == null || highAdsIds.isEmpty()) {
             Log.d(TAG, "High-floor ad IDs are null or empty. Proceeding with fallback.");
-            loadAndShowBaseAd(activity, base_ad, callback);
+            callback.onNextAction(false);
             return;
         }
 
@@ -302,16 +384,24 @@ public class YNMMultiFloorInterAds {
             }
         }
 
-        // If no ads are ready, use the fallback.
-        loadAndShowBaseAd(activity, base_ad, callback);
-    }
+        // If no ad is ready, check if a waterfall is in progress.
+        if (isWaterfallLoading) {
+            synchronized (this) {
+                if (!isShowRequestPending) {
+                    Log.d(TAG, "No ad ready, but waterfall is in progress. Queuing show request.");
+                    isShowRequestPending = true;
+                    pendingActivity = activity;
+                    pendingCallback = callback;
+                } else {
+                    Log.w(TAG, "Another show request is already pending. Ignoring new request.");
+                    callback.onAdFailedToShow(new AdsError("Another ad request is already in progress."));
+                    callback.onNextAction(false);
+                }
+            }
+            return;
+        }
 
-    /**
-     * Loads and shows the base (fallback) ad. This is the last resort if no high-floor ads are available.
-     */
-    private void loadAndShowBaseAd(@NonNull final Activity activity, @NonNull final AdsUnitItem base_ad, @NonNull final YNMAdsCallbacks callback) {
-        Log.d(TAG, "No high ad ready, show base");
-        AdsInterPreload.showPreloadInterAds(activity, base_ad.getKey(), base_ad.getAdUnitId(), 10000, callback);
+        callback.onNextAction(false);
     }
 
     /**
@@ -327,13 +417,15 @@ public class YNMMultiFloorInterAds {
 
     /**
      * Actively reloads all high-floor ads using the waterfall strategy.
-     * This clears the cache and starts the loading process from the highest floor.
+     * If the ad already cached, it will not be reloaded
      */
     public void activelyReloadAllAds() {
         Log.d(TAG, "Actively reloading all high-floor ads via waterfall.");
-        // Clear existing cache and loading flags to force a fresh waterfall load.
-        adCache.clear();
-        loadingAds.clear();
+        // This is acceptable, as the ongoing waterfall will eventually fill the (now clear) cache.
         startWaterfallPreload();
+    }
+
+    public boolean isWaterfallLoading() {
+        return isWaterfallLoading;
     }
 }
