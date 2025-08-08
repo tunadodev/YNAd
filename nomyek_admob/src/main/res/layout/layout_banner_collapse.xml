@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <FrameLayout
+        android:id="@+id/large_banner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </FrameLayout>
+
+    <include layout="@layout/layout_shimmer_placeholder_large" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/collapse_button"
+        android:layout_width="wrap_content"
+        android:layout_margin="@dimen/_6sdp"
+        android:layout_alignParentTop="true"
+        android:backgroundTint="@color/white"
+        android:layout_alignParentEnd="true"
+        android:visibility="gone"
+        app:strokeWidth="2dp"
+        app:strokeColor="@color/black"
+        app:cardElevation="0dp"
+        app:cardCornerRadius="@dimen/_100sdp"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_margin="@dimen/_2sdp"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
+            android:src="@drawable/down"/>
+    </com.google.android.material.card.MaterialCardView>
+
+</RelativeLayout>

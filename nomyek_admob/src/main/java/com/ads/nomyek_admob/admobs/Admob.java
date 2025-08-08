@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -1419,10 +1420,21 @@ public class Admob {
         loadCollapsibleBanner(mActivity, id, gravity, adContainer, containerShimmer, callback);
     }
 
-    private void loadBanner(final Activity mActivity, String id,
-                            final FrameLayout adContainer, final ShimmerFrameLayout containerShimmer,
-                            final AdsCallback callback, Boolean useInlineAdaptive, String inlineStyle) {
+    public void loadBanner(final Activity mActivity, String id,
+                           final FrameLayout adContainer, final ShimmerFrameLayout containerShimmer,
+                           final AdsCallback callback, Boolean useInlineAdaptive, String inlineStyle) {
 
+        if (adContainer.getChildCount() > 0) {
+            for (int i = 0; i < adContainer.getChildCount(); i++) {
+                View child = adContainer.getChildAt(i);
+                if (child instanceof com.google.android.gms.ads.AdView) {
+                    ((com.google.android.gms.ads.AdView) child).destroy();
+                }
+            }
+            adContainer.removeAllViews();
+        }
+
+        adContainer.setVisibility(View.GONE);
         containerShimmer.setVisibility(View.VISIBLE);
         containerShimmer.startShimmer();
         try {
@@ -1430,13 +1442,14 @@ public class Admob {
             adView.setAdUnitId(id);
             adContainer.addView(adView);
             AdSize adSize = getAdSize(mActivity, useInlineAdaptive, inlineStyle);
-            int adHeight;
-            if (useInlineAdaptive && inlineStyle.equalsIgnoreCase(BANNER_INLINE_SMALL_STYLE)) {
-                adHeight = MAX_SMALL_INLINE_BANNER_HEIGHT;
-            } else {
-                adHeight = adSize.getHeight();
+
+            int adHeight = adSize.getHeight();
+            if (adHeight > 0) {
+                int heightInPixels = (int) (adHeight * Resources.getSystem().getDisplayMetrics().density + 0.5f);
+                containerShimmer.getLayoutParams().height = heightInPixels;
+                containerShimmer.requestLayout();
             }
-            containerShimmer.getLayoutParams().height = (int) (adHeight * Resources.getSystem().getDisplayMetrics().density + 0.5f);
+
             adView.setAdSize(adSize);
             adView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
             adView.setAdListener(new AdListener() {
