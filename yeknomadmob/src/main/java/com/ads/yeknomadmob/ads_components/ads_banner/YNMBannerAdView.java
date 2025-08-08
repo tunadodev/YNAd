@@ -2,6 +2,8 @@ package com.ads.yeknomadmob.ads_components.ads_banner;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.widget.RelativeLayout;
 
@@ -17,6 +19,8 @@ import java.util.List;
 public class YNMBannerAdView extends RelativeLayout {
 
     private String TAG = "YNMBannerAdView";
+    private Handler refreshHandler = new Handler(Looper.getMainLooper());
+    private Runnable refreshRunnable;
 
     public YNMBannerAdView(@NonNull Context context) {
         super(context);
@@ -56,5 +60,23 @@ public class YNMBannerAdView extends RelativeLayout {
 
     public void loadMultiIdBanner(Activity activity, List<String> idBanner, YNMAdsCallbacks ynmAdsCallbacks) {
         YNMAds.getInstance().loadMultiIdBanner(activity, idBanner, ynmAdsCallbacks);
+    }
+
+    public void loadMultiIdBanner(Activity activity, List<String> idBanner, int refreshInterval, YNMAdsCallbacks ynmAdsCallbacks) {
+        YNMAds.getInstance().loadMultiIdBanner(activity, idBanner, ynmAdsCallbacks);
+
+        if (refreshInterval > 0) {
+            refreshRunnable = () -> {
+                YNMAds.getInstance().loadMultiIdBanner(activity, idBanner, ynmAdsCallbacks);
+                refreshHandler.postDelayed(refreshRunnable, refreshInterval);
+            };
+            refreshHandler.postDelayed(refreshRunnable, refreshInterval);
+        }
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        refreshHandler.removeCallbacks(refreshRunnable);
     }
 }
