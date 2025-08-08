@@ -1,23 +1,79 @@
 package com.ads.demo;
 
+import android.os.Handler;
+import android.os.Looper;
 import com.ads.demo.databinding.ActivityMainBinding;
 import com.ads.nomyek_admob.ads_components.YNMAds;
 import com.ads.nomyek_admob.ads_components.YNMAdsCallbacks;
+import com.ads.nomyek_admob.ads_components.ads_banner.YNMBannerAdView;
+import com.ads.nomyek_admob.ads_components.ads_banner.YNMBannerCollapse;
 import com.ads.nomyek_admob.ads_components.ads_native.YNMNativeAdView;
-import com.ads.nomyek_admob.ads_components.wrappers.AdsError;
-import com.ads.nomyek_admob.ads_components.wrappers.AdsInterstitial;
-import com.ads.nomyek_admob.ads_components.wrappers.AdsRewardItem;
 import com.ads.nomyek_admob.event.YNMAirBridge;
 import com.ads.nomyek_admob.utils.AdsInterPreload;
-import com.ads.nomyek_admob.utils.AdsNativePreload;
 import com.ads.nomyek_admob.utils.AdsRewardPreload;
 import com.ads.nomyek_admob.utils.AdsUnitItem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseActivity<ActivityMainBinding>{
+public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private YNMNativeAdView ynmAdNative = null;
+    private final Handler refreshHandler = new Handler(Looper.getMainLooper());
+    private Runnable refreshBannerRunnable;
+    private boolean isBannerRefreshing = false;
+
+    public void showBannerMultiId(String id, String unitName) {
+        if (findViewById(R.id.bannerView) != null) {
+            YNMAds.getInstance().setInitCallback(() -> {
+                YNMBannerAdView bannerAdView = findViewById(R.id.bannerView);
+                List<String> ids = new ArrayList<>();
+                ids.add(id);
+                ids.add(id);
+                bannerAdView.loadMultiIdBanner(this, ids, new YNMAdsCallbacks(new YNMAirBridge.AppData("nameView", unitName), YNMAds.BANNER));
+            });
+        }
+    }
+
+    public void startBannerRefresh(String id, String unitName) {
+        if (isBannerRefreshing) {
+            return; // Refresh loop is already running
+        }
+
+        refreshBannerRunnable = new Runnable() {
+            @Override
+            public void run() {
+                // Load the banner
+                showBannerMultiId(id, unitName);
+                // Schedule the next refresh after 30 seconds
+                refreshHandler.postDelayed(this, 30000); // 30 seconds
+            }
+        };
+
+        // Start the refresh loop immediately
+        refreshHandler.post(refreshBannerRunnable);
+        isBannerRefreshing = true;
+    }
+
+    public void stopBannerRefresh() {
+        if (refreshBannerRunnable != null) {
+            refreshHandler.removeCallbacks(refreshBannerRunnable);
+        }
+        isBannerRefreshing = false;
+    }
+
+    @Override
+    protected void onPause() {
+        stopBannerRefresh();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        stopBannerRefresh();
+        super.onDestroy();
+    }
+
+
     @Override
     protected int getLayoutActivity() {
         return R.layout.activity_main;
@@ -25,37 +81,14 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>{
 
     @Override
     protected void initViews() {
-        viewBinding.bannerView.loadBanner(this, BuildConfig.ad_banner);
-//        AdsInterPreload.preloadInterAds(this,new YNMAirBridge.AppData(), BuildConfig.ad_interstitial_splash, "test", 5000);
-        AdsRewardPreload.preloadRewardAds(this,new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 5000);
-        //AdsInterPreload.preloadInterAds(this, BuildConfig.ad_interstitial_splash, "test2");
-//        YNMAds.getInstance().setInitCallback(() -> {
-//            viewBinding.ykmNativeAds.loadNativeAd(this, BuildConfig.ad_native);
-//        }) ;
-//        AdsNativePreload.flexPreloadedShowNativeAds(this, viewBinding.ykmNativeAds, com.ads.nomyek_admob.R.layout.custom_native_admob_medium, com.ads.nomyek_admob.R.layout.custom_native_admob_large, BuildConfig.ad_interstitial_splash, BuildConfig.ad_native);
+        ArrayList<String> listAds = new ArrayList();
+        listAds.add(BuildConfig.ad_banner);
+        listAds.add(BuildConfig.ad_banner);
+        viewBinding.collapseBanner.loadBannerCollapse(this, listAds, () -> startBannerRefresh(BuildConfig.ad_banner, "test"));
 
+        AdsRewardPreload.preloadRewardAds(this, new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 6000);
 
         viewBinding.showInter.setOnClickListener(view -> {
-//            AdsInterPreload.showPreloadInterAds(this, "test", BuildConfig.ad_interstitial_splash, 5000, new YNMAdsCallbacks() {
-//                @Override
-//                public void onNextAction() {
-//                    super.onNextAction();
-//                    AdsInterPreload.preloadInterAds(MainActivity.this,new YNMAirBridge.AppData(), BuildConfig.ad_interstitial_splash, "test", 5000);
-//                }
-//            });
-//            AdsRewardPreload.showRewardPreload(this,"test_reward", BuildConfig.ad_reward, 5000, new YNMAdsCallbacks() {
-//                @Override
-//                public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
-//                    super.onUserEarnedReward(rewardItem);
-//                    AdsRewardPreload.preloadRewardAds(MainActivity.this,new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 5000);
-//
-//                }
-//
-//                @Override
-//                public void onAdFailedToLoad(@Nullable AdsError adError) {
-//                    super.onAdFailedToLoad(adError);
-//                }
-//            });
             List<AdsUnitItem> adUnits = new ArrayList<>();
             adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key1"));
             adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3"));
@@ -65,25 +98,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding>{
                     // Xử lý khi quảng cáo đóng
                 }
             });
-//            AdsRewardPreload.showRewardPreload(this,"test_reward", BuildConfig.ad_reward, 5000, new YNMAdsCallbacks() {
-//                @Override
-//                public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
-//                    super.onUserEarnedReward(rewardItem);
-//                }
-//
-//                @Override
-//                public void onAdFailedToLoad(@Nullable AdsError adError) {
-//                    super.onAdFailedToLoad(adError);
-//                }
-//            });
         });
         List<AdsUnitItem> adUnits = new ArrayList<>();
         adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key1"));
         adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3"));
-        AdsInterPreload.preloadMultipleInterAds(this, new YNMAirBridge.AppData("","list"), adUnits, 10000);
-
-// Khi cần hiển thị quảng cáo
-
+        AdsInterPreload.preloadMultipleInterAds(this, new YNMAirBridge.AppData("", "list"), adUnits, 10000);
     }
 
 }
