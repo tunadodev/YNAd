@@ -8,10 +8,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import com.ads.yeknomadmob.R;
 import com.ads.yeknomadmob.ads_components.YNMAds;
 import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
