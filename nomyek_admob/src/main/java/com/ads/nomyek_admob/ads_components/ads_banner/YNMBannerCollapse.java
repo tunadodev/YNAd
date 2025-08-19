@@ -109,6 +109,7 @@ public class YNMBannerCollapse extends RelativeLayout {
 
     private void loadLargeBannerWithWaterfall(Activity activity, List<String> adUnitIds) {
         if (adUnitIds.isEmpty()) {
+            collapseBanner();
             return;
         }
 
@@ -129,6 +130,8 @@ public class YNMBannerCollapse extends RelativeLayout {
                 super.onAdFailedToLoad(errorCode);
                 if (!remainingAdUnitIds.isEmpty()) {
                     loadLargeBannerWithWaterfall(activity, remainingAdUnitIds);
+                } else{
+                    collapseBanner();
                 }
             }
         }, true, BANNER_INLINE_LARGE_STYLE);
