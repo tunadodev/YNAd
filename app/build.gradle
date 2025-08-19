@@ -34,7 +34,7 @@ android {
             manifestPlaceholders = [ ad_app_id:"ca-app-pub-3940256099942544~3347511713"]
             buildConfigField "String", "ad_open_splash", "\"ca-app-pub-3940256099942544/9257395921\""
             buildConfigField "String", "ad_interstitial_splash", "\"ca-app-pub-3940256099942544/8691691433\""
-            buildConfigField "String", "ad_banner", "\"ca-app-pub-3940256099942544/6300978111\""
+            buildConfigField "String", "ad_banner", "\"ca-app-pub-3940256099942544/9214589741\""
             buildConfigField "String", "ad_reward", "\"ca-app-pub-3940256099942544/5224354917\""
             buildConfigField "String", "ad_reward_inter", "\"ca-app-pub-3940256099942544/5354046379\""
             buildConfigField "String", "ad_appopen_resume", "\"ca-app-pub-3940256099942544/3419835294\""

@@ -9,6 +9,7 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -250,7 +251,7 @@ public class Admob {
                     Log.e(TAG, "loadSplashInterstitialAds: on timeout");
                     isTimeout = true;
                     if (mInterstitialSplash != null) {
-                        Log.i(TAG, "loadSplashInterstitialAds:show ad on timeout ");
+                        Log.i(TAG, "loadSplashInterstitalAds:show ad on timeout ");
                         if (showSplashIfReady)
                             onShowSplash((AppCompatActivity) context, adListener);
                         else
@@ -258,7 +259,7 @@ public class Admob {
                         return;
                     }
                     if (adListener != null) {
-                        adListener.onNextAction();
+                        adListener.onNextAction(false);
                         isShowLoadingSplash = false;
                     }
                 }
@@ -291,7 +292,7 @@ public class Admob {
                 super.onAdFailedToShow(adError);
                 if (adListener != null) {
                     adListener.onAdFailedToShow(adError);
-                    adListener.onNextAction();
+                    adListener.onNextAction(false);
                 }
             }
 
@@ -302,7 +303,7 @@ public class Admob {
                 if (isTimeout)
                     return;
                 if (adListener != null) {
-                    adListener.onNextAction();
+                    adListener.onNextAction(false);
                     if (handlerTimeout != null && rdTimeout != null) {
                         handlerTimeout.removeCallbacks(rdTimeout);
                     }
@@ -403,7 +404,7 @@ public class Admob {
                         return;
                     }
                     if (adListener != null) {
-                        adListener.onNextAction();
+                        adListener.onNextAction(false);
                         isShowLoadingSplash = false;
                     }
                 }
@@ -443,7 +444,7 @@ public class Admob {
                     if (i != null)
                         Log.e(TAG, "loadSplashInterstitalAds: load fail " + i.getMessage());
                     adListener.onAdFailedToLoad(i);
-                    adListener.onNextAction();
+                    adListener.onNextAction(false);
                 }
             }
 
@@ -452,7 +453,7 @@ public class Admob {
                 super.onAdFailedToShow(adError);
                 if (adListener != null) {
                     adListener.onAdFailedToShow(adError);
-                    adListener.onNextAction();
+                    adListener.onNextAction(false);
                 }
             }
         });
@@ -546,7 +547,7 @@ public class Admob {
                 super.onAdFailedToShow(adError);
                 if (adListener != null) {
                     adListener.onAdFailedToShow(adError);
-                    adListener.onNextAction();
+                    adListener.onNextAction(false);
                 }
             }
 
@@ -557,7 +558,7 @@ public class Admob {
                 if (isTimeout)
                     return;
                 if (adListener != null) {
-                    adListener.onNextAction();
+                    adListener.onNextAction(false);
                     if (handlerTimeout != null && rdTimeout != null) {
                         handlerTimeout.removeCallbacks(rdTimeout);
                     }
@@ -608,7 +609,7 @@ public class Admob {
                         return;
                     }
                     if (adListener != null) {
-                        adListener.onNextAction();
+                        adListener.onNextAction(false);
                         isShowLoadingSplash = false;
                     }
                 }
@@ -641,7 +642,7 @@ public class Admob {
                 super.onAdFailedToShow(adError);
                 if (adListener != null) {
                     adListener.onAdFailedToShow(adError);
-                    adListener.onNextAction();
+                    adListener.onNextAction(false);
                 }
             }
 
@@ -652,7 +653,7 @@ public class Admob {
                 if (isTimeout)
                     return;
                 if (adListener != null) {
-                    adListener.onNextAction();
+                    adListener.onNextAction(false);
                     if (handlerTimeout != null && rdTimeout != null) {
                         handlerTimeout.removeCallbacks(rdTimeout);
                     }
@@ -670,7 +671,7 @@ public class Admob {
         Log.d(TAG, "onShowSplash: ");
 
         if (mInterstitialSplash == null) {
-            adListener.onNextAction();
+            adListener.onNextAction(false);
             return;
         }
 
@@ -706,7 +707,7 @@ public class Admob {
                 mInterstitialSplash = null;
                 if (adListener != null) {
                     if (!openActivityAfterShowInterAds) {
-                        adListener.onNextAction();
+                        adListener.onNextAction(true);
                     }
                     adListener.onAdClosed();
 
@@ -725,7 +726,7 @@ public class Admob {
                 if (adListener != null) {
                     adListener.onAdFailedToShow(adError);
                     if (!openActivityAfterShowInterAds) {
-                        adListener.onNextAction();
+                        adListener.onNextAction(false);
                     }
 
                     if (dialog != null) {
@@ -756,7 +757,7 @@ public class Admob {
                 try {
                     AppOpenManager.getInstance().setInterstitialShowing(true);
                 } catch (Exception e) {
-                    adListener.onNextAction();
+                    adListener.onNextAction(false);
                     return;
                 }
             } catch (Exception e) {
@@ -766,7 +767,7 @@ public class Admob {
             new Handler().postDelayed(() -> {
                 if (activity.getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
                     if (openActivityAfterShowInterAds && adListener != null) {
-                        adListener.onNextAction();
+                        adListener.onNextAction(true);
                         new Handler().postDelayed(() -> {
                             if (dialog != null && dialog.isShowing() && !activity.isDestroyed())
                                 dialog.dismiss();
@@ -780,7 +781,7 @@ public class Admob {
                         if (dialog != null) {
                             dialog.dismiss();
                         }
-                        adListener.onNextAction();
+                        adListener.onNextAction(true);
                         isShowLoadingSplash = false;
                     }
                 } else {
@@ -789,12 +790,14 @@ public class Admob {
                     isShowLoadingSplash = false;
                     Log.e(TAG, "onShowSplash:   show fail in background after show loading ad");
                     adListener.onAdFailedToShow(new AdError(0, " show fail in background after show loading ad", "YNMAds"));
+                    adListener.onNextAction(false);
                 }
             }, 800);
 
         } else {
             isShowLoadingSplash = false;
             Log.e(TAG, "onShowSplash: fail on background");
+            adListener.onNextAction(false);
         }
     }
 
@@ -804,7 +807,7 @@ public class Admob {
         Log.d(TAG, "onShowSplash: ");
 
         if (mInter == null) {
-            adListener.onNextAction();
+            adListener.onNextAction(false);
             return;
         }
 
@@ -841,7 +844,7 @@ public class Admob {
                 mInterstitialSplash = null;
                 if (adListener != null) {
                     if (!openActivityAfterShowInterAds) {
-                        adListener.onNextAction();
+                        adListener.onNextAction(true);
                     }
                     adListener.onAdClosed();
 
@@ -860,7 +863,7 @@ public class Admob {
                 if (adListener != null) {
                     adListener.onAdFailedToShow(adError);
                     if (!openActivityAfterShowInterAds) {
-                        adListener.onNextAction();
+                        adListener.onNextAction(false);
                     }
 
                     if (dialog != null) {
@@ -894,7 +897,7 @@ public class Admob {
                 try {
                     AppOpenManager.getInstance().setInterstitialShowing(true);
                 } catch (Exception e) {
-                    adListener.onNextAction();
+                    adListener.onNextAction(false);
                     return;
                 }
             } catch (Exception e) {
@@ -904,7 +907,7 @@ public class Admob {
             new Handler().postDelayed(() -> {
                 if (activity.getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
                     if (openActivityAfterShowInterAds && adListener != null) {
-                        adListener.onNextAction();
+                        adListener.onNextAction(true);
                         new Handler().postDelayed(() -> {
                             if (dialog != null && dialog.isShowing() && !activity.isDestroyed())
                                 dialog.dismiss();
@@ -918,7 +921,7 @@ public class Admob {
                         if (dialog != null) {
                             dialog.dismiss();
                         }
-                        adListener.onNextAction();
+                        adListener.onNextAction(true);
                         isShowLoadingSplash = false;
                     }
                 } else {
@@ -927,12 +930,14 @@ public class Admob {
                     isShowLoadingSplash = false;
                     Log.e(TAG, "onShowSplash:   show fail in background after show loading ad");
                     adListener.onAdFailedToShow(new AdError(0, " show fail in background after show loading ad", "YNMAds"));
+                    adListener.onNextAction(false);
                 }
             }, 800);
 
         } else {
             isShowLoadingSplash = false;
             Log.e(TAG, "onShowSplash: fail on background");
+            adListener.onNextAction(false);
         }
     }
 
@@ -1010,7 +1015,7 @@ public class Admob {
                 }
                 if (adListener != null) {
 
-                    adListener.onNextAction();
+                    adListener.onNextAction(false);
                 }
             };
             handlerTimeout.postDelayed(rdTimeout, timeOut);
@@ -1091,7 +1096,7 @@ public class Admob {
 
         if (mInterstitialAd == null) {
             if (callback != null) {
-                callback.onNextAction();
+                callback.onNextAction(false);
             }
             return;
         }
@@ -1106,7 +1111,7 @@ public class Admob {
                 AppOpenManager.getInstance().setInterstitialShowing(false);
                 if (callback != null) {
                     if (!openActivityAfterShowInterAds) {
-                        callback.onNextAction();
+                        callback.onNextAction(true);
                     }
                     callback.onAdClosed();
                 }
@@ -1124,7 +1129,7 @@ public class Admob {
                 if (callback != null) {
                     callback.onAdFailedToShow(adError);
                     if (!openActivityAfterShowInterAds) {
-                        callback.onNextAction();
+                        callback.onNextAction(false);
                     }
 
                     if (dialog != null) {
@@ -1165,7 +1170,7 @@ public class Admob {
             return;
         }
         if (callback != null) {
-            callback.onNextAction();
+            callback.onNextAction(false);
         }
     }
 
@@ -1200,7 +1205,7 @@ public class Admob {
                         callback.onInterstitialShow();
                         AppOpenManager.getInstance().setInterstitialShowing(true);
                     } catch (Exception e) {
-                        callback.onNextAction();
+                        callback.onNextAction(false);
                         return;
                     }
                 } catch (Exception e) {
@@ -1210,7 +1215,7 @@ public class Admob {
                 new Handler().postDelayed(() -> {
                     if (((AppCompatActivity) context).getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.RESUMED)) {
                         if (openActivityAfterShowInterAds && callback != null) {
-                            callback.onNextAction();
+                            callback.onNextAction(true);
                             new Handler().postDelayed(() -> {
                                 if (dialog != null && dialog.isShowing() && !((Activity) context).isDestroyed())
                                     dialog.dismiss();
@@ -1223,6 +1228,7 @@ public class Admob {
                             dialog.dismiss();
                         Log.e(TAG, "showInterstitialAd:   show fail in background after show loading ad");
                         callback.onAdFailedToShow(new AdError(0, " show fail in background after show loading ad", "YNMAds"));
+                        callback.onNextAction(false);
                     }
                 }, 800);
             }
@@ -1231,7 +1237,7 @@ public class Admob {
             if (dialog != null) {
                 dialog.dismiss();
             }
-            callback.onNextAction();
+            callback.onNextAction(false);
         }
     }
 
@@ -1414,10 +1420,21 @@ public class Admob {
         loadCollapsibleBanner(mActivity, id, gravity, adContainer, containerShimmer, callback);
     }
 
-    private void loadBanner(final Activity mActivity, String id,
-                            final FrameLayout adContainer, final ShimmerFrameLayout containerShimmer,
-                            final AdsCallback callback, Boolean useInlineAdaptive, String inlineStyle) {
+    public void loadBanner(final Activity mActivity, String id,
+                           final FrameLayout adContainer, final ShimmerFrameLayout containerShimmer,
+                           final AdsCallback callback, Boolean useInlineAdaptive, String inlineStyle) {
 
+        if (adContainer.getChildCount() > 0) {
+            for (int i = 0; i < adContainer.getChildCount(); i++) {
+                View child = adContainer.getChildAt(i);
+                if (child instanceof com.google.android.gms.ads.AdView) {
+                    ((com.google.android.gms.ads.AdView) child).destroy();
+                }
+            }
+            adContainer.removeAllViews();
+        }
+
+        adContainer.setVisibility(View.GONE);
         containerShimmer.setVisibility(View.VISIBLE);
         containerShimmer.startShimmer();
         try {
@@ -1425,13 +1442,14 @@ public class Admob {
             adView.setAdUnitId(id);
             adContainer.addView(adView);
             AdSize adSize = getAdSize(mActivity, useInlineAdaptive, inlineStyle);
-            int adHeight;
-            if (useInlineAdaptive && inlineStyle.equalsIgnoreCase(BANNER_INLINE_SMALL_STYLE)) {
-                adHeight = MAX_SMALL_INLINE_BANNER_HEIGHT;
-            } else {
-                adHeight = adSize.getHeight();
+
+            int adHeight = adSize.getHeight();
+            if (adHeight > 0) {
+                int heightInPixels = (int) (adHeight * Resources.getSystem().getDisplayMetrics().density + 0.5f);
+                containerShimmer.getLayoutParams().height = heightInPixels;
+                containerShimmer.requestLayout();
             }
-            containerShimmer.getLayoutParams().height = (int) (adHeight * Resources.getSystem().getDisplayMetrics().density + 0.5f);
+
             adView.setAdSize(adSize);
             adView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
             adView.setAdListener(new AdListener() {

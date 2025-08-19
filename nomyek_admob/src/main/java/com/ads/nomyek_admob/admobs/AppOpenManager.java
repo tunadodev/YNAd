@@ -543,7 +543,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                 isTimeDelay = true;
                 if (adListener != null && !isAppOpenShowed) {
                     isAppOpenShowed = true;
-                    adListener.onNextAction();
+                    adListener.onNextAction(false);
                 }
             }
         }, timeOutOpen);
@@ -575,7 +575,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                             public void onAdDismissedFullScreenContent() {
                                 super.onAdDismissedFullScreenContent();
                                 if (adListener != null) {
-                                    adListener.onNextAction();
+                                    adListener.onNextAction(false);
                                 }
                             }
 
@@ -642,7 +642,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                         if (splashAdMedium == null && splashAdAll == null && statusMedium == Type_Load_Fail && statusAll == Type_Load_Fail) {
                             if (adListener != null && !isAppOpenShowed) {
                                 isAppOpenShowed = true;
-                                adListener.onNextAction();
+                                adListener.onNextAction(false);
                             }
                         }
                     }
@@ -683,7 +683,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                             public void onAdDismissedFullScreenContent() {
                                 super.onAdDismissedFullScreenContent();
                                 if (adListener != null) {
-                                    adListener.onNextAction();
+                                    adListener.onNextAction(false);
                                 }
                             }
 
@@ -737,7 +737,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                         if (splashAdHigh == null && splashAdAll == null && statusHigh == Type_Load_Fail && statusAll == Type_Load_Fail) {
                             if (adListener != null && !isAppOpenShowed) {
                                 isAppOpenShowed = true;
-                                adListener.onNextAction();
+                                adListener.onNextAction(false);
                             }
                         }
                     }
@@ -779,7 +779,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                             public void onAdDismissedFullScreenContent() {
                                 super.onAdDismissedFullScreenContent();
                                 if (adListener != null) {
-                                    adListener.onNextAction();
+                                    adListener.onNextAction(false);
                                 }
                             }
 
@@ -793,7 +793,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
 
                                 if (statusHigh == Type_Load_Fail && statusMedium == Type_Load_Fail) {
                                     if (adListener != null && !isAppOpenShowed) {
-                                        adListener.onNextAction();
+                                        adListener.onNextAction(false);
                                     }
                                 }
 
@@ -832,7 +832,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                         if (splashAdHigh == null && splashAdMedium == null && statusHigh == Type_Load_Fail && statusMedium == Type_Load_Fail) {
                             if (adListener != null && !isAppOpenShowed) {
                                 isAppOpenShowed = true;
-                                adListener.onNextAction();
+                                adListener.onNextAction(false);
                             }
                         }
 
@@ -859,7 +859,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
             public void run() {
                 if (adListener != null && !isAppOpenShowed && splashAdOpen == null && splashAdInter == null) {
                     isAppOpenShowed = true;
-                    adListener.onNextAction();
+                    adListener.onNextAction(false);
                 }
             }
         }, timeOutOpen);
@@ -899,7 +899,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                             public void onAdDismissedFullScreenContent() {
                                 super.onAdDismissedFullScreenContent();
                                 if (adListener != null) {
-                                    adListener.onNextAction();
+                                    adListener.onNextAction(false);
                                 }
                             }
 
@@ -923,7 +923,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                                             } else if (statusInter == Type_Load_Fail && !isAppOpenShowed) {
                                                 if (adListener != null) {
                                                     isAppOpenShowed = true;
-                                                    adListener.onNextAction();
+                                                    adListener.onNextAction(false);
                                                 }
                                             }
                                         }
@@ -933,7 +933,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                                             if (!isAppOpenShowed) {
                                                 if (adListener != null) {
                                                     isAppOpenShowed = true;
-                                                    adListener.onNextAction();
+                                                    adListener.onNextAction(false);
                                                 }
                                             }
                                         }
@@ -969,7 +969,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                         if (statusInter != Type_Loading) {
                             if (adListener != null && !isAppOpenShowed) {
                                 isAppOpenShowed = true;
-                                adListener.onNextAction();
+                                adListener.onNextAction(false);
                             }
                         } else {
                             timerListenInter = new CountDownTimer(time, 1000) {
@@ -981,7 +981,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                                     } else if (statusInter == Type_Load_Fail && !isAppOpenShowed) {
                                         if (adListener != null) {
                                             isAppOpenShowed = true;
-                                            adListener.onNextAction();
+                                            adListener.onNextAction(false);
                                         }
                                     }
                                 }
@@ -991,7 +991,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                                     if (!isAppOpenShowed) {
                                         if (adListener != null) {
                                             isAppOpenShowed = true;
-                                            adListener.onNextAction();
+                                            adListener.onNextAction(false);
                                         }
                                     }
                                 }
@@ -1029,7 +1029,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                         if (statusOpen == Type_Load_Fail) {
                             if (adListener != null && !isAppOpenShowed) {
                                 isAppOpenShowed = true;
-                                adListener.onNextAction();
+                                adListener.onNextAction(false);
                             }
                         }
                     }
@@ -1125,7 +1125,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
 
         Runnable actionTimeOut = () -> {
             Log.d("AppOpenSplash", "getAdSplash time out");
-            adListener.onNextAction();
+            adListener.onNextAction(false);
             isShowingAd = false;
         };
         Handler handleTimeOut = new Handler();
@@ -1146,7 +1146,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                 if (statusAll == Type_Load_Fail || statusAll == Type_Show_Fail) {
                     Log.d("AppOpenSplash", "onAdFailedToHigh: High");
                     if (adListener != null && !isAppOpenShowed) {
-                        adListener.onNextAction();
+                        adListener.onNextAction(false);
                     }
                     handleTimeOut.removeCallbacks(actionTimeOut);
                 }
@@ -1189,7 +1189,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                     public void onAdDismissedFullScreenContent() {
                         super.onAdDismissedFullScreenContent();
                         if (adListener != null) {
-                            adListener.onNextAction();
+                            adListener.onNextAction(isAppOpenShowed);
                             Log.d("AppOpenSplash", "onAdDismissedFullScreenContent: vao 1");
                         }
                     }
@@ -1236,7 +1236,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                         if (statusHigh == Type_Load_Fail || statusHigh == Type_Show_Fail) {
                             Log.d("AppOpenSplash", "onAdFailedToLoad: All");
                             if (adListener != null && !isAppOpenShowed) {
-                                adListener.onNextAction();
+                                adListener.onNextAction(false);
                             }
                             handleTimeOut.removeCallbacks(actionTimeOut);
                         }
@@ -1280,7 +1280,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                             public void onAdDismissedFullScreenContent() {
                                 super.onAdDismissedFullScreenContent();
                                 if (adListener != null) {
-                                    adListener.onNextAction();
+                                    adListener.onNextAction(isAppOpenShowed);
                                     Log.d("AppOpenSplash", "onAdDismissedFullScreenContent: vao 2");
                                 }
                             }
@@ -1302,7 +1302,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                                             public void onFinish() {
                                                 if (adListener != null && !isAppOpenShowed) {
                                                     if (statusAll != Type_Load_Success && (statusHigh == Type_Load_Fail || statusHigh == Type_Show_Fail)) {
-                                                        adListener.onNextAction();
+                                                        adListener.onNextAction(true);
                                                         Log.d("AppOpenSplash", "onAdFailedToShowFullScreenContentAll: vao 2");
                                                     }
                                                 }
@@ -1350,7 +1350,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
 
     public void showAppOpenSplash(Context context, AdsCallback adCallback) {
         if (splashAd == null) {
-            adCallback.onNextAction();
+            adCallback.onNextAction(false);
             Log.d("AppOpenSplash Failed", "splashAd null: vao 2");
             return;
         }
@@ -1359,7 +1359,7 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
                     new FullScreenContentCallback() {
                         @Override
                         public void onAdDismissedFullScreenContent() {
-                            adCallback.onNextAction();
+                            adCallback.onNextAction(isAppOpenShowed);
                             isAppOpenShowed = false;
                             Log.d("AppOpenSplash Failed", "onAdDismissedFullScreenContent: vao 1");
                         }
