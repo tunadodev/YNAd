@@ -1455,10 +1455,6 @@ public class Admob {
             adView.setAdListener(new AdListener() {
                 @Override
                 public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
-                    containerShimmer.stopShimmer();
-                    adContainer.setVisibility(View.GONE);
-                    containerShimmer.setVisibility(View.GONE);
-
                     if (callback != null) {
                         callback.onAdFailedToLoad(loadAdError);
                     }
