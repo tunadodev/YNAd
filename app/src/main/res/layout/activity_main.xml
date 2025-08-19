@@ -26,7 +26,7 @@
                 />
         </RelativeLayout>
 
-        <com.ads.nomyek_admob.ads_components.ads_banner.YNMBannerAdView
+        <com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerAdView
             android:id="@+id/bannerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -35,7 +35,7 @@
             app:refresh_interval="10000"
             app:show_time="5000" />
 
-        <com.ads.nomyek_admob.ads_components.ads_banner.YNMBannerCollapse
+        <com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerCollapse
             android:id="@+id/collapse_banner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

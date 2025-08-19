@@ -1,4 +1,4 @@
-package com.ads.nomyek_admob.ads_components.ads_banner;
+package com.ads.yeknomadmob.ads_components.ads_banner;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,10 +10,11 @@ import android.widget.RelativeLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.ads.nomyek_admob.R;
-import com.ads.nomyek_admob.admobs.Admob;
-import com.ads.nomyek_admob.ads_components.YNMAds;
-import com.ads.nomyek_admob.ads_components.YNMAdsCallbacks;
+import com.ads.yeknomadmob.R;
+import com.ads.yeknomadmob.ads_components.YNMAds;
+import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
+
+import java.util.List;
 
 public class YNMBannerAdView extends RelativeLayout {
 
@@ -49,30 +50,24 @@ public class YNMBannerAdView extends RelativeLayout {
         inflate(getContext(), R.layout.layout_banner_view, this);
     }
 
-    public void showAd(Activity activity) {
-        showAd(activity, new YNMAdsCallbacks());
-    }
-
     public void loadBanner(Activity activity, String idBanner) {
         loadBanner(activity, idBanner, new YNMAdsCallbacks());
     }
 
-    //load ads in normal way
     public void loadBanner(Activity activity, String idBanner, YNMAdsCallbacks ynmAdsCallbacks) {
         YNMAds.getInstance().loadBanner(activity, idBanner, ynmAdsCallbacks);
     }
 
-    //load ad using multi floor
-    public void showAd(Activity activity, YNMAdsCallbacks ynmAdsCallbacks) {
-        YNMMultiFloorBannerAds.getInstance().showMFBannerAd(this, ynmAdsCallbacks);
+    public void loadMultiIdBanner(Activity activity, List<String> idBanner, YNMAdsCallbacks ynmAdsCallbacks) {
+        YNMAds.getInstance().loadMultiIdBanner(activity, idBanner, ynmAdsCallbacks);
     }
 
-    public void showAd(Activity activity, int refreshInterval, YNMAdsCallbacks ynmAdsCallbacks) {
-        showAd(activity, ynmAdsCallbacks);
+    public void loadMultiIdBanner(Activity activity, List<String> idBanner, int refreshInterval, YNMAdsCallbacks ynmAdsCallbacks) {
+        YNMAds.getInstance().loadMultiIdBanner(activity, idBanner, ynmAdsCallbacks);
 
         if (refreshInterval > 0) {
             refreshRunnable = () -> {
-                showAd(activity, ynmAdsCallbacks);
+                YNMAds.getInstance().loadMultiIdBanner(activity, idBanner, ynmAdsCallbacks);
                 refreshHandler.postDelayed(refreshRunnable, refreshInterval);
             };
             refreshHandler.postDelayed(refreshRunnable, refreshInterval);
@@ -82,8 +77,6 @@ public class YNMBannerAdView extends RelativeLayout {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (refreshRunnable != null) {
-            refreshHandler.removeCallbacks(refreshRunnable);
-        }
+        refreshHandler.removeCallbacks(refreshRunnable);
     }
 }

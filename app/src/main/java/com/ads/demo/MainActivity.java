@@ -2,16 +2,24 @@ package com.ads.demo;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
+import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.ads.demo.databinding.ActivityMainBinding;
-import com.ads.nomyek_admob.ads_components.YNMAds;
-import com.ads.nomyek_admob.ads_components.YNMAdsCallbacks;
-import com.ads.nomyek_admob.ads_components.ads_banner.YNMBannerAdView;
-import com.ads.nomyek_admob.ads_components.ads_banner.YNMBannerCollapse;
-import com.ads.nomyek_admob.ads_components.ads_native.YNMNativeAdView;
-import com.ads.nomyek_admob.event.YNMAirBridge;
-import com.ads.nomyek_admob.utils.AdsInterPreload;
-import com.ads.nomyek_admob.utils.AdsRewardPreload;
-import com.ads.nomyek_admob.utils.AdsUnitItem;
+import com.ads.yeknomadmob.ads_components.YNMAds;
+import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
+import com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerAdView;
+import com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerCollapse;
+import com.ads.yeknomadmob.ads_components.ads_native.YNMNativeAdView;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsRewardItem;
+import com.ads.yeknomadmob.event.YNMAirBridge;
+import com.ads.yeknomadmob.utils.AdsInterPreload;
+import com.ads.yeknomadmob.utils.AdsRewardPreload;
+import com.ads.yeknomadmob.utils.AdsUnitItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +92,12 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         ArrayList<String> listAds = new ArrayList();
         listAds.add(BuildConfig.ad_banner);
         listAds.add(BuildConfig.ad_banner);
-        viewBinding.collapseBanner.loadBannerCollapse(this, listAds, () -> startBannerRefresh(BuildConfig.ad_banner, "test"));
+        viewBinding.collapseBanner.loadBannerCollapse(this, listAds, new YNMBannerCollapse.OnCollapseListener() {
+            @Override
+            public void onBannerCollapsed() {
+                startBannerRefresh(BuildConfig.ad_banner, "test");
+            }
+        });
 
         AdsRewardPreload.preloadRewardAds(this, new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 6000);
 
