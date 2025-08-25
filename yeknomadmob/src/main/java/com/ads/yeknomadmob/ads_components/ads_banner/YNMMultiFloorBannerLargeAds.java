@@ -74,7 +74,7 @@ public class YNMMultiFloorBannerLargeAds {
         loadAdInWaterfall(0);
     }
 
-    private void loadAdInWaterfall(final int index) {
+    public void loadAdInWaterfall(final int index) {
         if (index >= highAdsIds.size()) {
             isWaterfallLoading = false;
             Log.w(TAG, "Waterfall finished for LARGE banners. No ad was loaded.");

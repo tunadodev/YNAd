@@ -56,7 +56,7 @@ public class YNMMultiFloorBannerAds {
         startWaterfallPreload();
     }
 
-    private void startWaterfallPreload() {
+    public void startWaterfallPreload() {
         if (applicationContext == null || highAdsIds == null || highAdsIds.isEmpty()) {
             Log.w(TAG, "Preload skipped: Manager not initialized.");
             return;

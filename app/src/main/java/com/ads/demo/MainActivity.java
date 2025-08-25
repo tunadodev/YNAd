@@ -49,7 +49,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
 
         viewBinding.collapseBanner.loadBannerCollapse(this, () -> {
-            viewBinding.bannerView.loadAd(this, new YNMAdsCallbacks() {
+            viewBinding.bannerView.showAd(this, new YNMAdsCallbacks() {
                 @Override
                 public void onAdLoaded() {
                     super.onAdLoaded();
