@@ -1,7 +1,5 @@
 package com.ads.yeknomadmob.ads_components.ads_banner;
 
-import static com.ads.yeknomadmob.admobs.Admob.BANNER_INLINE_LARGE_STYLE;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -12,17 +10,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.ads.yeknomadmob.R;
-import com.ads.yeknomadmob.admobs.Admob;
-import com.ads.yeknomadmob.utils.AdsCallback;
+import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
 import com.facebook.shimmer.ShimmerFrameLayout;
-import com.google.android.gms.ads.LoadAdError;
 import com.google.android.material.card.MaterialCardView;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class YNMBannerCollapse extends RelativeLayout {
 
@@ -86,7 +82,7 @@ public class YNMBannerCollapse extends RelativeLayout {
         this.onCollapseListener = onCollapseListener;
     }
 
-    public void loadBannerCollapse(Activity activity, List<String> adUnitIds, OnCollapseListener onCollapseListener) {
+    public void loadBannerCollapse(Activity activity, OnCollapseListener onCollapseListener) {
         if (isAdShowing) {
             Log.d(TAG, "Ad is already showing. Refresh is ignored.");
             return;
@@ -97,43 +93,32 @@ public class YNMBannerCollapse extends RelativeLayout {
         this.setVisibility(View.VISIBLE);
         largeBannerContainer.setVisibility(View.VISIBLE);
         collapseButton.setVisibility(View.GONE);
+        containerShimmer.startShimmer();
+        containerShimmer.setVisibility(View.VISIBLE);
+
 
         this.onCollapseListener = onCollapseListener;
 
-        List<String> reversedAdUnitIds = new ArrayList<>(adUnitIds);
-        Collections.reverse(reversedAdUnitIds);
-
-        loadLargeBannerWithWaterfall(activity, reversedAdUnitIds);
-    }
-
-    private void loadLargeBannerWithWaterfall(Activity activity, List<String> adUnitIds) {
-        if (adUnitIds.isEmpty()) {
-            collapseBanner();
-            return;
-        }
-
-        String adUnitId = adUnitIds.get(0);
-        List<String> remainingAdUnitIds = adUnitIds.subList(1, adUnitIds.size());
-
-        Admob.getInstance().loadBanner(activity, adUnitId, largeBannerContainer, containerShimmer, new AdsCallback() {
+        YNMMultiFloorBannerLargeAds.getInstance().showMFBannerAd(largeBannerContainer, new YNMAdsCallbacks() {
             @Override
             public void onAdLoaded() {
                 super.onAdLoaded();
+                containerShimmer.stopShimmer();
+                containerShimmer.setVisibility(View.GONE);
                 isAdShowing = true;
                 collapseButton.setVisibility(View.VISIBLE);
                 startCollapseTimer();
             }
 
             @Override
-            public void onAdFailedToLoad(LoadAdError errorCode) {
-                super.onAdFailedToLoad(errorCode);
-                if (!remainingAdUnitIds.isEmpty()) {
-                    loadLargeBannerWithWaterfall(activity, remainingAdUnitIds);
-                } else{
-                    collapseBanner();
-                }
+            public void onAdFailedToShow(AdsError error) {
+                super.onAdFailedToShow(error);
+                Log.e(TAG, "Failed to load collapse banner from multi-floor manager: " + error.getMessage());
+                containerShimmer.stopShimmer();
+                containerShimmer.setVisibility(View.GONE);
+                collapseBanner();
             }
-        }, true, BANNER_INLINE_LARGE_STYLE);
+        });
     }
 
     private void startCollapseTimer() {

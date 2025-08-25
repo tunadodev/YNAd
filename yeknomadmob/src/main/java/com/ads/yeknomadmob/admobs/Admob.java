@@ -2423,4 +2423,69 @@ public class Admob {
     private final static int INTERS_ADS = 3;
     private final static int REWARD_ADS = 4;
     private final static int NATIVE_ADS = 5;
+
+    public void loadBannerAdView(final Context context, String id, String adType, final AdsCallback callback) {
+        try {
+            AdView adView = new AdView(context);
+            adView.setAdUnitId(id);
+            adView.setAdSize(getAdSize(context, adType));
+            adView.setAdListener(new AdListener() {
+                @Override
+                public void onAdFailedToLoad(@NonNull LoadAdError loadAdError) {
+                    if (callback != null) {
+                        callback.onAdFailedToLoad(loadAdError);
+                    }
+                }
+
+                @Override
+                public void onAdLoaded() {
+                    adView.setOnPaidEventListener(adValue -> {
+                        Log.d(TAG, "OnPaidEvent banner:" + adValue.getValueMicros());
+
+                        YNMLogEventManager.logPaidAdImpression(context,
+                                adValue,
+                                adView.getAdUnitId(),
+                                adView.getResponseInfo(), TypeAds.BANNER);
+                    });
+                    if (callback != null) {
+                        callback.onBannerAdLoaded(adView);
+                    }
+                }
+
+                @Override
+                public void onAdClicked() {
+                    super.onAdClicked();
+                    if (callback != null) {
+                        callback.onAdClicked();
+                    }
+                }
+
+                @Override
+                public void onAdImpression() {
+                    super.onAdImpression();
+                    if (callback != null) {
+                        callback.onAdImpression();
+                    }
+                }
+            });
+
+            adView.loadAd(getAdRequest());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private AdSize getAdSize(Context context, String bannerType) {
+        DisplayMetrics outMetrics = context.getResources().getDisplayMetrics();
+
+        float widthPixels = outMetrics.widthPixels;
+        float density = outMetrics.density;
+
+        int adWidth = (int) (widthPixels / density);
+
+        if (BANNER_INLINE_LARGE_STYLE.equalsIgnoreCase(bannerType)) {
+            return AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(context, adWidth);
+        }
+        return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, adWidth);
+    }
 }

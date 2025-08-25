@@ -11,10 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.ads.yeknomadmob.R;
+import com.ads.yeknomadmob.admobs.Admob;
 import com.ads.yeknomadmob.ads_components.YNMAds;
 import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
-
-import java.util.List;
 
 public class YNMBannerAdView extends RelativeLayout {
 
@@ -50,24 +49,30 @@ public class YNMBannerAdView extends RelativeLayout {
         inflate(getContext(), R.layout.layout_banner_view, this);
     }
 
+    public void showAd(Activity activity) {
+        showAd(activity, new YNMAdsCallbacks());
+    }
+
     public void loadBanner(Activity activity, String idBanner) {
         loadBanner(activity, idBanner, new YNMAdsCallbacks());
     }
 
+    //load ads in normal way
     public void loadBanner(Activity activity, String idBanner, YNMAdsCallbacks ynmAdsCallbacks) {
         YNMAds.getInstance().loadBanner(activity, idBanner, ynmAdsCallbacks);
     }
 
-    public void loadMultiIdBanner(Activity activity, List<String> idBanner, YNMAdsCallbacks ynmAdsCallbacks) {
-        YNMAds.getInstance().loadMultiIdBanner(activity, idBanner, ynmAdsCallbacks);
+    //load ad using multi floor
+    public void showAd(Activity activity, YNMAdsCallbacks ynmAdsCallbacks) {
+        YNMMultiFloorBannerAds.getInstance().showMFBannerAd(this, ynmAdsCallbacks);
     }
 
-    public void loadMultiIdBanner(Activity activity, List<String> idBanner, int refreshInterval, YNMAdsCallbacks ynmAdsCallbacks) {
-        YNMAds.getInstance().loadMultiIdBanner(activity, idBanner, ynmAdsCallbacks);
+    public void showAd(Activity activity, int refreshInterval, YNMAdsCallbacks ynmAdsCallbacks) {
+        showAd(activity, ynmAdsCallbacks);
 
         if (refreshInterval > 0) {
             refreshRunnable = () -> {
-                YNMAds.getInstance().loadMultiIdBanner(activity, idBanner, ynmAdsCallbacks);
+                showAd(activity, ynmAdsCallbacks);
                 refreshHandler.postDelayed(refreshRunnable, refreshInterval);
             };
             refreshHandler.postDelayed(refreshRunnable, refreshInterval);
@@ -77,6 +82,8 @@ public class YNMBannerAdView extends RelativeLayout {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        refreshHandler.removeCallbacks(refreshRunnable);
+        if (refreshRunnable != null) {
+            refreshHandler.removeCallbacks(refreshRunnable);
+        }
     }
 }
