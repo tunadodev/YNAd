@@ -128,7 +128,8 @@ public class YNMMultiFloorBannerLargeAds {
                 }
             }
         }
-        Log.w(TAG, "No large banner ad available in cache to show.");
+        Log.w(TAG, "No large banner ad available in cache to show. Triggering new preload.");
         callback.onAdFailedToShow(new AdsError("No large banner ad available."));
+        startWaterfallPreload();
     }
 }

@@ -2439,6 +2439,14 @@ public class Admob {
 
                 @Override
                 public void onAdLoaded() {
+                    adView.setOnPaidEventListener(adValue -> {
+                        Log.d(TAG, "OnPaidEvent banner:" + adValue.getValueMicros());
+
+                        YNMLogEventManager.logPaidAdImpression(context,
+                                adValue,
+                                adView.getAdUnitId(),
+                                adView.getResponseInfo(), TypeAds.BANNER);
+                    });
                     if (callback != null) {
                         callback.onBannerAdLoaded(adView);
                     }

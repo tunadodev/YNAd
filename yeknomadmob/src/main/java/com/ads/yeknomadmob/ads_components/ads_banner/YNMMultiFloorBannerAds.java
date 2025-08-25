@@ -129,7 +129,8 @@ public class YNMMultiFloorBannerAds {
                 }
             }
         }
-        Log.w(TAG, "No standard banner ad available in cache to show.");
+        Log.w(TAG, "No standard banner ad available in cache to show. Triggering new preload.");
         callback.onAdFailedToShow(new AdsError("No standard banner ad available."));
+        startWaterfallPreload();
     }
 }
