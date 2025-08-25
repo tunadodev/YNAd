@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import com.ads.yeknomadmob.R;
 import com.ads.yeknomadmob.admobs.Admob;
+import com.ads.yeknomadmob.ads_components.YNMAds;
 import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
 
 public class YNMBannerAdView extends RelativeLayout {
@@ -52,6 +53,16 @@ public class YNMBannerAdView extends RelativeLayout {
         loadAd(activity, new YNMAdsCallbacks());
     }
 
+    public void loadBanner(Activity activity, String idBanner) {
+        loadBanner(activity, idBanner, new YNMAdsCallbacks());
+    }
+
+    //load ads in normal way
+    public void loadBanner(Activity activity, String idBanner, YNMAdsCallbacks ynmAdsCallbacks) {
+        YNMAds.getInstance().loadBanner(activity, idBanner, ynmAdsCallbacks);
+    }
+
+    //load ad using multi floor
     public void loadAd(Activity activity, YNMAdsCallbacks ynmAdsCallbacks) {
         YNMMultiFloorBannerAds.getInstance().showMFBannerAd(this, ynmAdsCallbacks);
     }
