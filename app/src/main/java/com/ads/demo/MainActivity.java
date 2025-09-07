@@ -5,16 +5,16 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.ads.demo.databinding.ActivityMainBinding;
-import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
-import com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerCollapse;
-import com.ads.yeknomadmob.ads_components.ads_banner.YNMMultiFloorBannerAds;
-import com.ads.yeknomadmob.ads_components.ads_banner.YNMMultiFloorBannerLargeAds;
-import com.ads.yeknomadmob.ads_components.ads_native.YNMNativeAdView;
-import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
-import com.ads.yeknomadmob.event.YNMAirBridge;
-import com.ads.yeknomadmob.utils.AdsInterPreload;
-import com.ads.yeknomadmob.utils.AdsRewardPreload;
-import com.ads.yeknomadmob.utils.AdsUnitItem;
+import com.ads.nomyek_admob.ads_components.YNMAdsCallbacks;
+import com.ads.nomyek_admob.ads_components.ads_banner.YNMBannerCollapse;
+import com.ads.nomyek_admob.ads_components.ads_banner.YNMMultiFloorBannerAds;
+import com.ads.nomyek_admob.ads_components.ads_banner.YNMMultiFloorBannerLargeAds;
+import com.ads.nomyek_admob.ads_components.ads_native.YNMNativeAdView;
+import com.ads.nomyek_admob.ads_components.wrappers.AdsError;
+import com.ads.nomyek_admob.event.YNMAirBridge;
+import com.ads.nomyek_admob.utils.AdsInterPreload;
+import com.ads.nomyek_admob.utils.AdsRewardPreload;
+import com.ads.nomyek_admob.utils.AdsUnitItem;
 
 import java.util.ArrayList;
 import java.util.List;
