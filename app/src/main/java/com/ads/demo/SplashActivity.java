@@ -7,12 +7,17 @@ import com.ads.yeknomadmob.admobs.Admob;
 import com.ads.yeknomadmob.admobs.AppOpenManager;
 import com.ads.yeknomadmob.ads_components.YNMAds;
 import com.ads.yeknomadmob.ads_components.YNMInitCallback;
+import com.ads.yeknomadmob.ads_components.ads_banner.YNMMultiFloorBannerAds;
+import com.ads.yeknomadmob.ads_components.ads_banner.YNMMultiFloorBannerLargeAds;
 import com.ads.yeknomadmob.config.AirBridgeConfig;
 import com.ads.yeknomadmob.config.SolarConfig;
 import com.ads.yeknomadmob.config.YNMAdsConfig;
 import com.ads.yeknomadmob.utils.AdsNativePreload;
+import com.ads.yeknomadmob.utils.AdsUnitItem;
 import com.google.android.gms.ads.FullScreenContentCallback;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,6 +45,15 @@ public class SplashActivity extends BaseActivity<ActivitySplashScreenBinding> {
         initAds();
         showInterstialAds();
         timer.schedule(new AfterLoading(), 25000); // Schedule to run after 8 seconds (8000 milliseconds)
+
+        List<AdsUnitItem> ids = new ArrayList<>();
+        ids.add(new AdsUnitItem(BuildConfig.ad_banner, "banner_base"));
+        ids.add(new AdsUnitItem(BuildConfig.ad_banner, "banner_high_1"));
+        ids.add(new AdsUnitItem(BuildConfig.ad_banner, "banner_high_2"));
+
+        YNMMultiFloorBannerAds.getInstance().init(this, ids);
+        YNMMultiFloorBannerLargeAds.getInstance().init(this, ids);
+
     }
     class AfterLoading extends TimerTask {
         public void run() {
