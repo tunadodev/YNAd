@@ -13,17 +13,29 @@ import androidx.annotation.Nullable;
 import com.ads.yeknomadmob.admobs.Admob;
 import com.ads.yeknomadmob.admobs.AppOpenManager;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsErrorMax;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsInterstitial;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsInterstitialMax;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsNative;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsReward;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsRewardItem;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsRewardItemMax;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsRewardMax;
 import com.ads.yeknomadmob.config.YNMAdsConfig;
 import com.ads.yeknomadmob.event.YNMAirBridge;
 import com.ads.yeknomadmob.event.YNMSolar;
+import com.ads.yeknomadmob.max.MaxNew;
 import com.ads.yeknomadmob.utils.AdsCallback;
 import com.ads.yeknomadmob.utils.AppUtil;
+import com.ads.yeknomadmob.utils.MaxAdsCallback;
 import com.ads.yeknomadmob.utils.RewardCallback;
+import com.ads.yeknomadmob.utils.RewardCallbackMax;
 import com.ads.yeknomadmob.utils.SharePreferenceUtils;
+import com.applovin.mediation.MaxAd;
+import com.applovin.mediation.MaxError;
+import com.applovin.mediation.MaxReward;
+import com.applovin.mediation.ads.MaxInterstitialAd;
+import com.applovin.mediation.ads.MaxRewardedAd;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.LoadAdError;
@@ -41,6 +53,7 @@ public class YNMAds {
     private static volatile YNMAds INSTANCE;
     private YNMAdsConfig adConfig;
     private YNMInitCallback initCallback;
+    private YNMInitCallback initCallbackMax;
     private Boolean initAdSuccess = false;
 
     //format
@@ -48,6 +61,7 @@ public class YNMAds {
     public final static String NATIVE = "Native";
     public final static String INTERSTITIAL = "Interstitial";
     public final static String REWARD = "Reward";
+    int countInit = 0;
 
     public static synchronized YNMAds getInstance() {
         if (INSTANCE == null) {
@@ -80,17 +94,36 @@ public class YNMAds {
         }
         AppUtil.VARIANT_DEV = adConfig.isVariantDev();
         Log.i(TAG, "Config variant dev: " + AppUtil.VARIANT_DEV);
-        if (adConfig.getMediationProvider() == YNMAdsConfig.PROVIDER_ADMOB) {
-            Admob.getInstance().init(activity, context, adConfig.getListDeviceTest());
-            if (adConfig.isEnableAdResume())
-                AppOpenManager.getInstance().init(adConfig.getApplication(), adConfig.getIdAdResume());
-
-            initAdSuccess = true;
-            if (initCallback != null)
-                initCallback.initAdsSuccess();
-        }
+        Admob.getInstance().init(activity, context, adConfig.getListDeviceTest(), () -> {
+            countInit++;
+            if (countInit == 2) {
+                initAdSuccess = true;
+                if (initCallback != null)
+                    initCallback.initAdsSuccess();
+            }
+        });
+        Log.e("GiaHuy", "initializeMobileAdsSdk: Admob 1");
+        if (adConfig.isEnableAdResume())
+            AppOpenManager.getInstance().init(adConfig.getApplication(), adConfig.getIdAdResume());
+        MaxNew.getInstance().init(context, adConfig.getMaxKey(), () -> {
+            countInit++;
+            if (countInit == 2) {
+                initAdSuccess = true;
+                if (initCallback != null)
+                    initCallback.initAdsSuccess();
+            }
+        });
+        Log.e("GiaHuy", "initializeMobileAdsSdk: Max 1");
+//        if (adConfig.getMediationProvider() == YNMAdsConfig.PROVIDER_ADMOB) {
+//            Admob.getInstance().init(activity, context, adConfig.getListDeviceTest());
+//            if (adConfig.isEnableAdResume())
+//                AppOpenManager.getInstance().init(adConfig.getApplication(), adConfig.getIdAdResume());
+//
+//            initAdSuccess = true;
+//            if (initCallback != null)
+//                initCallback.initAdsSuccess();
+//        }
     }
-
     public void loadBanner(final Activity mActivity, String id, final YNMAdsCallbacks adCallback) {
         switch (adConfig.getMediationProvider()) {
             case YNMAdsConfig.PROVIDER_ADMOB:
@@ -283,8 +316,13 @@ public class YNMAds {
             initCallback.initAdsSuccess();
     }
 
+    public void setInitCallbackMax(YNMInitCallback initCallback) {
+        this.initCallbackMax = initCallback;
+        if (initAdSuccess)
+            initCallback.initAdsSuccess();
+    }
 
-    public AdsInterstitial getInterstitialAds(Context context, String id, YNMAdsCallbacks adListener) {
+    public void getInterstitialAds(Context context, String id, YNMAdsCallbacks adListener) {
         AdsInterstitial apInterstitialAd = new AdsInterstitial();
         adListener.onAdStartLoad();
         Admob.getInstance().getInterstitialAds(context, id, new AdsCallback() {
@@ -311,7 +349,27 @@ public class YNMAds {
                 adListener.onAdFailedToShow(new AdsError(adError));
             }
         });
-        return apInterstitialAd;
+    }
+
+    public void getInterstitialAdsMax(Context context, String id, YNMAdsCallbacksMax adListener) {
+        AdsInterstitialMax apInterstitialAd = new AdsInterstitialMax();
+        adListener.onAdStartLoad();
+        MaxNew.getInstance().getInterstitialAds(context, id, new MaxAdsCallback() {
+            @Override
+            public void onInterstitialLoad(@Nullable MaxInterstitialAd interstitialAd, @Nullable MaxAd ad) {
+                super.onInterstitialLoad(interstitialAd, ad);
+                apInterstitialAd.setInterstitialAd(interstitialAd);
+                adListener.onInterstitialLoad(apInterstitialAd);
+                adListener.onAdLoaded();
+            }
+
+            @Override
+            public void onAdFailedToLoad(@Nullable MaxError i) {
+                super.onAdFailedToLoad(i);
+                Log.e("GiaHuy", "onAdFailedToLoad: " + i.getCode());
+                adListener.onAdFailedToLoad(new AdsErrorMax(i));
+            }
+        });
     }
 
     /**
@@ -530,6 +588,61 @@ public class YNMAds {
         Admob.getInstance().forceShowInterstitial(context, mInterstitialAd.getInterstitialAd(), adCallback);
     }
 
+    public void forceShowInterstitialMax(@NonNull Context context, AdsInterstitialMax mInterstitialAd,
+                                      @NonNull final YNMAdsCallbacksMax callback) {
+        boolean isSkip = System.currentTimeMillis() - SharePreferenceUtils.getLastImpressionInterstitialTime(context)
+                < YNMAds.getInstance().adConfig.getIntervalInterstitialAd() * 1000L;
+        callback.onCheckSkipInter(isSkip);
+        if (isSkip) {
+            Log.i(TAG, "forceShowInterstitial: ignore by interval impression interstitial time");
+            callback.onNextAction();
+            return;
+        }
+        if (mInterstitialAd == null || mInterstitialAd.isNotReady()) {
+            Log.e(TAG, "forceShowInterstitial: AdsInterstitial is not ready");
+            callback.onNextAction();
+            return;
+        }
+        MaxAdsCallback adCallback = new MaxAdsCallback() {
+            @Override
+            public void onAdClosed() {
+                super.onAdClosed();
+                Log.d(TAG, "onAdClosed: ");
+                callback.onAdClosed();
+                mInterstitialAd.setInterstitialAd(null);
+            }
+
+            @Override
+            public void onNextAction() {
+                super.onNextAction();
+                Log.d(TAG, "onNextAction: ");
+                callback.onNextAction();
+            }
+
+            @Override
+            public void onAdFailedToShow(@Nullable MaxError adError) {
+                super.onAdFailedToShow(adError);
+                Log.d(TAG, "onAdFailedToShow: ");
+                callback.onAdFailedToShow(new AdsErrorMax(adError));
+                mInterstitialAd.setInterstitialAd(null);
+            }
+
+            @Override
+            public void onAdClicked() {
+                super.onAdClicked();
+                callback.onAdClicked();
+            }
+
+            @Override
+            public void onInterstitialShow() {
+                super.onInterstitialShow();
+                callback.onInterstitialShow();
+                callback.onAdImpression();
+            }
+        };
+        MaxNew.getInstance().forceShowInterstitial(context, mInterstitialAd.getInterstitialAd(), adCallback, false);
+    }
+
     public void showInterstitialAdByTimes(Context context, AdsInterstitial mInterstitialAd, final YNMAdsCallbacks callback, boolean shouldReloadAds) {
         if (mInterstitialAd.isNotReady()) {
             Log.e(TAG, "forceShowInterstitial: AdsInterstitial is not ready");
@@ -709,6 +822,20 @@ public class YNMAds {
         return apRewardAd;
     }
 
+    public AdsRewardMax getRewardAdMax(Activity activity, String id, YNMAdsCallbacksMax callback) {
+        AdsRewardMax apRewardAd = new AdsRewardMax();
+        MaxNew.getInstance().getRewardAd(activity, id, new MaxAdsCallback() {
+            @Override
+            public void onRewardAdLoaded(MaxRewardedAd rewardedAd) {
+                super.onRewardAdLoaded(rewardedAd);
+                apRewardAd.setMaxReward(rewardedAd);
+                callback.onAdLoaded();
+                callback.onRewardAdLoaded(apRewardAd);
+            }
+        });
+        return apRewardAd;
+    }
+
     public AdsReward getRewardInterstitialAd(Activity activity, String id, YNMAdsCallbacks callback) {
         AdsReward apRewardAd = new AdsReward();
         switch (adConfig.getMediationProvider()) {
@@ -832,5 +959,40 @@ public class YNMAds {
 //                    }
 //                });
         }
+    }
+
+    public void forceShowRewardAdMax(Activity activity, AdsRewardMax apRewardAd, YNMAdsCallbacksMax
+            callback) {
+        if (!apRewardAd.isReady()) {
+            Log.e(TAG, "forceShowRewardAd fail: reward ad not ready");
+            callback.onNextAction();
+            return;
+        }
+
+        MaxNew.getInstance().showRewardAd(activity, apRewardAd.getMaxReward(), new RewardCallbackMax() {
+            @Override
+            public void onUserEarnedReward(MaxReward var1) {
+                callback.onUserEarnedReward(new AdsRewardItemMax(var1));
+            }
+
+            @Override
+            public void onRewardedAdClosed() {
+                apRewardAd.clean();
+                callback.onNextAction();
+            }
+
+            @Override
+            public void onRewardedAdFailedToShow(MaxError codeError) {
+                apRewardAd.clean();
+                callback.onAdFailedToShow(new AdsErrorMax(codeError));
+            }
+
+            @Override
+            public void onAdClicked() {
+                if (callback != null) {
+                    callback.onAdClicked();
+                }
+            }
+        });
     }
 }

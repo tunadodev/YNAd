@@ -11,9 +11,13 @@ import androidx.annotation.Nullable;
 
 import com.ads.yeknomadmob.ads_components.YNMAds;
 import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
+import com.ads.yeknomadmob.ads_components.YNMAdsCallbacksMax;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsErrorMax;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsReward;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsRewardItem;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsRewardItemMax;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsRewardMax;
 import com.ads.yeknomadmob.dialogs.PrepareLoadingAdsDialog;
 import com.ads.yeknomadmob.event.YNMAirBridge;
 
@@ -75,7 +79,60 @@ public class AdsRewardPreload {
         }
     }
 
+    public static class RewardModelMax {
+        private AdsRewardMax rewardAd;
+        private PreloadState state;
+        private YNMAdsCallbacks callback;
+        private YNMAdsCallbacksMax callbacksMax;
+        private long lastUpdateTime;
+
+        public RewardModelMax(AdsRewardMax ad, PreloadState state) {
+            this.rewardAd = ad;
+            this.state = state;
+            this.lastUpdateTime = System.currentTimeMillis();
+        }
+
+        public AdsRewardMax getRewardAd() {
+            return rewardAd;
+        }
+
+        public void setRewardAd(AdsRewardMax rewardAd) {
+            this.rewardAd = rewardAd;
+            this.lastUpdateTime = System.currentTimeMillis();
+        }
+
+        public PreloadState getState() {
+            return state;
+        }
+
+        public void setState(PreloadState state) {
+            this.state = state;
+            this.lastUpdateTime = System.currentTimeMillis();
+        }
+
+        public YNMAdsCallbacks getCallback() {
+            return callback;
+        }
+
+        public YNMAdsCallbacksMax getCallbackMax() {
+            return callbacksMax;
+        }
+
+        public void setCallback(YNMAdsCallbacks callback) {
+            this.callback = callback;
+        }
+
+        public long getLastUpdateTime() {
+            return lastUpdateTime;
+        }
+
+        public boolean isReady() {
+            return state == PreloadState.SUCCESS && rewardAd != null && rewardAd.isReady();
+        }
+    }
+
     private static final Map<String, RewardModel> mapCaches = new HashMap<>();
+    private static final Map<String, RewardModelMax> mapCachesMax = new HashMap<>();
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     /**
@@ -85,11 +142,18 @@ public class AdsRewardPreload {
         mapCaches.remove(key);
     }
 
+    public static void destroyRewardMax(String key) {
+        mapCachesMax.remove(key);
+    }
+
     /**
      * Clear all reward ads from cache
      */
     public static void destroyAllRewards() {
         mapCaches.clear();
+    }
+    public static void destroyAllRewardsMax() {
+        mapCachesMax.clear();
     }
 
     /**
@@ -150,6 +214,67 @@ public class AdsRewardPreload {
                         }
                         // Remove on load fail
                         destroyReward(key);
+                    }
+                }
+            });
+        });
+    }
+
+    public static void preloadRewardAdsMax(Activity context, YNMAirBridge.AppData appData, String id, String key, long timeout) {
+        // Check if already loading or loaded
+        RewardModelMax existingModel = mapCachesMax.get(key);
+        if (existingModel != null) {
+            // If already loading, just return
+            if (existingModel.getState() == PreloadState.LOADING || existingModel.getState() == PreloadState.SUCCESS) {
+                Log.d("AdsRewardPreload", "Ad with key " + key + " is already loading");
+                return;
+            }
+            // If loaded or failed, remove old model to start fresh
+            mapCachesMax.remove(key);
+        }
+
+        // Create new model with LOADING state
+        RewardModelMax model = new RewardModelMax(null, PreloadState.LOADING);
+        mapCachesMax.put(key, model);
+
+        // Set timeout handler
+        mainHandler.postDelayed(() -> {
+            RewardModelMax currentModel = mapCachesMax.get(key);
+            if (currentModel != null && currentModel.getState() == PreloadState.LOADING) {
+                currentModel.setState(PreloadState.FAIL);
+                if (currentModel.getCallbackMax() != null) {
+                    currentModel.getCallbackMax().onAdFailedToLoad(new AdsErrorMax("Preload timeout"));
+                }
+                // Remove on timeout
+                destroyRewardMax(key);
+            }
+        }, timeout);
+
+        // Start loading
+        YNMAds.getInstance().setInitCallbackMax(() -> {
+            YNMAds.getInstance().getRewardAdMax(context, id, new YNMAdsCallbacksMax(appData, YNMAds.REWARD) {
+                @Override
+                public void onRewardAdLoaded(AdsRewardMax rewardedAd) {
+                    RewardModelMax currentModel = mapCachesMax.get(key);
+                    if (currentModel != null) {
+                        currentModel.setRewardAd(rewardedAd);
+                        currentModel.setState(PreloadState.SUCCESS);
+                        if (currentModel.getCallback() != null) {
+                            currentModel.getCallback().onAdLoaded();
+                        }
+                    }
+                }
+
+                @Override
+                public void onAdFailedToLoad(@Nullable AdsErrorMax adError) {
+                    RewardModelMax currentModel = mapCachesMax.get(key);
+                    if (currentModel != null) {
+                        currentModel.setState(PreloadState.FAIL);
+                        if (currentModel.getCallbackMax() != null) {
+                            currentModel.getCallbackMax().onAdFailedToLoad(adError);
+                        }
+                        // Remove on load fail
+                        destroyRewardMax(key);
                     }
                 }
             });
@@ -259,7 +384,7 @@ public class AdsRewardPreload {
     /**
      * Show preloaded reward ad or load new one if needed
      */
-    public static void showRewardPreload(Activity context, String key, String adId, long timeOut, final YNMAdsCallbacks callback) {
+    public static void showRewardPreload(Activity context, String key, final YNMAdsCallbacks callback) {
         if (isActivityDestroyed(context)) {
             if (callback != null) {
                 callback.onAdFailedToLoad(new AdsError("Activity is not available"));
@@ -268,123 +393,271 @@ public class AdsRewardPreload {
         }
         
         YNMAds.getInstance().setInitCallback(() -> {
-            RewardModel model = mapCaches.get(key);
-            
-            if (model != null) {
-                switch (model.getState()) {
-                    case SUCCESS:
-                        if (model.isReady()) {
-                            // Show preloaded ad
-                            YNMAds.getInstance().forceShowRewardAd(context, model.getRewardAd(), new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.REWARD) {
-                                @Override
-                                public void onAdClosed() {
-                                    super.onAdClosed();
-                                    if (callback != null) callback.onAdClosed();
-                                }
-
-                                @Override
-                                public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
-                                    super.onUserEarnedReward(rewardItem);
-                                    if (callback != null) callback.onUserEarnedReward(rewardItem);
-                                }
-
-                                @Override
-                                public void onNextAction() {
-                                    super.onNextAction();
-                                    if (callback != null) callback.onNextAction();
-                                }
-                            });
-                            // Remove from cache after showing
-                            destroyReward(key);
-                        } else {
-                            // Preloaded ad is not ready, load new one
-                            loadNewReward(context, adId, key, timeOut, callback);
+            checkEndShowMax(context, key, callback, new CheckShowCallback() {
+                @Override
+                public void showFail() {
+                    super.showFail();
+                    checkEndShow(context, key, callback, new CheckShowCallback() {
+                        @Override
+                        public void showFail() {
+                            super.showFail();
+                            callback.onNextAction();
                         }
-                        break;
-                        
-                    case LOADING:
-                        // Wait for preload result
-                        if (isActivityDestroyed(context)) {
-                            if (callback != null) {
-                                callback.onAdFailedToLoad(new AdsError("Activity is not available"));
-                            }
-                            return;
-                        }
-                        
-                        PrepareLoadingAdsDialog dialog = new PrepareLoadingAdsDialog(context);
-                        dialog.setCancelable(false);
-                        dialog.show();
-                        
-                        model.setCallback(new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.REWARD) {
+                    });
+                }
+            });
+        });
+    }
+
+    static void checkEndShow(Activity context, String key, YNMAdsCallbacks callback, CheckShowCallback checkShowCallback) {
+        RewardModel model = mapCaches.get(key);
+
+        if (model != null) {
+            switch (model.getState()) {
+                case SUCCESS:
+                    if (model.isReady()) {
+                        // Show preloaded ad
+                        YNMAds.getInstance().forceShowRewardAd(context, model.getRewardAd(), new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.REWARD) {
                             @Override
-                            public void onAdLoaded() {
-                                if (dialog != null && dialog.isShowing() && !isActivityDestroyed(context)) {
-                                    try {
-                                        dialog.dismiss();
-                                    } catch (IllegalArgumentException e) {
-                                        Log.e("AdsRewardPreload", "Failed to dismiss dialog: " + e.getMessage());
-                                    }
-                                }
-                                
-                                if (isActivityDestroyed(context)) {
-                                    if (callback != null) {
-                                        callback.onAdFailedToLoad(new AdsError("Activity is not available"));
-                                    }
-                                    destroyReward(key);
-                                    return;
-                                }
-                                
-                                if (model.isReady()) {
-                                    YNMAds.getInstance().forceShowRewardAd(context, model.getRewardAd(), new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.REWARD) {
-                                        @Override
-                                        public void onAdClosed() {
-                                            super.onAdClosed();
-                                            if (callback != null) callback.onAdClosed();
-                                        }
-
-                                        @Override
-                                        public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
-                                            super.onUserEarnedReward(rewardItem);
-                                            if (callback != null) callback.onUserEarnedReward(rewardItem);
-                                        }
-
-                                        @Override
-                                        public void onNextAction() {
-                                            super.onNextAction();
-                                            if (callback != null) callback.onNextAction();
-                                        }
-                                    });
-                                    // Remove from cache after showing
-                                    destroyReward(key);
-                                } else {
-                                    loadNewReward(context, adId, key, timeOut, callback);
-                                }
+                            public void onAdClosed() {
+                                super.onAdClosed();
+                                if (callback != null) callback.onAdClosed();
                             }
 
                             @Override
-                            public void onAdFailedToLoad(@Nullable AdsError adError) {
-                                if (dialog != null && dialog.isShowing() && !isActivityDestroyed(context)) {
-                                    try {
-                                        dialog.dismiss();
-                                    } catch (IllegalArgumentException e) {
-                                        Log.e("AdsRewardPreload", "Failed to dismiss dialog: " + e.getMessage());
-                                    }
-                                }
-                                loadNewReward(context, adId, key, timeOut, callback);
+                            public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
+                                super.onUserEarnedReward(rewardItem);
+                                if (callback != null) callback.onUserEarnedReward(rewardItem);
+                            }
+
+                            @Override
+                            public void onNextAction() {
+                                super.onNextAction();
+                                if (callback != null) callback.onNextAction();
                             }
                         });
-                        break;
-                        
-                    case FAIL:
-                        // Preload failed, load new one
-                        loadNewReward(context, adId, key, timeOut, callback);
-                        break;
-                }
-            } else {
-                // No preload exists, load new one
-                loadNewReward(context, adId, key, timeOut, callback);
+                        // Remove from cache after showing
+                        destroyReward(key);
+                    } else {
+                        // Preloaded ad is not ready, load new one
+                        if (checkShowCallback != null)
+                            checkShowCallback.showFail();
+                    }
+                    break;
+
+                case LOADING:
+                    // Wait for preload result
+                    if (checkShowCallback != null)
+                        checkShowCallback.showFail();
+//                    if (isActivityDestroyed(context)) {
+//                        if (callback != null) {
+//                            callback.onAdFailedToLoad(new AdsError("Activity is not available"));
+//                        }
+//                        return;
+//                    }
+//
+//                    PrepareLoadingAdsDialog dialog = new PrepareLoadingAdsDialog(context);
+//                    dialog.setCancelable(false);
+//                    dialog.show();
+//
+//                    model.setCallback(new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.REWARD) {
+//                        @Override
+//                        public void onAdLoaded() {
+//                            if (dialog != null && dialog.isShowing() && !isActivityDestroyed(context)) {
+//                                try {
+//                                    dialog.dismiss();
+//                                } catch (IllegalArgumentException e) {
+//                                    Log.e("AdsRewardPreload", "Failed to dismiss dialog: " + e.getMessage());
+//                                }
+//                            }
+//
+//                            if (isActivityDestroyed(context)) {
+//                                if (callback != null) {
+//                                    callback.onAdFailedToLoad(new AdsError("Activity is not available"));
+//                                }
+//                                destroyReward(key);
+//                                return;
+//                            }
+//
+//                            if (model.isReady()) {
+//                                YNMAds.getInstance().forceShowRewardAd(context, model.getRewardAd(), new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.REWARD) {
+//                                    @Override
+//                                    public void onAdClosed() {
+//                                        super.onAdClosed();
+//                                        if (callback != null) callback.onAdClosed();
+//                                    }
+//
+//                                    @Override
+//                                    public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
+//                                        super.onUserEarnedReward(rewardItem);
+//                                        if (callback != null) callback.onUserEarnedReward(rewardItem);
+//                                    }
+//
+//                                    @Override
+//                                    public void onNextAction() {
+//                                        super.onNextAction();
+//                                        if (callback != null) callback.onNextAction();
+//                                    }
+//                                });
+//                                // Remove from cache after showing
+//                                destroyReward(key);
+//                            } else {
+//                                loadNewReward(context, adId, key, timeOut, callback);
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onAdFailedToLoad(@Nullable AdsError adError) {
+//                            if (dialog != null && dialog.isShowing() && !isActivityDestroyed(context)) {
+//                                try {
+//                                    dialog.dismiss();
+//                                } catch (IllegalArgumentException e) {
+//                                    Log.e("AdsRewardPreload", "Failed to dismiss dialog: " + e.getMessage());
+//                                }
+//                            }
+//                            loadNewReward(context, adId, key, timeOut, callback);
+//                        }
+//                    });
+                    break;
+
+                case FAIL:
+                    // Preload failed, load new one
+//                    loadNewReward(context, adId, key, timeOut, callback);
+                    if (checkShowCallback != null)
+                        checkShowCallback.showFail();
+                    break;
             }
-        });
+        } else {
+            if (checkShowCallback != null)
+                checkShowCallback.showFail();
+            // No preload exists, load new one
+//            loadNewReward(context, adId, key, timeOut, callback);
+        }
+    }
+
+    static void checkEndShowMax(Activity context, String key, YNMAdsCallbacks callback, CheckShowCallback checkShowCallback) {
+        RewardModelMax model = mapCachesMax.get(key);
+
+        if (model != null) {
+            switch (model.getState()) {
+                case SUCCESS:
+                    if (model.isReady()) {
+                        // Show preloaded ad
+                        YNMAds.getInstance().forceShowRewardAdMax(context, model.getRewardAd(), new YNMAdsCallbacksMax(new YNMAirBridge.AppData(), YNMAds.REWARD) {
+                            @Override
+                            public void onAdClosed() {
+                                super.onAdClosed();
+                                if (callback != null) callback.onAdClosed();
+                            }
+
+                            @Override
+                            public void onUserEarnedReward(@NonNull AdsRewardItemMax rewardItem) {
+                                super.onUserEarnedReward(rewardItem);
+//                                if (callback != null) callback.onUserEarnedReward(rewardItem);
+                            }
+
+                            @Override
+                            public void onNextAction() {
+                                super.onNextAction();
+                                if (callback != null) callback.onNextAction();
+                            }
+                        });
+                        // Remove from cache after showing
+                        destroyRewardMax(key);
+                    } else {
+                        // Preloaded ad is not ready, load new one
+                        if (checkShowCallback != null)
+                            checkShowCallback.showFail();
+                    }
+                    break;
+
+                case LOADING:
+                    // Wait for preload result
+                    if (checkShowCallback != null)
+                        checkShowCallback.showFail();
+//                    if (isActivityDestroyed(context)) {
+//                        if (callback != null) {
+//                            callback.onAdFailedToLoad(new AdsError("Activity is not available"));
+//                        }
+//                        return;
+//                    }
+//
+//                    PrepareLoadingAdsDialog dialog = new PrepareLoadingAdsDialog(context);
+//                    dialog.setCancelable(false);
+//                    dialog.show();
+//
+//                    model.setCallback(new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.REWARD) {
+//                        @Override
+//                        public void onAdLoaded() {
+//                            if (dialog != null && dialog.isShowing() && !isActivityDestroyed(context)) {
+//                                try {
+//                                    dialog.dismiss();
+//                                } catch (IllegalArgumentException e) {
+//                                    Log.e("AdsRewardPreload", "Failed to dismiss dialog: " + e.getMessage());
+//                                }
+//                            }
+//
+//                            if (isActivityDestroyed(context)) {
+//                                if (callback != null) {
+//                                    callback.onAdFailedToLoad(new AdsError("Activity is not available"));
+//                                }
+//                                destroyReward(key);
+//                                return;
+//                            }
+//
+//                            if (model.isReady()) {
+//                                YNMAds.getInstance().forceShowRewardAd(context, model.getRewardAd(), new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.REWARD) {
+//                                    @Override
+//                                    public void onAdClosed() {
+//                                        super.onAdClosed();
+//                                        if (callback != null) callback.onAdClosed();
+//                                    }
+//
+//                                    @Override
+//                                    public void onUserEarnedReward(@NonNull AdsRewardItem rewardItem) {
+//                                        super.onUserEarnedReward(rewardItem);
+//                                        if (callback != null) callback.onUserEarnedReward(rewardItem);
+//                                    }
+//
+//                                    @Override
+//                                    public void onNextAction() {
+//                                        super.onNextAction();
+//                                        if (callback != null) callback.onNextAction();
+//                                    }
+//                                });
+//                                // Remove from cache after showing
+//                                destroyReward(key);
+//                            } else {
+//                                loadNewReward(context, adId, key, timeOut, callback);
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onAdFailedToLoad(@Nullable AdsError adError) {
+//                            if (dialog != null && dialog.isShowing() && !isActivityDestroyed(context)) {
+//                                try {
+//                                    dialog.dismiss();
+//                                } catch (IllegalArgumentException e) {
+//                                    Log.e("AdsRewardPreload", "Failed to dismiss dialog: " + e.getMessage());
+//                                }
+//                            }
+//                            loadNewReward(context, adId, key, timeOut, callback);
+//                        }
+//                    });
+                    break;
+
+                case FAIL:
+                    // Preload failed, load new one
+//                    loadNewReward(context, adId, key, timeOut, callback);
+                    if (checkShowCallback != null)
+                        checkShowCallback.showFail();
+                    break;
+            }
+        } else {
+            // No preload exists, load new one
+            if (checkShowCallback != null)
+                checkShowCallback.showFail();
+        }
     }
 
     /**

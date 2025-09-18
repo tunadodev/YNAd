@@ -8,6 +8,7 @@ public class YNMAdsConfig {
 
     //switch mediation use for app
     public static final int PROVIDER_ADMOB = 0;
+    public static final int PROVIDER_MAX = 1;
 
 
     public static final String ENVIRONMENT_DEVELOP = "develop";
@@ -22,6 +23,7 @@ public class YNMAdsConfig {
     /**
      * airBridgeConfig enable airbridge and setup dev key
      */
+    private String keyMax;
     private AirBridgeConfig airBridgeConfig;
     private SolarConfig solarConfig;
     /**
@@ -67,6 +69,10 @@ public class YNMAdsConfig {
         this.isVariantDev = environment.equals(ENVIRONMENT_DEVELOP);
     }
 
+    public void setMaxKey(String key) {
+        keyMax = key;
+    }
+    public String getMaxKey() { return keyMax; }
     public String getEventNamePurchase() {
         return eventNamePurchase;
     }

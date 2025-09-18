@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.ads.yeknomadmob.utils.TypeAds;
+import com.applovin.mediation.MaxAd;
 import com.google.android.gms.ads.AdValue;
 
 import java.util.HashMap;
@@ -81,6 +82,43 @@ public class YNMAirBridge {
             semanticAttributes.put("currency", currencyCode);
 
             event.setAction(adUnitId);
+            event.setLabel(adNetworkAdapter);
+            event.setValue(valueMicros / 1000000.0);
+            event.setSemanticAttributes(semanticAttributes);
+
+            Airbridge.trackEvent(event);
+            Event eventCustom = new Event("custom_ad_impression");
+            eventCustom.setLabel(adType.toString());
+            YNMAirBridge.getInstance().logCustomEvent(eventCustom);
+        }
+    }
+
+    public static void logPaidAdImpressionValue(Context context, MaxAd maxAd, TypeAds adType) {
+        if (enableAirBridge) {
+            // Extract the impression-level ad revenue data.
+            double valueMicros = maxAd.getRevenue();
+            String currencyCode = "USD";
+            int precision = 1;
+
+            // Get the ad unit ID.
+            String adNetworkAdapter = maxAd.getNetworkName();
+
+            Event event = new Event("airbridge.adImpression");
+            Map<String, Object> admob = new HashMap<>();
+            admob.put("value_micros", valueMicros);
+            admob.put("currency_code", currencyCode);
+            admob.put("precision", precision);
+
+            admob.put("ad_unit_id", maxAd.getAdUnitId());
+            admob.put("ad_network_adapter", adNetworkAdapter);
+
+            Map<String, Object> adPartners = new HashMap<>();
+            adPartners.put("admob", admob);
+            Map<String, Object> semanticAttributes = new HashMap<>();
+            semanticAttributes.put("adPartners", adPartners);
+            semanticAttributes.put("currency", currencyCode);
+
+            event.setAction(maxAd.getAdUnitId());
             event.setLabel(adNetworkAdapter);
             event.setValue(valueMicros / 1000000.0);
             event.setSemanticAttributes(semanticAttributes);

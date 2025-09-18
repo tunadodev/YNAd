@@ -38,6 +38,7 @@ import com.ads.yeknomadmob.event.YNMLogEventManager;
 import com.ads.yeknomadmob.utils.AdmodHelper;
 import com.ads.yeknomadmob.utils.AdsCallback;
 import com.ads.yeknomadmob.utils.AppUtil;
+import com.ads.yeknomadmob.utils.InitAdsCallback;
 import com.ads.yeknomadmob.utils.RewardCallback;
 import com.ads.yeknomadmob.utils.SharePreferenceUtils;
 import com.ads.yeknomadmob.utils.TypeAds;
@@ -138,9 +139,9 @@ public class Admob {
     /**
      * khởi tạo admod
      */
-    public void init(Activity activity, Context context, List<String> testDeviceList) {
+    public void init(Activity activity, Context context, List<String> testDeviceList, InitAdsCallback callback) {
         this.context = context;
-        initializeMobileAdsSdk(testDeviceList);
+        initializeMobileAdsSdk(testDeviceList, callback);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             String processName = Application.getProcessName();
             String packageName = context.getPackageName();
@@ -150,17 +151,19 @@ public class Admob {
         }
     }
 
-    void initializeMobileAdsSdk(List<String> testDeviceList) {
+    void initializeMobileAdsSdk(List<String> testDeviceList, InitAdsCallback callback) {
         if (isMobileAdsInitializeCalled.getAndSet(true)) {
             return;
         }
         MobileAds.initialize(context, initializationStatus -> {
+            Log.e("GiaHuy", "initializeMobileAdsSdk: Admob");
             Map<String, AdapterStatus> statusMap = initializationStatus.getAdapterStatusMap();
             for (String adapterClass : statusMap.keySet()) {
                 AdapterStatus status = statusMap.get(adapterClass);
                 Log.d(TAG, String.format("Adapter name: %s, Description: %s, Latency: %d",
                         adapterClass, status.getDescription(), status.getLatency()));
             }
+            callback.initSuccess();
         });
         MobileAds.setRequestConfiguration(new RequestConfiguration.Builder().setTestDeviceIds(testDeviceList).build());
     }

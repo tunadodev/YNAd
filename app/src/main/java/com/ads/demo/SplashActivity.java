@@ -2,6 +2,8 @@ package com.ads.demo;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.util.Log;
+
 import com.ads.demo.databinding.ActivitySplashScreenBinding;
 import com.ads.yeknomadmob.admobs.Admob;
 import com.ads.yeknomadmob.admobs.AppOpenManager;
@@ -63,6 +65,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashScreenBinding> {
         YNMAds.getInstance().setInitCallback(new YNMInitCallback() {
             @Override
             public void initAdsSuccess() {
+                Log.e("GiaHuy", "initAdsSuccess: ");
                 AppOpenManager.getInstance().setFullScreenContentCallback(new FullScreenContentCallback() {
                     @Override
                     public void onAdDismissedFullScreenContent() {
@@ -110,6 +113,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashScreenBinding> {
         app.listTestDevice.add("EC25F576DA9B6CE74778B268CB87E431");
         app.ynmAdsConfig.setListDeviceTest(app.listTestDevice);
         app.ynmAdsConfig.setIntervalInterstitialAd(15);
+        app.ynmAdsConfig.setMaxKey("ZAfVxNkdSk6cf7ZwKlno-4hm9rkqoJZqRtOQdltbEIQZEmpRKvnSPUMfWylvDoPqffwh6xUdDL2la8IlH_UGFD");
 
         YNMAds.getInstance().init(SplashActivity.this, app, app.ynmAdsConfig);
 

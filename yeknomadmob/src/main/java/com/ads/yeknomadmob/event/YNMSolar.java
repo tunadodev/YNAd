@@ -6,6 +6,9 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.ads.yeknomadmob.utils.TypeAds;
+import com.applovin.mediation.MaxAd;
+import com.applovin.mediation.MaxAdFormat;
+import com.applovin.sdk.AppLovinSdk;
 import com.google.android.gms.ads.AdValue;
 import com.google.android.gms.ads.AdapterResponseInfo;
 import com.google.android.gms.ads.ResponseInfo;
@@ -125,6 +128,29 @@ public class YNMSolar {
             //True: rendered success
             seAdImpEventModel.setRenderSuccess(true);
             //You can add custom properties as needed. Here we do not give examples.
+            SolarEngineManager.getInstance().trackAdImpression(seAdImpEventModel);
+        }
+    }
+
+    public static void logPaidAdImpressionValue(Context context, MaxAd maxAd, TypeAds adType) {
+        if (enableSolar) {
+            SEAdImpEventModel seAdImpEventModel =  new SEAdImpEventModel();
+            //Monetization Platform Name
+            seAdImpEventModel.setAdNetworkPlatform( maxAd.getNetworkName());
+            //Mediation Platform Name (Max SDK set as "Max")
+            seAdImpEventModel.setMediationPlatform("Max");
+            //Displayed Ad Type (If rewarded ad, adType = 1)
+            seAdImpEventModel.setAdType(adType.ordinal());
+            //Monetization Platform App ID (optional) You can input the appKey in SE SDK.
+            seAdImpEventModel.setAdNetworkAppID("---SE SDK appKey---");
+            //Monetization Platform Ad Unit ID
+            seAdImpEventModel.setAdNetworkADID(maxAd.getNetworkPlacement());
+            //Ad eCPM
+            seAdImpEventModel.setEcpm(maxAd.getRevenue()*1000);
+            //Monetization Platform Currency Type (USD)
+            seAdImpEventModel.setCurrencyType("USD");
+            //True: rendered success
+            seAdImpEventModel.setRenderSuccess(true);
             SolarEngineManager.getInstance().trackAdImpression(seAdImpEventModel);
         }
     }

@@ -7,6 +7,7 @@ import com.ads.yeknomadmob.config.YNMAdsConfig;
 import com.ads.yeknomadmob.utils.AppUtil;
 import com.ads.yeknomadmob.utils.SharePreferenceUtils;
 import com.ads.yeknomadmob.utils.TypeAds;
+import com.applovin.mediation.MaxAd;
 import com.google.android.gms.ads.AdValue;
 import com.google.android.gms.ads.ResponseInfo;
 
@@ -18,6 +19,12 @@ public class YNMLogEventManager {
         logEventWithAds(context, (float) adValue.getValueMicros(), adValue.getPrecisionType(), adUnitId, responseInfo.getMediationAdapterClassName(), YNMAdsConfig.PROVIDER_ADMOB);
         YNMAirBridge.logPaidAdImpressionValue(context, adValue, adUnitId, responseInfo.getMediationAdapterClassName(), TypeAds);
         YNMSolar.logPaidAdImpressionValue(context, adValue, adUnitId, responseInfo, TypeAds);
+    }
+
+    public static void logPaidAdImpression(Context context, MaxAd maxAd, TypeAds TypeAds) {
+        logEventWithAds(context, (float) maxAd.getRevenue(), 1, maxAd.getAdUnitId(), maxAd.getNetworkName(), YNMAdsConfig.PROVIDER_MAX);
+        YNMAirBridge.logPaidAdImpressionValue(context, maxAd, TypeAds);
+        YNMSolar.logPaidAdImpressionValue(context, maxAd, TypeAds);
     }
 
     private static void logEventWithAds(Context context, float revenue, int precision, String adUnitId, String network, int mediationProvider) {

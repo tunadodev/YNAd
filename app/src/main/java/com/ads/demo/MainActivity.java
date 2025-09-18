@@ -100,22 +100,36 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         });
 
         AdsRewardPreload.preloadRewardAds(this, new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 6000);
+        AdsRewardPreload.preloadRewardAdsMax(this, new YNMAirBridge.AppData(), BuildConfig.reward_max, "test_reward", 6000);
 
         viewBinding.showInter.setOnClickListener(view -> {
-            List<AdsUnitItem> adUnits = new ArrayList<>();
-            adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key1"));
-            adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3"));
-            AdsInterPreload.showPreloadMultipleInterAds(this, adUnits, 10000, new YNMAdsCallbacks() {
-                @Override
-                public void onAdClosed() {
-                    // Xử lý khi quảng cáo đóng
-                }
+            AdsRewardPreload.showRewardPreload(this, "test_reward", new YNMAdsCallbacks() {
+
             });
+//            List<AdsUnitItem> adUnits = new ArrayList<>();
+//            adUnits.add(new AdsUnitItem(BuildConfig.inter_max, "key4"));
+//            adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3"));
+//
+//            AdsInterPreload.showPreloadInterAds(this, adUnits, 10000, new YNMAdsCallbacks() {
+//                @Override
+//                public void onAdClosed() {
+//                    // Xử lý khi quảng cáo đóng
+//                }
+//
+//                @Override
+//                public void onNextAction() {
+//                    super.onNextAction();
+//
+//                }
+//            });
         });
-        List<AdsUnitItem> adUnits = new ArrayList<>();
-        adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key1"));
-        adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3"));
-        AdsInterPreload.preloadMultipleInterAds(this, new YNMAirBridge.AppData("", "list"), adUnits, 10000);
+//        List<AdsUnitItem> adUnits = new ArrayList<>();
+//        adUnits.add(new AdsUnitItem(BuildConfig.ad_native, "key1"));
+//        adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3"));
+        AdsUnitItem x = new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3");
+        AdsUnitItem y = new AdsUnitItem(BuildConfig.inter_max, "key4");
+        AdsInterPreload.preloadMax(this, new YNMAirBridge.AppData("", "list1"), y, 10000, null);
+        AdsInterPreload.preload(this, new YNMAirBridge.AppData("", "list"), x, 10000, null);
     }
 
 }
