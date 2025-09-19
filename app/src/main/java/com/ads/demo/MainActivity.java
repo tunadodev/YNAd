@@ -99,8 +99,10 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
             }
         });
 
-        AdsRewardPreload.preloadRewardAds(this, new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 6000);
-        AdsRewardPreload.preloadRewardAdsMax(this, new YNMAirBridge.AppData(), BuildConfig.reward_max, "test_reward", 6000);
+        viewBinding.loadInter.setOnClickListener(view -> {
+            AdsRewardPreload.preloadRewardAds(this, new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 6000);
+            AdsRewardPreload.preloadRewardAdsMax(this, new YNMAirBridge.AppData(), BuildConfig.reward_max, "test_reward", 6000);
+        });
 
         viewBinding.showInter.setOnClickListener(view -> {
             AdsRewardPreload.showRewardPreload(this, "test_reward", new YNMAdsCallbacks() {
