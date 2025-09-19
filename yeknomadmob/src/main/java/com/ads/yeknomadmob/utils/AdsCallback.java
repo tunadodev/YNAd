@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.ads.yeknomadmob.admobs.Admob;
 import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.nativead.NativeAd;
@@ -55,6 +56,9 @@ public class AdsCallback {
 
 
     public void onAdLoaded() {
+    }
+
+    public void onBannerAdLoaded(AdView adView) {
     }
 
     public void onAdLoadedHigh() {

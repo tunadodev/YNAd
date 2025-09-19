@@ -26,6 +26,7 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.appopen.AppOpenAd;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -262,7 +263,8 @@ public class AppOpenManager implements Application.ActivityLifecycleCallbacks, L
 
         AdRequest request = getAdRequest();
         AppOpenAd.load(
-                myApplication, isSplash ? splashAdId : appResumeAdId, request, loadCallback);
+                myApplication, isSplash ? splashAdId : appResumeAdId, request,
+                loadCallback);
     }
 
     /**
