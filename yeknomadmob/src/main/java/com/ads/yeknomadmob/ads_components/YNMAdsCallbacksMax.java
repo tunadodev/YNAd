@@ -54,7 +54,7 @@ public class YNMAdsCallbacksMax {
     public void onTimeOut() {
     }
 
-    public void onNextAction() {
+    public void onNextAction(boolean isAdShown) {
     }
 
     public void onAdClosed() {

@@ -595,12 +595,12 @@ public class YNMAds {
         callback.onCheckSkipInter(isSkip);
         if (isSkip) {
             Log.i(TAG, "forceShowInterstitial: ignore by interval impression interstitial time");
-            callback.onNextAction();
+            callback.onNextAction(false);
             return;
         }
         if (mInterstitialAd == null || mInterstitialAd.isNotReady()) {
             Log.e(TAG, "forceShowInterstitial: AdsInterstitial is not ready");
-            callback.onNextAction();
+            callback.onNextAction(false);
             return;
         }
         MaxAdsCallback adCallback = new MaxAdsCallback() {
@@ -613,10 +613,10 @@ public class YNMAds {
             }
 
             @Override
-            public void onNextAction() {
-                super.onNextAction();
+            public void onNextAction(boolean isAdsShown) {
+                super.onNextAction(isAdsShown);
                 Log.d(TAG, "onNextAction: ");
-                callback.onNextAction();
+                callback.onNextAction(isAdsShown);
             }
 
             @Override
@@ -967,7 +967,7 @@ public class YNMAds {
             callback) {
         if (!apRewardAd.isReady()) {
             Log.e(TAG, "forceShowRewardAd fail: reward ad not ready");
-            callback.onNextAction();
+            callback.onNextAction(false);
             return;
         }
 
@@ -980,7 +980,7 @@ public class YNMAds {
             @Override
             public void onRewardedAdClosed() {
                 apRewardAd.clean();
-                callback.onNextAction();
+                callback.onNextAction(true);
             }
 
             @Override

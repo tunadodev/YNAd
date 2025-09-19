@@ -948,7 +948,7 @@ public class AdsInterPreload {
     public static void showPreloadInterAds(Context context, List<AdsUnitItem> adUnits, long timeOut, final YNMAdsCallbacks callback) {
         if (adUnits == null || adUnits.isEmpty() || isContextDestroyed(context)) {
             if (callback != null) {
-                callback.onNextAction();
+                callback.onNextAction(false);
             }
             return;
         }
@@ -958,7 +958,7 @@ public class AdsInterPreload {
             if (System.currentTimeMillis() - SharePreferenceUtils.getLastImpressionInterstitialTime(context)
                     < YNMAds.getInstance().getAdConfig().getIntervalInterstitialAd() * 1000L) {
                 if (callback != null) {
-                    callback.onNextAction();
+                    callback.onNextAction(false);
                 }
                 return;
             }
@@ -972,7 +972,7 @@ public class AdsInterPreload {
                         @Override
                         public void showFail() {
                             super.showFail();
-                            callback.onNextAction();
+                            callback.onNextAction(false);
                             Log.e("GiaHuy", "showPreloadInterAds: 3");
                         }
                     });
@@ -987,7 +987,7 @@ public class AdsInterPreload {
     ) {
         if (isContextDestroyed(context)) {
             if (callback != null) {
-                callback.onNextAction();
+                callback.onNextAction(false);
             }
             return;
         }
@@ -1040,9 +1040,9 @@ public class AdsInterPreload {
                         }
 
                         @Override
-                        public void onNextAction() {
-                            super.onNextAction();
-                            if (callback != null) callback.onNextAction();
+                        public void onNextAction(boolean isAdShown) {
+                            super.onNextAction(isAdShown);
+                            if (callback != null) callback.onNextAction(isAdShown);
                         }
 
                         @Override
@@ -1196,7 +1196,7 @@ public class AdsInterPreload {
     ) {
         if (isContextDestroyed(context)) {
             if (callback != null) {
-                callback.onNextAction();
+                callback.onNextAction(false);
             }
             return;
         }
@@ -1249,9 +1249,9 @@ public class AdsInterPreload {
                         }
 
                         @Override
-                        public void onNextAction() {
-                            super.onNextAction();
-                            if (callback != null) callback.onNextAction();
+                        public void onNextAction(boolean isAdsShown) {
+                            super.onNextAction(isAdsShown);
+                            if (callback != null) callback.onNextAction(isAdsShown);
                         }
 
                         @Override

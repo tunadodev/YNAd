@@ -289,7 +289,7 @@ public class YNMMultiFloorInterAds {
                     if (pendingActivity != null && !pendingActivity.isDestroyed()) {
                         Log.d(TAG, "No high ad ready, fallback to onNextAction");
                         if (pendingCallback != null) {
-                            pendingCallback.onNextAction();
+                            pendingCallback.onNextAction(false);
                         }
                     }
                     clearPendingShowRequest();
@@ -327,13 +327,13 @@ public class YNMMultiFloorInterAds {
         if ((System.currentTimeMillis() - lastImpressionTime) / 1000 < interval) {
             Log.d(TAG, "Interstitial ad skipped due to interval constraint.");
             callback.onAdFailedToShow(new AdsError("Ad skipped due to frequency cap."));
-            callback.onNextAction();
+            callback.onNextAction(false);
             return; // Exit without showing any ad.
         }
 
         if (highAdsIds == null || highAdsIds.isEmpty()) {
             Log.d(TAG, "High-floor ad IDs are null or empty. Proceeding with fallback.");
-            callback.onNextAction();
+            callback.onNextAction(false);
             return;
         }
 
@@ -363,12 +363,6 @@ public class YNMMultiFloorInterAds {
                             super.onAdFailedToShow(adError);
                             callback.onAdFailedToShow(new AdsError(adError != null ? adError.getMessage() : "Unknown error"));
                         }
-
-                        @Override
-                        public void onNextAction() {
-                            super.onNextAction();
-                            callback.onNextAction();
-                        }
                     });
                     // Immediately start preloading a new ad to maintain a full cache.
                     startWaterfallPreload();
@@ -391,13 +385,13 @@ public class YNMMultiFloorInterAds {
                 } else {
                     Log.w(TAG, "Another show request is already pending. Ignoring new request.");
                     callback.onAdFailedToShow(new AdsError("Another ad request is already in progress."));
-                    callback.onNextAction();
+                    callback.onNextAction(false);
                 }
             }
             return;
         }
 
-        callback.onNextAction();
+        callback.onNextAction(false);
     }
 
     /**

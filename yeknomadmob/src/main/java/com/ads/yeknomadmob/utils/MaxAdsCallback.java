@@ -19,7 +19,7 @@ import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 public class MaxAdsCallback {
     public void onTimeOut() {
     }
-    public void onNextAction() {
+    public void onNextAction(boolean isAdsShown) {
     }
 
     public void onAdClosed() {

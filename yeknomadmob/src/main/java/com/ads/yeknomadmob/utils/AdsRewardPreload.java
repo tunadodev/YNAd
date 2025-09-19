@@ -1,7 +1,6 @@
 package com.ads.yeknomadmob.utils;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -347,9 +346,9 @@ public class AdsRewardPreload {
                     }
 
                     @Override
-                    public void onNextAction() {
-                        super.onNextAction();
-                        if (callback != null) callback.onNextAction();
+                    public void onNextAction(boolean isAdsShown) {
+                        super.onNextAction(isAdsShown);
+                        if (callback != null) callback.onNextAction(isAdsShown);
                     }
                 });
                 destroyReward(key);
@@ -401,7 +400,7 @@ public class AdsRewardPreload {
                         @Override
                         public void showFail() {
                             super.showFail();
-                            callback.onNextAction();
+                            callback.onNextAction(false);
                         }
                     });
                 }
@@ -431,9 +430,9 @@ public class AdsRewardPreload {
                             }
 
                             @Override
-                            public void onNextAction() {
-                                super.onNextAction();
-                                if (callback != null) callback.onNextAction();
+                            public void onNextAction(boolean isAdsShown) {
+                                super.onNextAction(isAdsShown);
+                                if (callback != null) callback.onNextAction(isAdsShown);
                             }
                         });
                         // Remove from cache after showing
@@ -557,9 +556,9 @@ public class AdsRewardPreload {
                             }
 
                             @Override
-                            public void onNextAction() {
-                                super.onNextAction();
-                                if (callback != null) callback.onNextAction();
+                            public void onNextAction(boolean isAdsShown) {
+                                super.onNextAction(isAdsShown);
+                                if (callback != null) callback.onNextAction(isAdsShown);
                             }
                         });
                         // Remove from cache after showing
@@ -868,9 +867,9 @@ public class AdsRewardPreload {
                         }
 
                         @Override
-                        public void onNextAction() {
-                            super.onNextAction();
-                            if (callback != null) callback.onNextAction();
+                        public void onNextAction(boolean isAdsShown) {
+                            super.onNextAction(isAdsShown);
+                            if (callback != null) callback.onNextAction(isAdsShown);
                         }
                     });
                     // Remove from cache after showing
@@ -955,9 +954,9 @@ public class AdsRewardPreload {
                                     if (callback != null) callback.onUserEarnedReward(rewardItem);
                                 }
                                 @Override
-                                public void onNextAction() {
-                                    super.onNextAction();
-                                    if (callback != null) callback.onNextAction();
+                                public void onNextAction(boolean isAdsShown) {
+                                    super.onNextAction(isAdsShown);
+                                    if (callback != null) callback.onNextAction(isAdsShown);
                                 }
                             });
                             // Remove from cache after showing
