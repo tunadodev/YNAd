@@ -546,6 +546,12 @@ public class YNMMultiFloorInterAds {
                             super.onAdFailedToShow(adError);
                             callback.onAdFailedToShow(new AdsError(adError != null ? adError.getMessage() : "Unknown error"));
                         }
+
+                        @Override
+                        public void onNextAction(boolean isShown) {
+                            super.onNextAction(isShown);
+                            callback.onNextAction(isShown);
+                        }
                     });
                     // Immediately start preloading a new ad to maintain a full cache.
                     startWaterfallPreload();
@@ -622,6 +628,12 @@ public class YNMMultiFloorInterAds {
                         public void onAdFailedToShow(@Nullable MaxError adError) {
                             super.onAdFailedToShow(adError);
                             callback.onAdFailedToShow(new AdsErrorMax(adError != null ? adError.getMessage() : "Unknown error"));
+                        }
+
+                        @Override
+                        public void onNextAction(boolean isShown) {
+                            super.onNextAction(isShown);
+                            callback.onNextAction(isShown);
                         }
                     }, false);
                     // Immediately start preloading a new ad to maintain a full cache.

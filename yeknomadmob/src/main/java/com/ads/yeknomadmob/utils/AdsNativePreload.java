@@ -311,17 +311,25 @@ public class AdsNativePreload {
     /**
      * Helper method to show ad if activity is still active
      */
-    private static void showAdIfActivityActive(Context context, YNMNativeAdView adView, 
+    private static void showAdIfActivityActive(Context context, YNMNativeAdView adView,
                                              NativeAdsModels model, int mediumLayout, 
-                                             int largeLayout, boolean isPreloaded) {
+                                             int largeLayout, boolean isPreloaded, boolean isResize) {
         if (context instanceof Activity) {
             Activity activity = (Activity) context;
             if (!activity.isFinishing() && !activity.isDestroyed()) {
-                AdsHelper.initAutoResizeAds(context, adView, model.getNativeAd(), 
-                                          mediumLayout, largeLayout, isPreloaded);
+                if (isResize) {
+                    AdsHelper.initAutoResizeAds(context, adView, model.getNativeAd(),
+                            mediumLayout, largeLayout, isPreloaded);
+                }
                 model.setState(State.SHOWED);
             }
         }
+    }
+
+    private static void showAdIfActivityActive(Context context, YNMNativeAdView adView,
+                                               NativeAdsModels model, int mediumLayout,
+                                               int largeLayout, boolean isPreloaded) {
+        showAdIfActivityActive(context, adView, model, mediumLayout, largeLayout, isPreloaded, true);
     }
     
     /**
@@ -595,7 +603,25 @@ public class AdsNativePreload {
             public void initAdsSuccess() {
                 // Start checking from the first ad
                 checkAndShowAdSequentially(context, adView, adUnits, 0, mediumLayout, 
-                                          largeLayout, appData, timeout);
+                                          largeLayout, appData, timeout, false);
+            }
+        });
+    }
+
+    public static void showPreloadMultipleNativeFCAds(Context context, YNMNativeAdView adView,
+                                                    List<AdsUnitItem> adUnits, int mediumLayout,
+                                                    int largeLayout, YNMAirBridge.AppData appData,
+                                                    long timeout) {
+        if (adUnits == null || adUnits.isEmpty()) {
+            return;
+        }
+
+        YNMAds.getInstance().setInitCallback(new YNMInitCallback() {
+            @Override
+            public void initAdsSuccess() {
+                // Start checking from the first ad
+                checkAndShowAdSequentially(context, adView, adUnits, 0, mediumLayout,
+                        largeLayout, appData, timeout, true);
             }
         });
     }
@@ -606,7 +632,7 @@ public class AdsNativePreload {
     private static void checkAndShowAdSequentially(Context context, YNMNativeAdView adView,
                                                 List<AdsUnitItem> adUnits, int currentIndex,
                                                 int mediumLayout, int largeLayout, 
-                                                YNMAirBridge.AppData appData, long timeout) {
+                                                YNMAirBridge.AppData appData, long timeout, boolean isFullScreen) {
         // Check if we've reached the end of the list
         if (currentIndex >= adUnits.size()) {
             // If reached the end, try to load the last ad unit as fallback
@@ -637,7 +663,7 @@ public class AdsNativePreload {
         
         // CASE 1: Ad is loaded and ready to show
         if (model != null && model.isLoaded()) {
-            showAdIfActivityActive(context, adView, model, mediumLayout, largeLayout, true);
+            showAdIfActivityActive(context, adView, model, mediumLayout, largeLayout, true, !isFullScreen);
             return;
         }
         
@@ -650,7 +676,7 @@ public class AdsNativePreload {
                 public void run() {
                     // Timeout waiting for this ad, check next ad
                     checkAndShowAdSequentially(context, adView, adUnits, currentIndex + 1, 
-                                             mediumLayout, largeLayout, appData, timeout);
+                                             mediumLayout, largeLayout, appData, timeout, isFullScreen);
                 }
             };
             timeoutHandler.postDelayed(timeoutRunnable, timeout);
@@ -665,11 +691,11 @@ public class AdsNativePreload {
                     // Show the loaded ad
                     NativeAdsModels loadedModel = adsMap.get(key);
                     if (loadedModel != null && loadedModel.isLoaded()) {
-                        showAdIfActivityActive(context, adView, loadedModel, mediumLayout, largeLayout, true);
+                        showAdIfActivityActive(context, adView, loadedModel, mediumLayout, largeLayout, true, !isFullScreen);
                     } else {
                         // Ad finished loading but is not ready, try next
                         checkAndShowAdSequentially(context, adView, adUnits, currentIndex + 1, 
-                                                 mediumLayout, largeLayout, appData, timeout);
+                                                 mediumLayout, largeLayout, appData, timeout, isFullScreen);
                     }
                 }
             };
@@ -681,7 +707,7 @@ public class AdsNativePreload {
                 if (currentModel != null && currentModel.isFailed()) {
                     timeoutHandler.removeCallbacks(timeoutRunnable);
                     checkAndShowAdSequentially(context, adView, adUnits, currentIndex + 1, 
-                                             mediumLayout, largeLayout, appData, timeout);
+                                             mediumLayout, largeLayout, appData, timeout, isFullScreen);
                 }
             }, 1000); // Check after 1 second
             
@@ -696,7 +722,7 @@ public class AdsNativePreload {
         
         // Try next ad unit
         checkAndShowAdSequentially(context, adView, adUnits, currentIndex + 1, 
-                                 mediumLayout, largeLayout, appData, timeout);
+                                 mediumLayout, largeLayout, appData, timeout, isFullScreen);
     }
 
     public static void showPreloadMultipleNativeAds(Context context, YNMNativeAdView adView,
