@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.ads.nomyek_admob.admobs.Admob;
 import com.google.android.gms.ads.AdError;
+import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.nativead.NativeAd;
@@ -14,7 +15,7 @@ import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 public class AdsCallback {
     public void onTimeOut() {
     }
-    public void onNextAction() {
+    public void onNextAction(boolean isShown) {
     }
 
     public void onAdClosed() {
@@ -24,7 +25,9 @@ public class AdsCallback {
     }
 
     public void onAdFailedToLoad(@Nullable LoadAdError i) {
-        Admob.getInstance().getDialog().dismiss();
+        if (Admob.getInstance().getDialog() != null) {
+            Admob.getInstance().getDialog().dismiss();
+        }
     }
 
     public void onAdFailedToLoadHigh(@Nullable LoadAdError i) {
@@ -53,6 +56,9 @@ public class AdsCallback {
 
 
     public void onAdLoaded() {
+    }
+
+    public void onBannerAdLoaded(AdView adView) {
     }
 
     public void onAdLoadedHigh() {

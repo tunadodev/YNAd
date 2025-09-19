@@ -9,6 +9,8 @@ import com.ads.nomyek_admob.ads_components.ads_native.YNMNativeAdView;
 import com.ads.nomyek_admob.ads_components.wrappers.AdsNative;
 import com.google.android.gms.ads.nativead.NativeAd;
 
+import java.util.Map;
+
 //check if a view is below or above a ratio with the full height
 public class AdsHelper {
     public interface ResizeCallback {
@@ -83,5 +85,11 @@ public class AdsHelper {
                 nativeAdView.populateNativeAdView((Activity) context, apNativeAd);
             }
         }, preLoaded ? 0 : 0);
+    }
+
+    // Helper method to convert dp to pixels
+    public static <K, V> V getOrDefaultCompat(Map<K, V> map, K key, V defaultValue) {
+        if (map.containsKey(key)) return map.get(key);
+        return defaultValue;
     }
 }

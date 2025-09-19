@@ -175,19 +175,21 @@ public class AdsInterPreload {
     private static void loadNewInterstitial(Context context, String adId, String key, long timeOut, final YNMAdsCallbacks callback) {
         if (isContextDestroyed(context)) {
             if (callback != null) {
-                callback.onNextAction();
+                callback.onNextAction(false);  // No ad shown
             }
             return;
         }
         
         YNMAds.getInstance().loadInterstitialAds(context, adId, timeOut, 0, true, new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.INTERSTITIAL) {
+            private boolean wasAdShown = false;
+
             @Override
             public void onInterstitialLoad(@Nullable AdsInterstitial interstitialAd) {
                 super.onInterstitialLoad(interstitialAd);
                 
                 if (isContextDestroyed(context)) {
                     if (callback != null) {
-                        callback.onNextAction();
+                        callback.onNextAction(false);  // No ad shown
                     }
                     destroyInterstitial(key);
                     return;
@@ -202,15 +204,16 @@ public class AdsInterPreload {
                         }
 
                         @Override
-                        public void onNextAction() {
-                            super.onNextAction();
-                            if (callback != null) callback.onNextAction();
+                        public void onNextAction(boolean isShown) {
+                            super.onNextAction(isShown);
+                            if (callback != null) callback.onNextAction(wasAdShown);
                         }
 
                         @Override
                         public void onCheckSkipInter(boolean isSkip) {
                             super.onCheckSkipInter(isSkip);
                             if (!isSkip) {
+                                wasAdShown = true;
                                 // Remove from cache after showing
                                 destroyInterstitial(key);
                             }
@@ -224,16 +227,16 @@ public class AdsInterPreload {
                 super.onAdFailedToLoad(adError);
                 if (callback != null) {
                     callback.onAdFailedToLoad(adError);
-                    callback.onNextAction();
+                    callback.onNextAction(false);  // No ad shown
                 }
                 // Remove from cache on load fail
                 destroyInterstitial(key);
             }
 
             @Override
-            public void onNextAction() {
-                super.onNextAction();
-                if (callback != null) callback.onNextAction();
+            public void onNextAction(boolean isShown) {
+                super.onNextAction(isShown);
+                if (callback != null) callback.onNextAction(wasAdShown);
             }
 
             @Override
@@ -241,12 +244,13 @@ public class AdsInterPreload {
                 super.onAdFailedToShow(adError);
                 // Remove from cache on show fail
                 destroyInterstitial(key);
+                if (callback != null) callback.onNextAction(false);  // Failed to show
             }
 
             @Override
             public void onTimeOut() {
                 super.onTimeOut();
-                if (callback != null) callback.onNextAction();
+                if (callback != null) callback.onNextAction(false);  // No ad shown due to timeout
                 // Remove from cache on timeout
                 destroyInterstitial(key);
             }
@@ -265,7 +269,7 @@ public class AdsInterPreload {
     public static void showPreloadInterAds(Context context, String key, String adId, long timeOut, final YNMAdsCallbacks callback) {
         if (isContextDestroyed(context)) {
             if (callback != null) {
-                callback.onNextAction();
+                callback.onNextAction(false);  // No ad shown
             }
             return;
         }
@@ -274,7 +278,7 @@ public class AdsInterPreload {
             // Check impression interval
             if (System.currentTimeMillis() - SharePreferenceUtils.getLastImpressionInterstitialTime(context)
                     < YNMAds.getInstance().getAdConfig().getIntervalInterstitialAd() * 1000L) {
-                callback.onNextAction();
+                callback.onNextAction(false);  // No ad shown due to interval
                 return;
             }
 
@@ -286,6 +290,8 @@ public class AdsInterPreload {
                         if (model.isReady()) {
                             // Show preloaded ad
                             YNMAds.getInstance().forceShowInterstitial(context, model.getInterstitialAd(), new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.INTERSTITIAL) {
+                                private boolean wasAdShown = false;
+
                                 @Override
                                 public void onAdClosed() {
                                     super.onAdClosed();
@@ -293,15 +299,16 @@ public class AdsInterPreload {
                                 }
 
                                 @Override
-                                public void onNextAction() {
-                                    super.onNextAction();
-                                    if (callback != null) callback.onNextAction();
+                                public void onNextAction(boolean isShown) {
+                                    super.onNextAction(isShown);
+                                    if (callback != null) callback.onNextAction(wasAdShown);
                                 }
 
                                 @Override
                                 public void onCheckSkipInter(boolean isSkip) {
                                     super.onCheckSkipInter(isSkip);
                                     if (!isSkip) {
+                                        wasAdShown = true;
                                         // Remove from cache after showing
                                         destroyInterstitial(key);
                                     }
@@ -317,7 +324,7 @@ public class AdsInterPreload {
                         // Wait for preload result
                         if (isContextDestroyed(context)) {
                             if (callback != null) {
-                                callback.onNextAction();
+                                callback.onNextAction(false);  // No ad shown
                             }
                             return;
                         }
@@ -325,9 +332,38 @@ public class AdsInterPreload {
                         PrepareLoadingAdsDialog dialog = new PrepareLoadingAdsDialog(context);
                         dialog.setCancelable(false);
                         dialog.show();
+                        
+                        // Set a timeout for waiting
+                        final Handler timeoutHandler = new Handler(Looper.getMainLooper());
+                        final Runnable timeoutRunnable = new Runnable() {
+                            @Override
+                            public void run() {
+                                // Timeout waiting for this ad
+                                Log.d("AdsInterPreload", "Timeout waiting for loading ad with key: " + key);
+                                if (dialog != null && dialog.isShowing() && !isContextDestroyed(context)) {
+                                    try {
+                                        dialog.dismiss();
+                                    } catch (IllegalArgumentException e) {
+                                        Log.e("AdsInterPreload", "Failed to dismiss dialog: " + e.getMessage());
+                                    }
+                                }
+                                // Check next ad
+                                if (callback != null) {
+                                    callback.onNextAction(false);  // No ad shown due to timeout
+                                }
+                            }
+                        };
+                        timeoutHandler.postDelayed(timeoutRunnable, timeOut);
+                        
+                        // Set callback to get load result
                         model.setCallback(new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.INTERSTITIAL) {
+                            private boolean wasAdShown = false;
+
                             @Override
                             public void onAdLoaded() {
+                                // Cancel timeout
+                                timeoutHandler.removeCallbacks(timeoutRunnable);
+                                
                                 if (dialog != null && dialog.isShowing() && !isContextDestroyed(context)) {
                                     try {
                                         dialog.dismiss();
@@ -338,12 +374,14 @@ public class AdsInterPreload {
                                 
                                 if (isContextDestroyed(context)) {
                                     if (callback != null) {
-                                        callback.onNextAction();
+                                        callback.onNextAction(false);  // No ad shown
                                     }
                                     return;
                                 }
                                 
+                                // Check if ad is ready
                                 if (model.isReady()) {
+                                    Log.d("AdsInterPreload", "Ad finished loading and is ready for key: " + key + ", showing it");
                                     YNMAds.getInstance().forceShowInterstitial(context, model.getInterstitialAd(), new YNMAdsCallbacks(new YNMAirBridge.AppData(), YNMAds.INTERSTITIAL) {
                                         @Override
                                         public void onAdClosed() {
@@ -352,27 +390,35 @@ public class AdsInterPreload {
                                         }
 
                                         @Override
-                                        public void onNextAction() {
-                                            super.onNextAction();
-                                            if (callback != null) callback.onNextAction();
+                                        public void onNextAction(boolean isShown) {
+                                            super.onNextAction(isShown);
+                                            if (callback != null) callback.onNextAction(wasAdShown);
                                         }
 
                                         @Override
                                         public void onCheckSkipInter(boolean isSkip) {
                                             super.onCheckSkipInter(isSkip);
                                             if (!isSkip) {
+                                                wasAdShown = true;
                                                 // Remove from cache after showing
                                                 destroyInterstitial(key);
                                             }
                                         }
                                     });
                                 } else {
-                                    loadNewInterstitial(context, adId, key, timeOut, callback);
+                                    // Ad finished loading but is not ready
+                                    Log.d("AdsInterPreload", "Ad finished loading but is not ready for key: " + key + ", moving to next");
+                                    if (callback != null) {
+                                        callback.onNextAction(false);  // No ad shown
+                                    }
                                 }
                             }
 
                             @Override
                             public void onAdFailedToLoad(@Nullable AdsError adError) {
+                                // Cancel timeout
+                                timeoutHandler.removeCallbacks(timeoutRunnable);
+                                
                                 if (dialog != null && dialog.isShowing() && !isContextDestroyed(context)) {
                                     try {
                                         dialog.dismiss();
@@ -383,18 +429,23 @@ public class AdsInterPreload {
                                 
                                 if (isContextDestroyed(context)) {
                                     if (callback != null) {
-                                        callback.onNextAction();
+                                        callback.onNextAction(false);  // No ad shown
                                     }
                                     return;
                                 }
                                 
-                                loadNewInterstitial(context, adId, key, timeOut, callback);
+                                // Ad failed to load
+                                Log.d("AdsInterPreload", "Ad failed to load for key: " + key);
+                                if (callback != null) {
+                                    callback.onNextAction(false);  // No ad shown
+                                }
                             }
                         });
                         break;
                         
                     case FAIL:
                         // Preload failed, load new one
+                        Log.d("AdsInterPreload", "Ad is in FAIL state for key: " + key + ", loading new");
                         loadNewInterstitial(context, adId, key, timeOut, callback);
                         break;
                 }
@@ -562,7 +613,7 @@ public class AdsInterPreload {
     public static void showPreloadMultipleInterAds(Context context, List<AdsUnitItem> adUnits, long timeOut, final YNMAdsCallbacks callback) {
         if (adUnits == null || adUnits.isEmpty() || isContextDestroyed(context)) {
             if (callback != null) {
-                callback.onNextAction();
+                callback.onNextAction(false);  // No ad shown
             }
             return;
         }
@@ -572,7 +623,7 @@ public class AdsInterPreload {
             if (System.currentTimeMillis() - SharePreferenceUtils.getLastImpressionInterstitialTime(context)
                     < YNMAds.getInstance().getAdConfig().getIntervalInterstitialAd() * 1000L) {
                 if (callback != null) {
-                    callback.onNextAction();
+                    callback.onNextAction(false);  // No ad shown due to interval
                 }
                 return;
             }
@@ -589,7 +640,7 @@ public class AdsInterPreload {
                                                   long timeOut, final YNMAdsCallbacks callback) {
         if (isContextDestroyed(context)) {
             if (callback != null) {
-                callback.onNextAction();
+                callback.onNextAction(false);  // No ad shown
             }
             return;
         }
@@ -604,7 +655,7 @@ public class AdsInterPreload {
                 loadNewInterstitial(context, lastAdUnit.getAdUnitId(), lastAdUnit.getKey(), timeOut, callback);
             } else {
                 if (callback != null) {
-                    callback.onNextAction();
+                    callback.onNextAction(false);  // No ad shown
                 }
             }
             return;
@@ -641,9 +692,9 @@ public class AdsInterPreload {
                         }
 
                         @Override
-                        public void onNextAction() {
-                            super.onNextAction();
-                            if (callback != null) callback.onNextAction();
+                        public void onNextAction(boolean isShown) {
+                            super.onNextAction(isShown);
+                            if (callback != null) callback.onNextAction(true);  // Ad shown
                         }
 
                         @Override
@@ -668,7 +719,7 @@ public class AdsInterPreload {
                 
                 if (isContextDestroyed(context)) {
                     if (callback != null) {
-                        callback.onNextAction();
+                        callback.onNextAction(false);  // No ad shown
                     }
                     return;
                 }
@@ -714,7 +765,7 @@ public class AdsInterPreload {
                         
                         if (isContextDestroyed(context)) {
                             if (callback != null) {
-                                callback.onNextAction();
+                                callback.onNextAction(false);  // No ad shown
                             }
                             return;
                         }
@@ -730,9 +781,9 @@ public class AdsInterPreload {
                                 }
 
                                 @Override
-                                public void onNextAction() {
-                                    super.onNextAction();
-                                    if (callback != null) callback.onNextAction();
+                                public void onNextAction(boolean isShown) {
+                                    super.onNextAction(isShown);
+                                    if (callback != null) callback.onNextAction(true);  // Ad shown
                                 }
 
                                 @Override
@@ -766,7 +817,7 @@ public class AdsInterPreload {
                         
                         if (isContextDestroyed(context)) {
                             if (callback != null) {
-                                callback.onNextAction();
+                                callback.onNextAction(false);  // No ad shown
                             }
                             return;
                         }
@@ -863,7 +914,7 @@ public class AdsInterPreload {
                                        long timeOut, final YNMAdsCallbacks callback) {
         if (adUnits == null || adUnits.isEmpty()) {
             if (callback != null) {
-                callback.onNextAction();
+                callback.onNextAction(false);  // No ad shown
             }
             return;
         }
@@ -872,7 +923,7 @@ public class AdsInterPreload {
         if (System.currentTimeMillis() - SharePreferenceUtils.getLastImpressionInterstitialTime(context)
                 < YNMAds.getInstance().getAdConfig().getIntervalInterstitialAd() * 1000L) {
             if (callback != null) {
-                callback.onNextAction();
+                callback.onNextAction(false);  // No ad shown due to interval
             }
             return;
         }
@@ -892,7 +943,7 @@ public class AdsInterPreload {
             showPreloadInterAds(context, firstAdUnit.getKey(), firstAdUnit.getAdUnitId(), timeOut, callback);
         } else {
             if (callback != null) {
-                callback.onNextAction();
+                callback.onNextAction(false);  // No ad shown
             }
         }
     }

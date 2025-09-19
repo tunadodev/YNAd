@@ -7,11 +7,17 @@ import com.ads.nomyek_admob.admobs.Admob;
 import com.ads.nomyek_admob.admobs.AppOpenManager;
 import com.ads.nomyek_admob.ads_components.YNMAds;
 import com.ads.nomyek_admob.ads_components.YNMInitCallback;
+import com.ads.nomyek_admob.ads_components.ads_banner.YNMMultiFloorBannerAds;
+import com.ads.nomyek_admob.ads_components.ads_banner.YNMMultiFloorBannerLargeAds;
 import com.ads.nomyek_admob.config.AirBridgeConfig;
 import com.ads.nomyek_admob.config.SolarConfig;
 import com.ads.nomyek_admob.config.YNMAdsConfig;
+import com.ads.nomyek_admob.utils.AdsNativePreload;
+import com.ads.nomyek_admob.utils.AdsUnitItem;
 import com.google.android.gms.ads.FullScreenContentCallback;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -39,6 +45,15 @@ public class SplashActivity extends BaseActivity<ActivitySplashScreenBinding> {
         initAds();
         showInterstialAds();
         timer.schedule(new AfterLoading(), 25000); // Schedule to run after 8 seconds (8000 milliseconds)
+
+        List<AdsUnitItem> ids = new ArrayList<>();
+        ids.add(new AdsUnitItem(BuildConfig.ad_banner, "banner_base"));
+        ids.add(new AdsUnitItem(BuildConfig.ad_banner, "banner_high_1"));
+        ids.add(new AdsUnitItem(BuildConfig.ad_banner, "banner_high_2"));
+
+        YNMMultiFloorBannerAds.getInstance().init(this, ids);
+        YNMMultiFloorBannerLargeAds.getInstance().init(this, ids);
+
     }
     class AfterLoading extends TimerTask {
         public void run() {
@@ -79,7 +94,7 @@ public class SplashActivity extends BaseActivity<ActivitySplashScreenBinding> {
                     }
                 });
                 AppOpenManager.getInstance().setSplashActivity(SplashActivity.class, BuildConfig.ad_open_splash, 25000);
-//                AppOpenManager.getInstance().loadAndShowSplashAds(BuildConfig.ad_open_splash, 1000);
+                AppOpenManager.getInstance().loadAndShowSplashAds(BuildConfig.ad_open_splash, 1000);
 //                AdsNativePreload.PreLoadNative(SplashActivity.this, BuildConfig.ad_native, "test");
             }
         });
@@ -103,7 +118,8 @@ public class SplashActivity extends BaseActivity<ActivitySplashScreenBinding> {
         solarConfig.setEnableDebug(false);
         app.ynmAdsConfig.setSolarConfig(solarConfig);
         // Optional: enable ads resume
-        //app.ynmAdsConfig.setIdAdResume(BuildConfig.ads_open_app);
+        app.ynmAdsConfig.setIdAdResume(BuildConfig.ads_open_app);
+
         // Optional: setup list device test - recommended to use
         app.listTestDevice.add("EC25F576DA9B6CE74778B268CB87E431");
         app.ynmAdsConfig.setListDeviceTest(app.listTestDevice);

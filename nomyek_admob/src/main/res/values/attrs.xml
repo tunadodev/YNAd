@@ -2,11 +2,15 @@
 <resources>
     <dimen name="banner_height">50dp</dimen>
     <declare-styleable name="YNMNativeAdView">
-        <attr name="layoutCustomNativeAd" format="integer"/>
-        <attr name="layoutLoading" format="integer"/>
-        <attr name="layoutPlaceHolder" format="integer"/>
+        <attr name="layoutCustomNativeAd" format="integer" />
+        <attr name="layoutLoading" format="integer" />
+        <attr name="layoutPlaceHolder" format="integer" />
     </declare-styleable>
     <declare-styleable name="YNMBannerAdView">
-        <attr name="idBanner" format="string"/>
+        <attr name="idBanner" format="string" />
+    </declare-styleable>
+    <declare-styleable name="YNMBannerCollapse">
+        <attr name="show_time" format="integer" />
+        <attr name="refresh_interval" format="integer" />
     </declare-styleable>
 </resources>

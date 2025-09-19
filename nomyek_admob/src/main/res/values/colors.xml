@@ -27,6 +27,7 @@
     <color name="text_exit">#2152FF</color>
     <color name="textColor">#ff666666</color>
     <color name="lightTransparent">#16000000</color>
+    <color name="transparent">#00000000</color>
     <color name="stockeCard">#5E58595A</color>
     <color name="whiteBlur">#bf9c9c9c</color>
 </resources>
