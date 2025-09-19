@@ -17,6 +17,7 @@ sdpAndroid = "1.1.1"
 shimmer = "0.5.0"
 userMessagingPlatform = "3.0.0"
 pangle = "7.6.0.2.0"
+mintegral = "16.9.91.1"
 
 [libraries]
 facebook = { module = "com.google.ads.mediation:facebook", version.ref = "facebook" }
@@ -37,6 +38,7 @@ shimmer = { module = "com.facebook.shimmer:shimmer", version.ref = "shimmer" }
 applovin = { module = "com.google.ads.mediation:applovin", version.ref = "applovin" }
 user-messaging-platform = { module = "com.google.android.ump:user-messaging-platform", version.ref = "userMessagingPlatform" }
 pangle = { module = "com.google.ads.mediation:pangle", version.ref = "pangle" }
+mintegral = { module = "com.google.ads.mediation:mintegral", version.ref = "mintegral" }
 
 
 [plugins]

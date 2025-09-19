@@ -10,10 +10,18 @@ import androidx.annotation.Nullable;
 import com.ads.yeknomadmob.admobs.Admob;
 import com.ads.yeknomadmob.ads_components.YNMAds;
 import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
+import com.ads.yeknomadmob.ads_components.YNMAdsCallbacksMax;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsErrorMax;
+import com.ads.yeknomadmob.max.MaxNew;
 import com.ads.yeknomadmob.utils.AdsCallback;
 import com.ads.yeknomadmob.utils.AdsUnitItem;
+import com.ads.yeknomadmob.utils.CheckShowCallback;
+import com.ads.yeknomadmob.utils.MaxAdsCallback;
 import com.ads.yeknomadmob.utils.SharePreferenceUtils;
+import com.applovin.mediation.MaxAd;
+import com.applovin.mediation.MaxError;
+import com.applovin.mediation.ads.MaxInterstitialAd;
 import com.google.android.gms.ads.AdError;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
@@ -51,6 +59,7 @@ public class YNMMultiFloorInterAds {
     // Stores the list of ad units for the waterfall, ordered from highest to lowest floor price.
     // This list is central to the waterfall logic.
     private List<AdsUnitItem> highAdsIds;
+    private List<AdsUnitItem> highAdsIdsMax;
 
     /**
      * handler: A Handler tied to the main UI thread (Looper.getMainLooper()).
@@ -67,8 +76,11 @@ public class YNMMultiFloorInterAds {
      * any pending ad requests if the waterfall process takes too long, preventing the app from getting stuck.
      */
     private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Handler handlerMax = new Handler(Looper.getMainLooper());
     private final Handler timeoutHandler = new Handler(Looper.getMainLooper());
+    private final Handler timeoutHandlerMax = new Handler(Looper.getMainLooper());
     private Runnable waterfallTimeoutRunnable;
+    private Runnable waterfallTimeoutRunnableMax;
 
 
     // --- State Management ---
@@ -80,12 +92,14 @@ public class YNMMultiFloorInterAds {
      * This is essential for the core feature: having ads ready to be shown instantly.
      */
     private static final Map<String, InterstitialAd> adCache = new ConcurrentHashMap<>();
+    private static final Map<String, MaxInterstitialAd> adCacheMax = new ConcurrentHashMap<>();
 
     /**
      * This flag prevents multiple waterfall preloading processes from running simultaneously.
      * It is marked as `volatile` to ensure that changes made by one thread are immediately visible to others.
      */
     private volatile boolean isWaterfallLoading = false;
+    private volatile boolean isWaterfallLoadingMax = false;
 
 
     // --- Pending Show Request State ---
@@ -98,6 +112,7 @@ public class YNMMultiFloorInterAds {
      * It signals that there is a pending request to be fulfilled as soon as an ad loads.
      */
     private volatile boolean isShowRequestPending = false;
+    private volatile boolean isShowRequestPendingMax = false;
 
     /**
      * Stores the Activity context from a pending show request. This is necessary to show the
@@ -110,6 +125,7 @@ public class YNMMultiFloorInterAds {
      * notified of the ad's lifecycle events. It is only non-null when `isShowRequestPending` is true.
      */
     private YNMAdsCallbacks pendingCallback;
+    private YNMAdsCallbacksMax pendingCallbackMax;
 
     /**
      * Private constructor to enforce the singleton pattern.
@@ -139,12 +155,33 @@ public class YNMMultiFloorInterAds {
      * @param context    The application context.
      * @param highAdsIds A list of AdMob Interstitial Ad IDs, ordered from the lowest floor price to the highest.
      */
-    public void init(@NonNull Context context, @NonNull List<AdsUnitItem> highAdsIds) {
+    public void initMix(@NonNull Context context, @NonNull List<AdsUnitItem> highAdsIds, @NonNull List<AdsUnitItem> highAdsIdsMax) {
+        this.applicationContext = context.getApplicationContext();
+        this.highAdsIds = highAdsIds;
+        this.highAdsIdsMax = highAdsIdsMax;
+        // Reverse the list so that the highest floor is at index 0 for easier and more efficient processing.
+
+        Collections.reverse(this.highAdsIds);
+        startWaterfallPreload();
+
+        Collections.reverse(this.highAdsIdsMax);
+        startWaterfallPreloadMax();
+    }
+
+    public void initAdmob(@NonNull Context context, @NonNull List<AdsUnitItem> highAdsIds) {
         this.applicationContext = context.getApplicationContext();
         this.highAdsIds = highAdsIds;
         // Reverse the list so that the highest floor is at index 0 for easier and more efficient processing.
         Collections.reverse(this.highAdsIds);
         startWaterfallPreload();
+    }
+
+    public void initMax(@NonNull Context context, @NonNull List<AdsUnitItem> highAdsIds) {
+        this.applicationContext = context.getApplicationContext();
+        this.highAdsIdsMax = highAdsIds;
+        // Reverse the list so that the highest floor is at index 0 for easier and more efficient processing.
+        Collections.reverse(this.highAdsIdsMax);
+        startWaterfallPreloadMax();
     }
 
     /**
@@ -182,6 +219,37 @@ public class YNMMultiFloorInterAds {
         loadAdInWaterfall(0); // Start from the highest floor (index 0)
     }
 
+    private void startWaterfallPreloadMax() {
+        if (applicationContext == null || highAdsIdsMax == null || highAdsIdsMax.isEmpty()) {
+            Log.w(TAG, "Cannot start waterfall preload: context or ad IDs are not initialized.");
+            return;
+        }
+        // To prevent starting a new waterfall if one is already in progress or an ad is ready.
+        if (isWaterfallLoadingMax) {
+            Log.d(TAG, "Waterfall preload skipped: a waterfall is already in progress.");
+            return;
+        }
+        if (!adCacheMax.isEmpty()) {
+            Log.d(TAG, "Waterfall preload skipped: ad cache is not empty.");
+            return;
+        }
+
+        isWaterfallLoadingMax = true;
+        Log.d(TAG, "Starting waterfall preload with a " + WATERFALL_TIMEOUT_MS + "ms timeout.");
+
+        // Define a timeout mechanism to prevent the app from getting stuck.
+        waterfallTimeoutRunnableMax = () -> {
+            if (isWaterfallLoadingMax) {
+                isWaterfallLoadingMax = false;
+                Log.e(TAG, "Waterfall loading timed out after " + WATERFALL_TIMEOUT_MS + "ms. Forcing state reset.");
+                handlePendingShowRequestIfLastAdFailedMax();
+            }
+        };
+        timeoutHandlerMax.postDelayed(waterfallTimeoutRunnableMax, WATERFALL_TIMEOUT_MS);
+
+        loadAdInWaterfallMax(0); // Start from the highest floor (index 0)
+    }
+
     /**
      * Cancels the waterfall timeout handler.
      */
@@ -189,6 +257,13 @@ public class YNMMultiFloorInterAds {
         if (waterfallTimeoutRunnable != null) {
             timeoutHandler.removeCallbacks(waterfallTimeoutRunnable);
             waterfallTimeoutRunnable = null;
+        }
+    }
+
+    private void cancelWaterfallTimeoutMax() {
+        if (waterfallTimeoutRunnableMax != null) {
+            timeoutHandlerMax.removeCallbacks(waterfallTimeoutRunnableMax);
+            waterfallTimeoutRunnableMax = null;
         }
     }
 
@@ -254,6 +329,62 @@ public class YNMMultiFloorInterAds {
         });
     }
 
+    private void loadAdInWaterfallMax(final int index) {
+        // Base case: If we've tried all ad IDs and none have loaded.
+        if (index >= highAdsIdsMax.size()) {
+            isWaterfallLoadingMax = false; // Mark waterfall as finished.
+            cancelWaterfallTimeoutMax();
+            Log.w(TAG, "Waterfall finished. No ad was loaded.");
+            handlePendingShowRequestIfLastAdFailedMax();
+            return;
+        }
+
+        final AdsUnitItem adUnit = highAdsIdsMax.get(index);
+
+        if (adUnit == null || adUnit.getAdUnitId() == null || adUnit.getAdUnitId().isEmpty()) {
+            Log.w(TAG, "Skipping invalid ad unit at index " + index + ". Proceeding to next.");
+            loadAdInWaterfallMax(index + 1);
+            return;
+        }
+
+        if (adCacheMax.containsKey(adUnit.getAdUnitId())) {
+            isWaterfallLoadingMax = false; // Mark waterfall as finished.
+            cancelWaterfallTimeoutMax();
+            Log.d(TAG, "Ad " + adUnit.getKey() + " is already cached. Stopping waterfall.");
+            // An ad is ready, check for pending requests.
+            handlePendingShowRequestMax();
+            return;
+        }
+
+        Log.d(TAG, "Waterfall loading ad at index " + index + ": " + adUnit.getKey());
+
+        MaxNew.getInstance().getInterstitialAds(applicationContext, adUnit.getAdUnitId(), new MaxAdsCallback() {
+            @Override
+            public void onInterstitialLoad(MaxInterstitialAd interstitialAd, MaxAd maxAd) {
+                super.onInterstitialLoad(interstitialAd, maxAd);
+                if (interstitialAd != null) {
+                    isWaterfallLoadingMax = false; // Mark waterfall as finished.
+                    cancelWaterfallTimeoutMax();
+                    adCacheMax.put(adUnit.getAdUnitId(), interstitialAd);
+                    Log.d(TAG, "Successfully preloaded ad from waterfall: " + adUnit.getKey());
+                    handlePendingShowRequestMax();
+                } else {
+                    // This case is unlikely but handled as a failure. Treat as a load failure.
+                    Log.e(TAG, "InterstitialAd was null for " + adUnit.getKey() + ". Proceeding to next in waterfall.");
+                    loadAdInWaterfallMax(index + 1);
+                }
+            }
+
+            @Override
+            public void onAdFailedToLoad(MaxError adError) {
+                super.onAdFailedToLoad(adError);
+                Log.e(TAG, "Failed to load ad: " + adUnit.getKey() + ". Error: " + (adError != null ? adError.getMessage() : "Unknown") + ". Proceeding to next in waterfall.");
+                // On failure, immediately try the next ad in the sequence. The isWaterfallLoading flag remains true.
+                loadAdInWaterfallMax(index + 1);
+            }
+        });
+    }
+
 
     /**
      * Checks for and fulfills a pending ad show request. This is called after an ad successfully loads.
@@ -267,10 +398,28 @@ public class YNMMultiFloorInterAds {
                     if (pendingActivity != null && !pendingActivity.isDestroyed()) {
                         // Check if there was a base ad in the pending request
                         if (pendingCallback != null) {
-                            showMFInterAds(pendingActivity, pendingCallback);
+                            showMFInterAdsAdmob(pendingActivity, pendingCallback);
                         }
                     }
                     clearPendingShowRequest();
+                });
+            }
+        }
+    }
+
+    private void handlePendingShowRequestMax() {
+        synchronized (this) {
+            if (isShowRequestPendingMax) {
+                Log.d(TAG, "Ad loaded, fulfilling pending show request.");
+                // Post the show call to the main thread to ensure UI safety.
+                handlerMax.post(() -> {
+                    if (pendingActivity != null && !pendingActivity.isDestroyed()) {
+                        // Check if there was a base ad in the pending request
+                        if (pendingCallbackMax != null) {
+                            showMFInterAdsMax(pendingActivity, null, pendingCallbackMax);
+                        }
+                    }
+                    clearPendingShowRequestMax();
                 });
             }
         }
@@ -298,6 +447,24 @@ public class YNMMultiFloorInterAds {
         }
     }
 
+    private void handlePendingShowRequestIfLastAdFailedMax() {
+        synchronized (this) {
+            // Check if the show request is pending AND the waterfall is truly finished.
+            if (isShowRequestPendingMax && !isWaterfallLoadingMax) {
+                Log.d(TAG, "Last loading ad failed, fulfilling pending show request with fallback.");
+                handlerMax.post(() -> {
+                    if (pendingActivity != null && !pendingActivity.isDestroyed()) {
+                        Log.d(TAG, "No high ad ready, fallback to onNextAction");
+                        if (pendingCallbackMax != null) {
+                            pendingCallbackMax.onNextAction(false);
+                        }
+                    }
+                    clearPendingShowRequestMax();
+                });
+            }
+        }
+    }
+
     /**
      * Resets the state of the pending show request. Executed within a synchronized block.
      */
@@ -305,6 +472,12 @@ public class YNMMultiFloorInterAds {
         isShowRequestPending = false;
         pendingActivity = null;
         pendingCallback = null;
+    }
+
+    private void clearPendingShowRequestMax() {
+        isShowRequestPendingMax = false;
+        pendingActivity = null;
+        pendingCallbackMax = null;
     }
 
     /**
@@ -319,7 +492,17 @@ public class YNMMultiFloorInterAds {
      * @param activity The activity context required to show the ad.
      * @param callback A callback to be invoked for ad lifecycle events.
      */
-    public void showMFInterAds(@NonNull final Activity activity, @NonNull final YNMAdsCallbacks callback) {
+    public void showMFInterAdsMix(@NonNull final Activity activity, @NonNull final YNMAdsCallbacks callback) {
+        showMFInterAdsMax(activity, callback, new YNMAdsCallbacksMax() {
+            @Override
+            public void onAdFailedToShow(@Nullable AdsErrorMax adError) {
+                super.onAdFailedToShow(adError);
+                showMFInterAdsAdmob(activity, callback);
+            }
+        });
+    }
+
+    public void showMFInterAdsAdmob(@NonNull final Activity activity, @NonNull final YNMAdsCallbacks callback) {
         // First, check if enough time has passed since the last interstitial ad was shown.
         long lastImpressionTime = SharePreferenceUtils.getLastImpressionInterstitialTime(activity);
         long interval = YNMAds.getInstance().getAdConfig().getIntervalInterstitialAd();
@@ -394,6 +577,83 @@ public class YNMMultiFloorInterAds {
         callback.onNextAction(false);
     }
 
+    public void showMFInterAdsMax(@NonNull final Activity activity, YNMAdsCallbacks out, YNMAdsCallbacksMax callback) {
+        // First, check if enough time has passed since the last interstitial ad was shown.
+        long lastImpressionTime = SharePreferenceUtils.getLastImpressionInterstitialTime(activity);
+        long interval = YNMAds.getInstance().getAdConfig().getIntervalInterstitialAd();
+
+        if ((System.currentTimeMillis() - lastImpressionTime) / 1000 < interval) {
+            Log.d(TAG, "Interstitial ad skipped due to interval constraint.");
+            callback.onAdFailedToShow(new AdsErrorMax("Ad skipped due to frequency cap."));
+            callback.onNextAction(false);
+            return; // Exit without showing any ad.
+        }
+
+        if (highAdsIdsMax == null || highAdsIdsMax.isEmpty()) {
+            Log.d(TAG, "High-floor ad IDs are null or empty. Proceeding with fallback.");
+            callback.onAdFailedToShow(new AdsErrorMax("Ad skipped due to frequency cap."));
+            callback.onNextAction(false);
+            return;
+        }
+
+        // Iterate from highest to lowest floor.
+        for (AdsUnitItem mAd : highAdsIdsMax) {
+            if (adCacheMax.containsKey(mAd.getAdUnitId())) {
+                // Log which floor is being shown.
+                Log.d(TAG, "Showing high-floor ad: " + mAd.getKey());
+                MaxInterstitialAd ad = adCacheMax.get(mAd.getAdUnitId());
+                if (ad != null) {
+                    destroyInterstitialMax(mAd.getAdUnitId()); // An ad can only be shown once. Remove it from the cache.
+                    MaxNew.getInstance().forceShowInterstitial(activity, ad, new MaxAdsCallback() {
+                        @Override
+                        public void onAdImpression() {
+                            super.onAdImpression();
+                            Log.d(TAG, "High-floor ad shown: " + mAd.getKey());
+                        }
+
+                        @Override
+                        public void onAdClosed() {
+                            super.onAdClosed();
+                            if (out != null)
+                                out.onNextAction(true);
+                        }
+
+                        @Override
+                        public void onAdFailedToShow(@Nullable MaxError adError) {
+                            super.onAdFailedToShow(adError);
+                            callback.onAdFailedToShow(new AdsErrorMax(adError != null ? adError.getMessage() : "Unknown error"));
+                        }
+                    }, false);
+                    // Immediately start preloading a new ad to maintain a full cache.
+                    startWaterfallPreloadMax();
+                    return; // Exit after successfully showing an ad.
+                } else {
+                    // Defensive cleanup: remove the key if the ad object is unexpectedly null.
+                    destroyInterstitialMax(mAd.getAdUnitId());
+                }
+            }
+        }
+
+        // If no ad is ready, check if a waterfall is in progress.
+        if (isWaterfallLoadingMax) {
+            synchronized (this) {
+                if (!isShowRequestPendingMax) {
+                    Log.d(TAG, "No ad ready, but waterfall is in progress. Queuing show request.");
+                    isShowRequestPendingMax = true;
+                    pendingActivity = activity;
+                    pendingCallbackMax = callback;
+                } else {
+                    Log.w(TAG, "Another show request is already pending. Ignoring new request.");
+                    callback.onAdFailedToShow(new AdsErrorMax("Another ad request is already in progress."));
+                    callback.onNextAction(false);
+                }
+            }
+            return;
+        }
+
+        callback.onNextAction(false);
+    }
+
     /**
      * Removes an interstitial ad from the cache. This is called before showing an ad, as they are single-use.
      *
@@ -401,6 +661,12 @@ public class YNMMultiFloorInterAds {
      */
     public void destroyInterstitial(String adId) {
         if (adCache.remove(adId) != null) {
+            Log.d(TAG, "Destroyed cached ad: " + adId);
+        }
+    }
+
+    public void destroyInterstitialMax(String adId) {
+        if (adCacheMax.remove(adId) != null) {
             Log.d(TAG, "Destroyed cached ad: " + adId);
         }
     }

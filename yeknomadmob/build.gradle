@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.facebook)
     implementation(libs.applovin)
     implementation(libs.pangle)
+    implementation(libs.mintegral)
     implementation 'com.reyun.solar.engine.oversea:solar-engine-core:1.2.9.2'
     implementation ("com.airbnb.android:lottie:6.4.1")
 
@@ -55,6 +56,8 @@ dependencies {
     implementation 'com.applovin.mediation:google-adapter:24.6.0.0'
     implementation 'com.applovin.mediation:facebook-adapter:6.20.0.0'
     implementation 'com.applovin.mediation:bytedance-adapter:7.6.0.3.0'
+    implementation 'com.applovin.mediation:mintegral-adapter:16.9.91.0'
+    implementation 'com.applovin.mediation:unityads-adapter:4.16.1.0'
 }
 afterEvaluate {
     publishing {
