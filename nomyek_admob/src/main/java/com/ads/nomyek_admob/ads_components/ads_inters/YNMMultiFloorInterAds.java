@@ -1,4 +1,4 @@
-package com.ads.nomyek_admob.ads_components.multi_floor_specs;
+package com.ads.nomyek_admob.ads_components.ads_inters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,7 +14,6 @@ import com.ads.nomyek_admob.ads_components.YNMAds;
 import com.ads.nomyek_admob.ads_components.YNMAdsCallbacks;
 import com.ads.nomyek_admob.ads_components.wrappers.AdsError;
 import com.ads.nomyek_admob.utils.AdsCallback;
-import com.ads.nomyek_admob.utils.AdsInterPreload;
 import com.ads.nomyek_admob.utils.AdsUnitItem;
 import com.ads.nomyek_admob.utils.SharePreferenceUtils;
 import com.google.android.gms.ads.AdError;
