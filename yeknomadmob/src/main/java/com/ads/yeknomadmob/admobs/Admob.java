@@ -142,13 +142,6 @@ public class Admob {
     public void init(Activity activity, Context context, List<String> testDeviceList, InitAdsCallback callback) {
         this.context = context;
         initializeMobileAdsSdk(testDeviceList, callback);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            String processName = Application.getProcessName();
-            String packageName = context.getPackageName();
-            if (!packageName.equals(processName)) {
-                WebView.setDataDirectorySuffix(processName);
-            }
-        }
     }
 
     void initializeMobileAdsSdk(List<String> testDeviceList, InitAdsCallback callback) {
@@ -169,13 +162,13 @@ public class Admob {
     }
 
     public void init(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            String processName = Application.getProcessName();
-            String packageName = context.getPackageName();
-            if (!packageName.equals(processName)) {
-                WebView.setDataDirectorySuffix(processName);
-            }
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//            String processName = Application.getProcessName();
+//            String packageName = context.getPackageName();
+//            if (!packageName.equals(processName)) {
+//                WebView.setDataDirectorySuffix(processName);
+//            }
+//        }
 
         MobileAds.initialize(context, initializationStatus -> {
             Map<String, AdapterStatus> statusMap = initializationStatus.getAdapterStatusMap();

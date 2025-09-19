@@ -4,9 +4,11 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -94,6 +96,13 @@ public class YNMAds {
         }
         AppUtil.VARIANT_DEV = adConfig.isVariantDev();
         Log.i(TAG, "Config variant dev: " + AppUtil.VARIANT_DEV);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            String processName = Application.getProcessName();
+            String packageName = context.getPackageName();
+            if (!packageName.equals(processName)) {
+                WebView.setDataDirectorySuffix(processName);
+            }
+        }
         Admob.getInstance().init(activity, context, adConfig.getListDeviceTest(), () -> {
             countInit++;
             if (countInit == 2) {

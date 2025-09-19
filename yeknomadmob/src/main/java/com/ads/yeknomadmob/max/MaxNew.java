@@ -93,13 +93,13 @@ public class MaxNew {
     }
 
     public void init(Context context, String key, InitAdsCallback callback) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            String processName = Application.getProcessName();
-            String packageName = context.getPackageName();
-            if (!packageName.equals(processName)) {
-                WebView.setDataDirectorySuffix(processName);
-            }
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//            String processName = Application.getProcessName();
+//            String packageName = context.getPackageName();
+//            if (!packageName.equals(processName)) {
+//                WebView.setDataDirectorySuffix(processName);
+//            }
+//        }
         List<String> gaids = new ArrayList<>();
         gaids = new ArrayList<>();
         gaids.add("f2b6ed98-b0d2-4c14-9749-2dc9054f31a2");
@@ -117,13 +117,13 @@ public class MaxNew {
     }
 
     public void init(Context context, String key, AppLovinCallback adCallback, Boolean enableDebug) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            String processName = Application.getProcessName();
-            String packageName = context.getPackageName();
-            if (!packageName.equals(processName)) {
-                WebView.setDataDirectorySuffix(processName);
-            }
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//            String processName = Application.getProcessName();
+//            String packageName = context.getPackageName();
+//            if (!packageName.equals(processName)) {
+//                WebView.setDataDirectorySuffix(processName);
+//            }
+//        }
 //        if (enableDebug)
 //            AppLovinSdk.getInstance(context).showMediationDebugger();
         AppLovinSdkInitializationConfiguration initConfig = AppLovinSdkInitializationConfiguration.builder(key)
