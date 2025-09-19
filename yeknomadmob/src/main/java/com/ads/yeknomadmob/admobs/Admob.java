@@ -149,7 +149,6 @@ public class Admob {
             return;
         }
         MobileAds.initialize(context, initializationStatus -> {
-            Log.e("GiaHuy", "initializeMobileAdsSdk: Admob");
             Map<String, AdapterStatus> statusMap = initializationStatus.getAdapterStatusMap();
             for (String adapterClass : statusMap.keySet()) {
                 AdapterStatus status = statusMap.get(adapterClass);

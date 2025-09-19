@@ -79,7 +79,6 @@ public class SplashActivity extends BaseActivity<ActivitySplashScreenBinding> {
         YNMAds.getInstance().setInitCallback(new YNMInitCallback() {
             @Override
             public void initAdsSuccess() {
-                Log.e("GiaHuy", "initAdsSuccess: ");
                 AppOpenManager.getInstance().setFullScreenContentCallback(new FullScreenContentCallback() {
                     @Override
                     public void onAdDismissedFullScreenContent() {

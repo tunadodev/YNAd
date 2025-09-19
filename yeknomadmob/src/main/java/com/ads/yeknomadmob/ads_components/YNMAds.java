@@ -111,7 +111,6 @@ public class YNMAds {
                     initCallback.initAdsSuccess();
             }
         });
-        Log.e("GiaHuy", "initializeMobileAdsSdk: Admob 1");
         if (adConfig.isEnableAdResume())
             AppOpenManager.getInstance().init(adConfig.getApplication(), adConfig.getIdAdResume());
         MaxNew.getInstance().init(context, adConfig.getMaxKey(), () -> {
@@ -122,7 +121,6 @@ public class YNMAds {
                     initCallback.initAdsSuccess();
             }
         });
-        Log.e("GiaHuy", "initializeMobileAdsSdk: Max 1");
 //        if (adConfig.getMediationProvider() == YNMAdsConfig.PROVIDER_ADMOB) {
 //            Admob.getInstance().init(activity, context, adConfig.getListDeviceTest());
 //            if (adConfig.isEnableAdResume())
@@ -375,7 +373,6 @@ public class YNMAds {
             @Override
             public void onAdFailedToLoad(@Nullable MaxError i) {
                 super.onAdFailedToLoad(i);
-                Log.e("GiaHuy", "onAdFailedToLoad: " + i.getCode());
                 adListener.onAdFailedToLoad(new AdsErrorMax(i));
             }
         });

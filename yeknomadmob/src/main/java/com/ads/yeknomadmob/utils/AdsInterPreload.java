@@ -903,7 +903,6 @@ public class AdsInterPreload {
                 Log.d("AdsInterPreload", "Ad timeout for key: " + adUnit.getKey() + ", trying next one");
             }
         }, timeout);
-        Log.e("GiaHuy", "preloadMax: ");
         // Start loading
         YNMAds.getInstance().setInitCallback(() -> {
             YNMAds.getInstance().getInterstitialAdsMax(context, adUnit.getAdUnitId(), model.getCallbackMax());
@@ -952,7 +951,6 @@ public class AdsInterPreload {
             }
             return;
         }
-        Log.e("GiaHuy", "showPreloadInterAds: ");
         YNMAds.getInstance().setInitCallback(() -> {
             // Check impression interval
             if (System.currentTimeMillis() - SharePreferenceUtils.getLastImpressionInterstitialTime(context)
@@ -962,18 +960,15 @@ public class AdsInterPreload {
                 }
                 return;
             }
-            Log.e("GiaHuy", "showPreloadInterAds: 1");
             checkAndShowMax(context, adUnits.get(0), timeOut, callback, new CheckShowCallback() {
                 @Override
                 public void showFail() {
                     super.showFail();
-                    Log.e("GiaHuy", "showPreloadInterAds: 2");
                     checkAndShow(context, adUnits.get(1), timeOut, callback, new CheckShowCallback() {
                         @Override
                         public void showFail() {
                             super.showFail();
                             callback.onNextAction(false);
-                            Log.e("GiaHuy", "showPreloadInterAds: 3");
                         }
                     });
                 }

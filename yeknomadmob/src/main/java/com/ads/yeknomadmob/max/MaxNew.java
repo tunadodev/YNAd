@@ -110,7 +110,6 @@ public class MaxNew {
         AdSettings.setDataProcessingOptions( new String[] {} );
         AppLovinSdk.getInstance(context).initialize( initConfig, appLovinSdkConfiguration -> {
             Log.d(TAG, "init: applovin success");
-            Log.e("GiaHuy", "initializeMobileAdsSdk: Max");
             callback.initSuccess();
         });
         this.context = context;
