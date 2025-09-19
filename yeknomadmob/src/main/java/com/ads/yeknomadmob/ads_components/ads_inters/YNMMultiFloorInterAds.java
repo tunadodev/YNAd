@@ -650,7 +650,7 @@ public class YNMMultiFloorInterAds {
             }
             return;
         }
-
+        callback.onAdFailedToShow(new AdsErrorMax("Another ad request is already in progress."));
         callback.onNextAction(false);
     }
 

@@ -102,7 +102,13 @@ public class MaxNew {
 //        }
         List<String> gaids = new ArrayList<>();
         gaids = new ArrayList<>();
-        gaids.add("f2b6ed98-b0d2-4c14-9749-2dc9054f31a2");
+        String gaid = "";
+        try {
+            gaid = String.valueOf(AdvertisingIdClient.getAdvertisingIdInfo(context));
+        } catch (Exception e) {
+            gaid = "";
+        }
+        gaids.add(gaid);
         AppLovinSdkInitializationConfiguration initConfig = AppLovinSdkInitializationConfiguration.builder(key)
                 .setMediationProvider( AppLovinMediationProvider.MAX )
                 .setTestDeviceAdvertisingIds(gaids)

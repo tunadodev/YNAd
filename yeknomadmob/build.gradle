@@ -58,6 +58,8 @@ dependencies {
     implementation 'com.applovin.mediation:bytedance-adapter:7.6.0.3.0'
     implementation 'com.applovin.mediation:mintegral-adapter:16.9.91.0'
     implementation 'com.applovin.mediation:unityads-adapter:4.16.1.0'
+
+    implementation 'androidx.ads:ads-identifier:1.0.0-alpha01'
 }
 afterEvaluate {
     publishing {
