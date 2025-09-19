@@ -41,6 +41,7 @@ import com.applovin.mediation.nativeAds.MaxNativeAdViewBinder;
 import com.applovin.sdk.AppLovinMediationProvider;
 import com.applovin.sdk.AppLovinSdk;
 import com.applovin.sdk.AppLovinSdkInitializationConfiguration;
+import com.facebook.ads.AdSettings;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.ads.rewarded.RewardedAd;
@@ -102,10 +103,11 @@ public class MaxNew {
         List<String> gaids = new ArrayList<>();
         gaids = new ArrayList<>();
         gaids.add("f2b6ed98-b0d2-4c14-9749-2dc9054f31a2");
-        AppLovinSdkInitializationConfiguration initConfig = AppLovinSdkInitializationConfiguration.builder(key, null)
+        AppLovinSdkInitializationConfiguration initConfig = AppLovinSdkInitializationConfiguration.builder(key)
                 .setMediationProvider( AppLovinMediationProvider.MAX )
                 .setTestDeviceAdvertisingIds(gaids)
                 .build();
+        AdSettings.setDataProcessingOptions( new String[] {} );
         AppLovinSdk.getInstance(context).initialize( initConfig, appLovinSdkConfiguration -> {
             Log.d(TAG, "init: applovin success");
             Log.e("GiaHuy", "initializeMobileAdsSdk: Max");
@@ -124,9 +126,10 @@ public class MaxNew {
         }
 //        if (enableDebug)
 //            AppLovinSdk.getInstance(context).showMediationDebugger();
-        AppLovinSdkInitializationConfiguration initConfig = AppLovinSdkInitializationConfiguration.builder(key, null)
+        AppLovinSdkInitializationConfiguration initConfig = AppLovinSdkInitializationConfiguration.builder(key)
                 .setMediationProvider( AppLovinMediationProvider.MAX )
                 .build();
+        AdSettings.setDataProcessingOptions( new String[] {} );
         AppLovinSdk.getInstance(context).initialize( initConfig, appLovinSdkConfiguration -> {
             Log.d(TAG, "init: applovin success");
             adCallback.initAppLovinSuccess();

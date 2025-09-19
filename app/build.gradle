@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.ads.demo"
-        minSdk 21
+        minSdk 23
         targetSdk 34
         versionCode 104
         versionName "1.0.4"
@@ -63,8 +63,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 }
 
