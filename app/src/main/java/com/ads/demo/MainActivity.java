@@ -37,7 +37,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
                 List<String> ids = new ArrayList<>();
                 ids.add(id);
                 ids.add(id);
-                bannerAdView.loadMultiIdBanner(this, ids, new YNMAdsCallbacks(new YNMAirBridge.AppData("nameView", unitName), YNMAds.BANNER));
+//                bannerAdView.loadMultiIdBanner(this, ids, new YNMAdsCallbacks(new YNMAirBridge.AppData("nameView", unitName), YNMAds.BANNER));
             });
         }
     }
@@ -89,49 +89,49 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     @Override
     protected void initViews() {
-        ArrayList<String> listAds = new ArrayList();
-        listAds.add(BuildConfig.ad_banner);
-        listAds.add(BuildConfig.ad_banner);
-        viewBinding.collapseBanner.loadBannerCollapse(this, listAds, new YNMBannerCollapse.OnCollapseListener() {
-            @Override
-            public void onBannerCollapsed() {
-                startBannerRefresh(BuildConfig.ad_banner, "test");
-            }
-        });
-
-        viewBinding.loadInter.setOnClickListener(view -> {
-            AdsRewardPreload.preloadRewardAds(this, new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 6000);
-            AdsRewardPreload.preloadRewardAdsMax(this, new YNMAirBridge.AppData(), BuildConfig.reward_max, "test_reward", 6000);
-        });
-
-        viewBinding.showInter.setOnClickListener(view -> {
-            AdsRewardPreload.showRewardPreload(this, "test_reward", new YNMAdsCallbacks() {
-
-            });
-//            List<AdsUnitItem> adUnits = new ArrayList<>();
-//            adUnits.add(new AdsUnitItem(BuildConfig.inter_max, "key4"));
-//            adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3"));
+//        ArrayList<String> listAds = new ArrayList();
+//        listAds.add(BuildConfig.ad_banner);
+//        listAds.add(BuildConfig.ad_banner);
+////        viewBinding.collapseBanner.loadBannerCollapse(this, listAds, new YNMBannerCollapse.OnCollapseListener() {
+////            @Override
+////            public void onBannerCollapsed() {
+////                startBannerRefresh(BuildConfig.ad_banner, "test");
+////            }
+////        });
 //
-//            AdsInterPreload.showPreloadInterAds(this, adUnits, 10000, new YNMAdsCallbacks() {
-//                @Override
-//                public void onAdClosed() {
-//                    // Xử lý khi quảng cáo đóng
-//                }
+//        viewBinding.loadInter.setOnClickListener(view -> {
+//            AdsRewardPreload.preloadRewardAds(this, new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 6000);
+//            AdsRewardPreload.preloadRewardAdsMax(this, new YNMAirBridge.AppData(), BuildConfig.reward_max, "test_reward", 6000);
+//        });
 //
-//                @Override
-//                public void onNextAction() {
-//                    super.onNextAction();
+//        viewBinding.showInter.setOnClickListener(view -> {
+//            AdsRewardPreload.showRewardPreload(this, "test_reward", new YNMAdsCallbacks() {
 //
-//                }
 //            });
-        });
-//        List<AdsUnitItem> adUnits = new ArrayList<>();
-//        adUnits.add(new AdsUnitItem(BuildConfig.ad_native, "key1"));
-//        adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3"));
-        AdsUnitItem x = new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3");
-        AdsUnitItem y = new AdsUnitItem(BuildConfig.inter_max, "key4");
-        AdsInterPreload.preloadMax(this, new YNMAirBridge.AppData("", "list1"), y, 10000, null);
-        AdsInterPreload.preload(this, new YNMAirBridge.AppData("", "list"), x, 10000, null);
+////            List<AdsUnitItem> adUnits = new ArrayList<>();
+////            adUnits.add(new AdsUnitItem(BuildConfig.inter_max, "key4"));
+////            adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3"));
+////
+////            AdsInterPreload.showPreloadInterAds(this, adUnits, 10000, new YNMAdsCallbacks() {
+////                @Override
+////                public void onAdClosed() {
+////                    // Xử lý khi quảng cáo đóng
+////                }
+////
+////                @Override
+////                public void onNextAction() {
+////                    super.onNextAction();
+////
+////                }
+////            });
+//        });
+////        List<AdsUnitItem> adUnits = new ArrayList<>();
+////        adUnits.add(new AdsUnitItem(BuildConfig.ad_native, "key1"));
+////        adUnits.add(new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3"));
+//        AdsUnitItem x = new AdsUnitItem(BuildConfig.ad_interstitial_splash, "key3");
+//        AdsUnitItem y = new AdsUnitItem(BuildConfig.inter_max, "key4");
+//        AdsInterPreload.preloadMax(this, new YNMAirBridge.AppData("", "list1"), y, 10000, null);
+//        AdsInterPreload.preload(this, new YNMAirBridge.AppData("", "list"), x, 10000, null);
     }
 
 }
