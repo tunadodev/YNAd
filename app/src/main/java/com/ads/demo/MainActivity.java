@@ -3,17 +3,16 @@ package com.ads.demo;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.View;
 
 import com.ads.demo.databinding.ActivityMainBinding;
 import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
-import com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerCollapse;
-import com.ads.yeknomadmob.ads_components.ads_banner.YNMMultiFloorBannerAds;
-import com.ads.yeknomadmob.ads_components.ads_banner.YNMMultiFloorBannerLargeAds;
+import com.ads.yeknomadmob.ads_components.ads_native.AdsNativePreload;
 import com.ads.yeknomadmob.ads_components.ads_native.YNMNativeAdView;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
 import com.ads.yeknomadmob.event.YNMAirBridge;
-import com.ads.yeknomadmob.utils.AdsInterPreload;
-import com.ads.yeknomadmob.utils.AdsRewardPreload;
+import com.ads.yeknomadmob.ads_components.ads_inters.AdsInterPreload;
+import com.ads.yeknomadmob.ads_components.ads_rewards.AdsRewardPreload;
 import com.ads.yeknomadmob.utils.AdsUnitItem;
 
 import java.util.ArrayList;
@@ -64,7 +63,17 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
             });
         });
 
+        viewBinding.showFCNative.setOnClickListener(view -> {
+            viewBinding.fullscreenAdContainer.setVisibility(View.VISIBLE);
+            AdsNativePreload.staticPreloadedShowNativeAds(this, viewBinding.fullscreenNativeAdView, BuildConfig.ad_native,
+                    com.ads.yeknomadmob.R.layout.custom_full_screen_native_ads,
+                    BuildConfig.ad_native, new YNMAirBridge.AppData()
+            );
+        });
 
+        viewBinding.clearBtn.setOnClickListener(view -> {
+            clear();
+        });
 
         // --- Existing Interstitial and Reward Ad Logic ---
         AdsRewardPreload.preloadRewardAds(this, new YNMAirBridge.AppData(), BuildConfig.ad_reward, "test_reward", 6000);
@@ -87,4 +96,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         AdsInterPreload.preloadMultipleInterAds(this, new YNMAirBridge.AppData("", "list"), adUnits, 10000);
     }
 
+    public void clear() {
+        viewBinding.fullscreenAdContainer.setVisibility(View.GONE);
+    }
 }

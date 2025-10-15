@@ -45,13 +45,10 @@ public class AdsHelper {
 
                 AdsNative apNativeAd = new AdsNative(large, nativeAd);
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Your code here
-                        nativeAdView.populateNativeAdView((Activity) context, apNativeAd);
-                    }
-                }, preLoaded ? 0 : 0);
+                new Handler().postDelayed(() -> {
+                    // Your code here
+                    nativeAdView.populateNativeAdView((Activity) context, apNativeAd);
+                }, 0);
             }
 
             @Override
@@ -63,13 +60,10 @@ public class AdsHelper {
 
                 AdsNative apNativeAd = new AdsNative(medium, nativeAd);
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Your code here
-                        nativeAdView.populateNativeAdView((Activity) context, apNativeAd);
-                    }
-                }, preLoaded ? 0 : 0);
+                new Handler().postDelayed(() -> {
+                    // Your code here
+                    nativeAdView.populateNativeAdView((Activity) context, apNativeAd);
+                }, 0);
             }
         });
         //set delay so it will have load effect even though the ads is preloaded
@@ -78,13 +72,10 @@ public class AdsHelper {
     //if the ads size take more than half screen, down size it
     public static void initFixedSizeAds(Context context, YNMNativeAdView nativeAdView,NativeAd nativeAd, int layout, boolean preLoaded){
         AdsNative apNativeAd = new AdsNative(layout, nativeAd);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // Your code here
-                nativeAdView.populateNativeAdView((Activity) context, apNativeAd);
-            }
-        }, preLoaded ? 0 : 0);
+        new Handler().postDelayed(() -> {
+            // Your code here
+            nativeAdView.populateNativeAdView((Activity) context, apNativeAd);
+        }, 0);
     }
 
     // Helper method to convert dp to pixels

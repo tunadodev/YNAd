@@ -9,7 +9,6 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -38,7 +37,7 @@ import com.ads.yeknomadmob.event.YNMLogEventManager;
 import com.ads.yeknomadmob.utils.AdmodHelper;
 import com.ads.yeknomadmob.utils.AdsCallback;
 import com.ads.yeknomadmob.utils.AppUtil;
-import com.ads.yeknomadmob.utils.RewardCallback;
+import com.ads.yeknomadmob.ads_components.ads_rewards.RewardCallback;
 import com.ads.yeknomadmob.utils.SharePreferenceUtils;
 import com.ads.yeknomadmob.utils.TypeAds;
 import com.facebook.shimmer.ShimmerFrameLayout;
@@ -66,17 +65,11 @@ import com.google.android.gms.ads.rewarded.RewardedAd;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAd;
 import com.google.android.gms.ads.rewardedinterstitial.RewardedInterstitialAdLoadCallback;
-import com.google.android.ump.ConsentDebugSettings;
-import com.google.android.ump.ConsentForm;
 import com.google.android.ump.ConsentInformation;
-import com.google.android.ump.ConsentRequestParameters;
-import com.google.android.ump.UserMessagingPlatform;
 
-import java.lang.reflect.Type;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
@@ -1924,20 +1917,17 @@ public class Admob {
         adView.setMediaView(adView.findViewById(R.id.ad_media));
 
         if (adView.getMediaView() != null) {
-            adView.getMediaView().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (context != null && AppUtil.VARIANT_DEV) {
-                        float sizeMin = TypedValue.applyDimension(
-                                TypedValue.COMPLEX_UNIT_DIP,
-                                120,
-                                context.getResources().getDisplayMetrics()
-                        );
-                        Log.e(TAG, "Native sizeMin: " + sizeMin);
-                        Log.e(TAG, "Native w/h media : " + adView.getMediaView().getWidth() + "/" + adView.getMediaView().getHeight());
-                        if (adView.getMediaView().getWidth() < sizeMin || adView.getMediaView().getHeight() < sizeMin) {
-                            Toast.makeText(context, "Size media native not valid", Toast.LENGTH_SHORT).show();
-                        }
+            adView.getMediaView().postDelayed(() -> {
+                if (context != null && AppUtil.VARIANT_DEV) {
+                    float sizeMin = TypedValue.applyDimension(
+                            TypedValue.COMPLEX_UNIT_DIP,
+                            120,
+                            context.getResources().getDisplayMetrics()
+                    );
+                    Log.e(TAG, "Native sizeMin: " + sizeMin);
+                    Log.e(TAG, "Native w/h media : " + adView.getMediaView().getWidth() + "/" + adView.getMediaView().getHeight());
+                    if (adView.getMediaView().getWidth() < sizeMin || adView.getMediaView().getHeight() < sizeMin) {
+                        Toast.makeText(context, "Size media native not valid", Toast.LENGTH_SHORT).show();
                     }
                 }
             }, 1000);

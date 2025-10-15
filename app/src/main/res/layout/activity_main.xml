@@ -24,7 +24,47 @@
                 android:layout_height="wrap_content"
                 android:text="Show inters Ads"
                 />
+
+            <Button
+                android:layout_below="@+id/showInter"
+                android:id="@+id/showFCNative"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Show fc native"
+                />
         </RelativeLayout>
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/fullscreen_ad_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/white"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone">
+
+            <com.ads.yeknomadmob.ads_components.ads_native.YNMNativeAdView
+                android:id="@+id/fullscreen_native_ad_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutLoading="@layout/native_shimmer_placeholder"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/clear_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="close ads"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerAdView
             android:id="@+id/bannerView"

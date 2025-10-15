@@ -1,7 +1,6 @@
-package com.ads.yeknomadmob.utils;
+package com.ads.yeknomadmob.ads_components.ads_rewards;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -16,6 +15,7 @@ import com.ads.yeknomadmob.ads_components.wrappers.AdsReward;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsRewardItem;
 import com.ads.yeknomadmob.dialogs.PrepareLoadingAdsDialog;
 import com.ads.yeknomadmob.event.YNMAirBridge;
+import com.ads.yeknomadmob.utils.AdsUnitItem;
 
 import java.util.HashMap;
 import java.util.List;

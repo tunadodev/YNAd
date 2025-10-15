@@ -8,8 +8,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.ads.yeknomadmob.admobs.Admob;
 import com.ads.yeknomadmob.admobs.AppOpenManager;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
@@ -22,7 +24,7 @@ import com.ads.yeknomadmob.event.YNMAirBridge;
 import com.ads.yeknomadmob.event.YNMSolar;
 import com.ads.yeknomadmob.utils.AdsCallback;
 import com.ads.yeknomadmob.utils.AppUtil;
-import com.ads.yeknomadmob.utils.RewardCallback;
+import com.ads.yeknomadmob.ads_components.ads_rewards.RewardCallback;
 import com.ads.yeknomadmob.utils.SharePreferenceUtils;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.google.android.gms.ads.AdError;
@@ -71,7 +73,7 @@ public class YNMAds {
             YNMAirBridge.setDisableAirBridgeLog(adConfig.getAirBridgeConfig().isDisableAirbridgeLog());
             YNMAirBridge.setTagTest(adConfig.getAirBridgeConfig().getTagTest());
             YNMAirBridge.setUserState(adConfig.getAirBridgeConfig().getUserState());
-            YNMAirBridge.getInstance().init(context, adConfig.getAirBridgeConfig().getAppNameAirBridge(),adConfig.getAirBridgeConfig().getTokenAirBridge(), true);
+            YNMAirBridge.getInstance().init(context, adConfig.getAirBridgeConfig().getAppNameAirBridge(), adConfig.getAirBridgeConfig().getTokenAirBridge(), true);
         }
         if (adConfig.isEnableSolar()) {
             Log.i(TAG, "init solar");
@@ -128,9 +130,9 @@ public class YNMAds {
      * Load banner with multiple ad unit IDs.
      * Tries to load each ad unit ID sequentially until one succeeds.
      * If all fail, the last failure callback will be triggered.
-     * 
-     * @param mActivity Activity context
-     * @param adUnitIds List of ad unit IDs to try
+     *
+     * @param mActivity  Activity context
+     * @param adUnitIds  List of ad unit IDs to try
      * @param adCallback Callback for ad events
      */
     public void loadMultiIdBanner(final Activity mActivity, final List<String> adUnitIds, final YNMAdsCallbacks adCallback) {
@@ -146,8 +148,8 @@ public class YNMAds {
     /**
      * Helper method to load banner ads sequentially
      */
-    private void loadMultiIdBannerSequentially(final Activity mActivity, final List<String> adUnitIds, 
-                                              final int currentIndex, final YNMAdsCallbacks adCallback) {
+    private void loadMultiIdBannerSequentially(final Activity mActivity, final List<String> adUnitIds,
+                                               final int currentIndex, final YNMAdsCallbacks adCallback) {
         // Check if we've tried all ad unit IDs
         if (currentIndex >= adUnitIds.size()) {
             adCallback.onAdFailedToLoad(new AdsError("All ad units have been attempted without success"));
@@ -156,7 +158,7 @@ public class YNMAds {
 
         // Get current ad unit ID
         final String currentAdUnitId = adUnitIds.get(currentIndex);
-        
+
         // Try to load the current ad unit
         switch (adConfig.getMediationProvider()) {
             case YNMAdsConfig.PROVIDER_ADMOB:
@@ -256,7 +258,7 @@ public class YNMAds {
 
     public void loadCollapsibleBanner(final Activity activity, String id, String gravity, YNMAdsCallbacks adCallback) {
         adCallback.onAdStartLoad();
-        Admob.getInstance().loadCollapsibleBanner(activity, id, gravity, new AdsCallback(){
+        Admob.getInstance().loadCollapsibleBanner(activity, id, gravity, new AdsCallback() {
             @Override
             public void onAdLoaded() {
                 super.onAdLoaded();

@@ -12,7 +12,6 @@ import com.ads.yeknomadmob.ads_components.ads_banner.YNMMultiFloorBannerLargeAds
 import com.ads.yeknomadmob.config.AirBridgeConfig;
 import com.ads.yeknomadmob.config.SolarConfig;
 import com.ads.yeknomadmob.config.YNMAdsConfig;
-import com.ads.yeknomadmob.utils.AdsNativePreload;
 import com.ads.yeknomadmob.utils.AdsUnitItem;
 import com.google.android.gms.ads.FullScreenContentCallback;
 

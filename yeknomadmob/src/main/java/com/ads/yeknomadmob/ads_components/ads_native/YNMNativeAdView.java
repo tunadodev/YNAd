@@ -62,10 +62,10 @@ public class YNMNativeAdView extends RelativeLayout {
 
     private void init() {
         layoutPlaceHolder = new FrameLayout(getContext());
-        addView(layoutPlaceHolder);
+        LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        addView(layoutPlaceHolder, layoutParams);
         if (layoutLoading != null)
-            addView(layoutLoading);
-
+            addView(layoutLoading, layoutParams);
     }
 
     public void setLayoutCustomNativeAd(int layoutCustomNativeAd) {
@@ -73,8 +73,12 @@ public class YNMNativeAdView extends RelativeLayout {
     }
 
     public void setLayoutLoading(int idLayoutLoading) {
+        if (layoutLoading != null) {
+            removeView(layoutLoading);
+        }
         this.layoutLoading = (ShimmerFrameLayout) LayoutInflater.from(getContext()).inflate(idLayoutLoading, null);
-        addView(layoutLoading);
+        LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        addView(layoutLoading, layoutParams);
     }
 
     public void populateNativeAdView(Activity activity, AdsNative nativeAd) {

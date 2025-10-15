@@ -1,4 +1,4 @@
-package com.ads.yeknomadmob.utils;
+package com.ads.yeknomadmob.ads_components.ads_inters;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,6 +12,8 @@ import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsInterstitial;
 import com.ads.yeknomadmob.dialogs.PrepareLoadingAdsDialog;
 import com.ads.yeknomadmob.event.YNMAirBridge;
+import com.ads.yeknomadmob.utils.AdsUnitItem;
+import com.ads.yeknomadmob.utils.SharePreferenceUtils;
 
 import java.util.HashMap;
 import java.util.List;

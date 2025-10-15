@@ -1,4 +1,4 @@
-package com.ads.yeknomadmob.utils;
+package com.ads.yeknomadmob.ads_components.ads_native;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,17 +12,16 @@ import com.ads.yeknomadmob.admobs.Admob;
 import com.ads.yeknomadmob.ads_components.YNMAds;
 import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
 import com.ads.yeknomadmob.ads_components.YNMInitCallback;
-import com.ads.yeknomadmob.ads_components.ads_native.YNMNativeAdView;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
 import com.ads.yeknomadmob.event.YNMAirBridge;
-import com.google.android.gms.ads.AdError;
+import com.ads.yeknomadmob.utils.AdsCallback;
+import com.ads.yeknomadmob.utils.AdsHelper;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.nativead.NativeAd;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Utility class to manage preloading and showing of Native Ads
@@ -270,6 +269,47 @@ public class AdsNativePreload {
      * 2. If ad is loading, wait for load completion then show
      * 3. If ad is not loading/loaded or failed, start loading and show when ready
      */
+    public static void staticPreloadedShowNativeAds(Context context, YNMNativeAdView adView,
+                                                  String key, int layout,
+                                                  String adsId, YNMAirBridge.AppData appData) {
+        YNMAds.getInstance().setInitCallback(() -> {
+            NativeAdsModels model = adsMap.get(key);
+
+            // CASE 1: Ad is loaded and ready to show
+            if (model != null && model.isLoaded()) {
+                showAdIfActivityActive(context, adView, model, layout, layout, true);
+                return;
+            }
+
+            // CASE 2: Ad is currently loading - wait for it
+            if (model != null && model.isLoading()) {
+                setupLoadListener(context, adView, key, layout, layout);
+                return;
+            }
+
+            // CASE 3: Ad doesn't exist, failed to load, or is in an invalid state
+            // Remove failed entry if exists
+            if (model != null && model.isFailed()) {
+                adsMap.remove(key);
+            }
+
+            // Create new ad and start loading
+            NativeAdLoadListener listener = createShowListener(context, adView, key, layout, layout);
+
+            // Create a new model and set to LOAD state
+            adsMap.put(key, new NativeAdsModels(null, listener, State.LOAD));
+
+            // Start loading the ad
+            loadNativeAdInternal(context, adsId, key, appData, listener);
+        });
+    }
+
+    /**
+     * Load and show a Native Ad - handles different scenarios:
+     * 1. If ad is already loaded, show it immediately
+     * 2. If ad is loading, wait for load completion then show
+     * 3. If ad is not loading/loaded or failed, start loading and show when ready
+     */
     public static void flexPreloadedShowNativeAds(Context context, YNMNativeAdView adView, 
                                                 String key, int mediumLayout, int largeLayout, 
                                                 String adsId, YNMAirBridge.AppData appData) {
@@ -317,8 +357,12 @@ public class AdsNativePreload {
         if (context instanceof Activity) {
             Activity activity = (Activity) context;
             if (!activity.isFinishing() && !activity.isDestroyed()) {
-                AdsHelper.initAutoResizeAds(context, adView, model.getNativeAd(), 
-                                          mediumLayout, largeLayout, isPreloaded);
+                if(mediumLayout == largeLayout){
+                    AdsHelper.initFixedSizeAds(context, adView, model.getNativeAd(), mediumLayout, isPreloaded);
+                } else{
+                    AdsHelper.initAutoResizeAds(context, adView, model.getNativeAd(),
+                            mediumLayout, largeLayout, isPreloaded);
+                }
                 model.setState(State.SHOWED);
             }
         }
