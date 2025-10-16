@@ -5,6 +5,7 @@
         <attr name="layoutCustomNativeAd" format="integer" />
         <attr name="layoutLoading" format="integer" />
         <attr name="layoutPlaceHolder" format="integer" />
+        <attr name="is_content_match_parent" format="boolean" />
     </declare-styleable>
     <declare-styleable name="YNMBannerAdView">
         <attr name="idBanner" format="string" />

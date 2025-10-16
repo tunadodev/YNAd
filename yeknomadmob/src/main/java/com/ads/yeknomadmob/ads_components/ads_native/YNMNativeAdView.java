@@ -22,8 +22,9 @@ public class YNMNativeAdView extends RelativeLayout {
     private ShimmerFrameLayout layoutLoading;
     private FrameLayout layoutPlaceHolder;
     private String TAG = "YNMNativeAdView";
+    private boolean isContentMatchParent = false;
 
-    public  enum TYPE_NATIVE_ADS {
+    public enum TYPE_NATIVE_ADS {
         DEFAULT,
         LARGER
     }
@@ -54,6 +55,7 @@ public class YNMNativeAdView extends RelativeLayout {
         // Get layout native view custom and  layout loading
         layoutCustomNativeAd = typedArray.getResourceId(R.styleable.YNMNativeAdView_layoutCustomNativeAd, 0);
         int idLayoutLoading = typedArray.getResourceId(R.styleable.YNMNativeAdView_layoutLoading, 0);
+        isContentMatchParent = typedArray.getBoolean(R.styleable.YNMNativeAdView_is_content_match_parent, false);
         if (idLayoutLoading != 0)
             layoutLoading = (ShimmerFrameLayout) LayoutInflater.from(getContext()).inflate(idLayoutLoading, null);
 
@@ -62,7 +64,7 @@ public class YNMNativeAdView extends RelativeLayout {
 
     private void init() {
         layoutPlaceHolder = new FrameLayout(getContext());
-        LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, isContentMatchParent ? LayoutParams.MATCH_PARENT : LayoutParams.WRAP_CONTENT);
         addView(layoutPlaceHolder, layoutParams);
         if (layoutLoading != null)
             addView(layoutLoading, layoutParams);
