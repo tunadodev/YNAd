@@ -55,7 +55,7 @@ public class YNMNativeAdView extends RelativeLayout {
         // Get layout native view custom and  layout loading
         layoutCustomNativeAd = typedArray.getResourceId(R.styleable.YNMNativeAdView_layoutCustomNativeAd, 0);
         int idLayoutLoading = typedArray.getResourceId(R.styleable.YNMNativeAdView_layoutLoading, 0);
-        isContentMatchParent = typedArray.getBoolean(R.styleable.YNMNativeAdView_is_content_match_parent, false);
+        isContentMatchParent = typedArray.getBoolean(R.styleable.YNMNativeAdView_is_content_match_parent, true);
         if (idLayoutLoading != 0)
             layoutLoading = (ShimmerFrameLayout) LayoutInflater.from(getContext()).inflate(idLayoutLoading, null);
 
