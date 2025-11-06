@@ -64,8 +64,8 @@ public class YNMBannerCollapse extends RelativeLayout {
         containerShimmer = findViewById(R.id.shimmer_container_banner_large);
 
         if (attrs != null) {
-            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.YNMBannerCollapse);
-            showTime = a.getInt(R.styleable.YNMBannerCollapse_show_time, 5000);
+            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.AdsCollapse);
+            showTime = a.getInt(R.styleable.AdsCollapse_show_time, 5000);
             a.recycle();
         }
 
@@ -82,7 +82,7 @@ public class YNMBannerCollapse extends RelativeLayout {
         this.onCollapseListener = onCollapseListener;
     }
 
-    public void loadBannerCollapse(Activity activity, OnCollapseListener onCollapseListener) {
+    public void loadBannerCollapse(Activity activity, YNMMultiFloorBannerAds bannerManager, OnCollapseListener onCollapseListener) {
         if (isAdShowing) {
             Log.d(TAG, "Ad is already showing. Refresh is ignored.");
             return;
@@ -99,7 +99,7 @@ public class YNMBannerCollapse extends RelativeLayout {
 
         this.onCollapseListener = onCollapseListener;
 
-        YNMMultiFloorBannerLargeAds.getInstance().showMFBannerAd(largeBannerContainer, new YNMAdsCallbacks() {
+        bannerManager.showMFBannerAd(largeBannerContainer, new YNMAdsCallbacks() {
             @Override
             public void onAdLoaded() {
                 super.onAdLoaded();

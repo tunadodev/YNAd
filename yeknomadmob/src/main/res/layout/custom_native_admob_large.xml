@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:backgroundTint="#1F242F"
+        android:backgroundTint="#ffffff"
         android:background="@color/cardview_dark_background"
         app:cardCornerRadius="@dimen/_10sdp"
         android:orientation="vertical">

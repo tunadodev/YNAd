@@ -10,8 +10,11 @@
     <declare-styleable name="YNMBannerAdView">
         <attr name="idBanner" format="string" />
     </declare-styleable>
-    <declare-styleable name="YNMBannerCollapse">
+    <declare-styleable name="AdsCollapse">
         <attr name="show_time" format="integer" />
         <attr name="refresh_interval" format="integer" />
+        <attr name="collapse_icon" format="reference" />
+        <attr name="collapse_icon_tint" format="color" />
+        <attr name="collapse_button_background" format="reference|color" />
     </declare-styleable>
 </resources>

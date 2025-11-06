@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/collapse_bound"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerCollapse
+            android:id="@+id/banner_large"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:refresh_interval="10000"
+            app:show_time="5000" />
+
+        <com.ads.yeknomadmob.ads_components.ads_native.YNMNativeCollapse
+            android:id="@+id/native_collapse"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layoutCustomNativeAd="@layout/custom_native_admob_large"
+            app:layoutLoading="@layout/native_shimmer_placeholder" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/normal_bound"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerAdView
+            android:id="@+id/banner_small"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:refresh_interval="10000"
+            app:show_time="5000" />
+
+        <com.ads.yeknomadmob.ads_components.ads_native.YNMNativeAdView
+            android:id="@+id/native_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="bottom"
+            android:visibility="gone"
+            app:is_content_match_parent="false"
+            app:layoutCustomNativeAd="@layout/custom_native_admob_banner"
+            app:layoutLoading="@layout/native_shimmer_placeholder"
+            app:layout_constraintBottom_toBottomOf="@+id/banner_small" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</merge>

@@ -49,10 +49,6 @@ public class YNMBannerAdView extends RelativeLayout {
         inflate(getContext(), R.layout.layout_banner_view, this);
     }
 
-    public void showAd(Activity activity) {
-        showAd(activity, new YNMAdsCallbacks());
-    }
-
     public void loadBanner(Activity activity, String idBanner) {
         loadBanner(activity, idBanner, new YNMAdsCallbacks());
     }
@@ -63,20 +59,9 @@ public class YNMBannerAdView extends RelativeLayout {
     }
 
     //load ad using multi floor
-    public void showAd(Activity activity, YNMAdsCallbacks ynmAdsCallbacks) {
-        YNMMultiFloorBannerAds.getInstance().showMFBannerAd(this, ynmAdsCallbacks);
-    }
-
-    public void showAd(Activity activity, int refreshInterval, YNMAdsCallbacks ynmAdsCallbacks) {
-        showAd(activity, ynmAdsCallbacks);
-
-        if (refreshInterval > 0) {
-            refreshRunnable = () -> {
-                showAd(activity, ynmAdsCallbacks);
-                refreshHandler.postDelayed(refreshRunnable, refreshInterval);
-            };
-            refreshHandler.postDelayed(refreshRunnable, refreshInterval);
-        }
+    public void showAd(Activity activity,YNMMultiFloorBannerAds bannerManager, YNMAdsCallbacks ynmAdsCallbacks) {
+        this.setVisibility(VISIBLE);
+        bannerManager.showMFBannerAd(this, ynmAdsCallbacks);
     }
 
     @Override

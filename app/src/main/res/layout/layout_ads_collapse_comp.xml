@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+        <com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerAdView
+            android:id="@+id/bannerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            app:refresh_interval="10000"
+            app:show_time="5000" />
+
+        <com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerCollapse
+            android:id="@+id/collapse_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            app:refresh_interval="10000"
+            app:show_time="5000" />
+
+        <com.ads.yeknomadmob.ads_components.ads_native.YNMNativeCollapse
+            android:id="@+id/native_large"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            app:layoutCustomNativeAd="@layout/custom_native_admob_large"
+            app:layoutLoading="@layout/native_shimmer_placeholder" />
+
+        <com.ads.yeknomadmob.ads_components.ads_native.YNMNativeAdView
+            android:id="@+id/native_ad_view"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:visibility="gone"
+            android:layout_alignParentBottom="true"
+            app:layoutCustomNativeAd="@layout/custom_native_admob_banner"
+            app:layoutLoading="@layout/native_shimmer_placeholder" />
+    </RelativeLayout>
+</layout>

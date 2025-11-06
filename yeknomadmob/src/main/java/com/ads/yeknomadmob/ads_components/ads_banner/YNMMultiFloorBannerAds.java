@@ -1,6 +1,5 @@
 package com.ads.yeknomadmob.ads_components.ads_banner;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -25,33 +24,22 @@ import java.util.concurrent.ConcurrentHashMap;
 public class YNMMultiFloorBannerAds {
 
     private static final String TAG = "YNMBannerAds";
-    private static volatile YNMMultiFloorBannerAds instance;
-
+    private String adSize = Admob.BANNER_INLINE_SMALL_STYLE;
     private Context applicationContext;
     private List<AdsUnitItem> highAdsIds;
-    private static final Map<String, AdView> adCache = new ConcurrentHashMap<>();
+    private final Map<String, AdView> adCache = new ConcurrentHashMap<>();
     private volatile boolean isWaterfallLoading = false;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
-    private YNMMultiFloorBannerAds() {
+    public YNMMultiFloorBannerAds() {
     }
 
-    public static YNMMultiFloorBannerAds getInstance() {
-        if (instance == null) {
-            synchronized (YNMMultiFloorBannerAds.class) {
-                if (instance == null) {
-                    instance = new YNMMultiFloorBannerAds();
-                }
-            }
-        }
-        return instance;
-    }
-
-    public void init(@NonNull Context context, @NonNull List<AdsUnitItem> highAdsIds) {
+    public void init(@NonNull Context context, @NonNull List<AdsUnitItem> highAdsIds, @NonNull String adSize) {
         Log.d(TAG, "Initializing with " + highAdsIds.size() + " ad units.");
         this.applicationContext = context.getApplicationContext();
         this.highAdsIds = highAdsIds;
+        this.adSize = adSize;
         Collections.reverse(this.highAdsIds);
         startWaterfallPreload();
     }
@@ -84,7 +72,7 @@ public class YNMMultiFloorBannerAds {
 
         final AdsUnitItem adUnit = highAdsIds.get(index);
         Log.d(TAG, "Waterfall trying to load ad unit at index " + index + ": " + adUnit.getKey());
-        Admob.getInstance().loadBannerAdView(applicationContext, adUnit.getAdUnitId(), Admob.BANNER_INLINE_SMALL_STYLE, new AdsCallback() {
+        Admob.getInstance().loadBannerAdView(applicationContext, adUnit.getAdUnitId(), adSize, new AdsCallback() {
             @Override
             public void onBannerAdLoaded(AdView adView) {
                 super.onBannerAdLoaded(adView);

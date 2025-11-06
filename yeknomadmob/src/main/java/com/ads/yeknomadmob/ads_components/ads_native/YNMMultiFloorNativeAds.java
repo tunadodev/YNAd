@@ -1,50 +1,36 @@
-package com.ads.yeknomadmob.ads_components.ads_banner;
+package com.ads.yeknomadmob.ads_components.ads_native;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.ViewGroup;
-
 import androidx.annotation.NonNull;
-
 import com.ads.yeknomadmob.admobs.Admob;
 import com.ads.yeknomadmob.ads_components.YNMAdsCallbacks;
 import com.ads.yeknomadmob.ads_components.wrappers.AdsError;
+import com.ads.yeknomadmob.ads_components.wrappers.AdsNative;
 import com.ads.yeknomadmob.utils.AdsCallback;
 import com.ads.yeknomadmob.utils.AdsUnitItem;
-import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
-
+import com.google.android.gms.ads.nativead.NativeAd;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class YNMMultiFloorBannerLargeAds {
+public class YNMMultiFloorNativeAds {
 
-    private static final String TAG = "YNMBannerLargeAds";
-    private static volatile YNMMultiFloorBannerLargeAds instance;
+    private static final String TAG = "YNMNativeAds";
 
     private Context applicationContext;
     private List<AdsUnitItem> highAdsIds;
-    private static final Map<String, AdView> adCache = new ConcurrentHashMap<>();
+    private final Map<String, NativeAd> adCache = new ConcurrentHashMap<>();
     private volatile boolean isWaterfallLoading = false;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
-    private YNMMultiFloorBannerLargeAds() {}
-
-    public static YNMMultiFloorBannerLargeAds getInstance() {
-        if (instance == null) {
-            synchronized (YNMMultiFloorBannerLargeAds.class) {
-                if (instance == null) {
-                    instance = new YNMMultiFloorBannerLargeAds();
-                }
-            }
-        }
-        return instance;
+    public YNMMultiFloorNativeAds() {
     }
 
     public void init(@NonNull Context context, @NonNull List<AdsUnitItem> highAdsIds) {
@@ -55,7 +41,7 @@ public class YNMMultiFloorBannerLargeAds {
         startWaterfallPreload();
     }
 
-    private void startWaterfallPreload() {
+    public void startWaterfallPreload() {
         if (applicationContext == null || highAdsIds == null || highAdsIds.isEmpty()) {
             Log.w(TAG, "Preload skipped: Manager not initialized.");
             return;
@@ -70,57 +56,54 @@ public class YNMMultiFloorBannerLargeAds {
         }
 
         isWaterfallLoading = true;
-        Log.i(TAG, "Starting LARGE banner waterfall preload...");
+        Log.i(TAG, "Starting STANDARD native waterfall preload...");
         loadAdInWaterfall(0);
     }
 
-    public void loadAdInWaterfall(final int index) {
+    private void loadAdInWaterfall(final int index) {
         if (index >= highAdsIds.size()) {
             isWaterfallLoading = false;
-            Log.w(TAG, "Waterfall finished for LARGE banners. No ad was loaded.");
+            Log.w(TAG, "Waterfall finished for STANDARD natives. No ad was loaded.");
             return;
         }
 
         final AdsUnitItem adUnit = highAdsIds.get(index);
         Log.d(TAG, "Waterfall trying to load ad unit at index " + index + ": " + adUnit.getKey());
-        Admob.getInstance().loadBannerAdView(applicationContext, adUnit.getAdUnitId(), Admob.BANNER_INLINE_LARGE_STYLE, new AdsCallback() {
+        Admob.getInstance().loadNativeAd(applicationContext, adUnit.getAdUnitId(), new AdsCallback() {
             @Override
-            public void onBannerAdLoaded(AdView adView) {
-                super.onBannerAdLoaded(adView);
-                if (adView != null) {
-                    adCache.put(adUnit.getAdUnitId(), adView);
-                    isWaterfallLoading = false;
-                    Log.i(TAG, "Successfully preloaded and cached LARGE banner ad: " + adUnit.getKey());
-                }
+            public void onUnifiedNativeAdLoaded(@NonNull NativeAd nativeAd) {
+                super.onUnifiedNativeAdLoaded(nativeAd);
+                adCache.put(adUnit.getAdUnitId(), nativeAd);
+                isWaterfallLoading = false;
+                Log.i(TAG, "Successfully preloaded and cached STANDARD native ad: " + adUnit.getKey());
             }
 
             @Override
             public void onAdFailedToLoad(LoadAdError adError) {
                 super.onAdFailedToLoad(adError);
-                Log.e(TAG, "Failed to load LARGE banner ad: " + adUnit.getKey() + ". Trying next.");
+                Log.e(TAG, "Failed to load STANDARD native ad: " + adUnit.getKey() + ". Trying next.");
                 loadAdInWaterfall(index + 1);
             }
         });
     }
 
-    public void showMFBannerAd(@NonNull final ViewGroup bannerContainer, @NonNull final YNMAdsCallbacks callback) {
-        Log.d(TAG, "Request to show a large banner.");
+    public void showMFNativeAd(@NonNull final Activity activity,
+                               @NonNull final int layoutResNative,
+                               @NonNull final YNMNativeAdView nativeAdView,
+                               @NonNull final YNMAdsCallbacks callback) {
+        Log.d(TAG, "Request to show a standard native.");
         if (highAdsIds == null || highAdsIds.isEmpty()) {
-            Log.e(TAG, "Cannot show ad: Ad IDs not configured for large banners.");
-            callback.onAdFailedToShow(new AdsError("Ad IDs not configured for large banners."));
+            Log.e(TAG, "Cannot show ad: Ad IDs not configured for standard natives.");
+            callback.onAdFailedToShow(new AdsError("Ad IDs not configured for standard natives."));
             return;
         }
 
         for (AdsUnitItem mAd : highAdsIds) {
             if (adCache.containsKey(mAd.getAdUnitId())) {
-                Log.i(TAG, "Found cached LARGE banner ad: " + mAd.getKey() + ". Preparing to show.");
-                AdView adView = adCache.remove(mAd.getAdUnitId());
-                if (adView != null) {
-                    if (adView.getParent() != null) {
-                        ((ViewGroup) adView.getParent()).removeView(adView);
-                    }
-                    bannerContainer.removeAllViews();
-                    bannerContainer.addView(adView);
+                Log.i(TAG, "Found cached STANDARD native ad: " + mAd.getKey() + ". Preparing to show.");
+                NativeAd nativeAd = adCache.remove(mAd.getAdUnitId());
+                if (nativeAd != null) {
+                    nativeAdView.populateNativeAdView(activity, new AdsNative(layoutResNative, nativeAd));
                     Log.i(TAG, "Ad shown successfully. Removing from cache and starting preload for next ad.");
                     callback.onAdLoaded();
                     startWaterfallPreload(); // Start reloading
@@ -128,8 +111,8 @@ public class YNMMultiFloorBannerLargeAds {
                 }
             }
         }
-        Log.w(TAG, "No large banner ad available in cache to show. Triggering new preload.");
-        callback.onAdFailedToShow(new AdsError("No large banner ad available."));
+        Log.w(TAG, "No standard native ad available in cache to show. Triggering new preload.");
+        callback.onAdFailedToShow(new AdsError("No standard native ad available."));
         startWaterfallPreload();
     }
 }

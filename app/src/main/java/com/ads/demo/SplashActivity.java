@@ -8,7 +8,7 @@ import com.ads.yeknomadmob.admobs.AppOpenManager;
 import com.ads.yeknomadmob.ads_components.YNMAds;
 import com.ads.yeknomadmob.ads_components.YNMInitCallback;
 import com.ads.yeknomadmob.ads_components.ads_banner.YNMMultiFloorBannerAds;
-import com.ads.yeknomadmob.ads_components.ads_banner.YNMMultiFloorBannerLargeAds;
+import com.ads.yeknomadmob.ads_components.ads_native.YNMMultiFloorNativeAds;
 import com.ads.yeknomadmob.config.AirBridgeConfig;
 import com.ads.yeknomadmob.config.SolarConfig;
 import com.ads.yeknomadmob.config.YNMAdsConfig;
@@ -24,6 +24,12 @@ import java.util.TimerTask;
 public class SplashActivity extends BaseActivity<ActivitySplashScreenBinding> {
     boolean isFirstTimeToGoToApp = false, isAdShown = false, isStartNextActivityCalled = false;
     Timer timer;
+
+    static YNMMultiFloorNativeAds native_large_manager = new YNMMultiFloorNativeAds();
+    static YNMMultiFloorNativeAds native_small_manager = new YNMMultiFloorNativeAds();
+
+    static YNMMultiFloorBannerAds banner_large_manager = new YNMMultiFloorBannerAds();
+    static YNMMultiFloorBannerAds banner_small_manager = new YNMMultiFloorBannerAds();
 
     @Override
     protected int getLayoutActivity() {
@@ -45,14 +51,30 @@ public class SplashActivity extends BaseActivity<ActivitySplashScreenBinding> {
         showInterstialAds();
         timer.schedule(new AfterLoading(), 25000); // Schedule to run after 8 seconds (8000 milliseconds)
 
+        //banner
         List<AdsUnitItem> ids = new ArrayList<>();
         ids.add(new AdsUnitItem(BuildConfig.ad_banner, "banner_base"));
         ids.add(new AdsUnitItem(BuildConfig.ad_banner, "banner_high_1"));
         ids.add(new AdsUnitItem(BuildConfig.ad_banner, "banner_high_2"));
 
-        YNMMultiFloorBannerAds.getInstance().init(this, ids);
-        YNMMultiFloorBannerLargeAds.getInstance().init(this, ids);
+        banner_large_manager.init(this, ids, Admob.BANNER_INLINE_LARGE_STYLE);
+        banner_small_manager.init(this, ids, Admob.BANNER_INLINE_SMALL_STYLE);
 
+        //native large
+        List<AdsUnitItem> ids2 = new ArrayList<>();
+        ids2.add(new AdsUnitItem(BuildConfig.ad_native, "ad_native"));
+        ids2.add(new AdsUnitItem(BuildConfig.ad_native, "ad_native_high_1"));
+        ids2.add(new AdsUnitItem(BuildConfig.ad_native, "ad_native_high_2"));
+
+        native_large_manager.init(this, ids2);
+
+        //native small
+        List<AdsUnitItem> ids3 = new ArrayList<>();
+        ids3.add(new AdsUnitItem(BuildConfig.ad_native, "ad_snative"));
+        ids3.add(new AdsUnitItem(BuildConfig.ad_native, "ad_snative_high_1"));
+        ids3.add(new AdsUnitItem(BuildConfig.ad_native, "ad_snative_high_2"));
+
+        native_small_manager.init(this, ids3);
     }
     class AfterLoading extends TimerTask {
         public void run() {

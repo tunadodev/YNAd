@@ -137,4 +137,16 @@ public class YNMNativeAdView extends RelativeLayout {
         setLayoutCustomNativeAd(layoutCustomNativeAd);
         loadNativeAd(activity, idAd, yNMAdsCallbacks);
     }
+
+    public void showAd(Activity activity, YNMMultiFloorNativeAds ads_operation, YNMAdsCallbacks ynmAdsCallbacks) {
+        this.setVisibility(VISIBLE);
+        if (layoutLoading == null) {
+            setLayoutLoading(R.layout.loading_native_medium);
+        }
+        if (layoutCustomNativeAd == 0) {
+            layoutCustomNativeAd = R.layout.custom_native_admob_medium;
+            setLayoutCustomNativeAd(layoutCustomNativeAd);
+        }
+        ads_operation.showMFNativeAd(activity, layoutCustomNativeAd, this, ynmAdsCallbacks);
+    }
 }

@@ -12,26 +12,22 @@
         <RelativeLayout
             android:id="@+id/ll_ads"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="wrap_content"
+            android:layout_above="@id/normal_bound"
+            android:orientation="vertical">
 
             <Button
                 android:id="@+id/showInter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Show inters Ads"
-                />
+                android:text="Show inters Ads" />
 
             <Button
-                android:layout_below="@+id/showInter"
                 android:id="@+id/showFCNative"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Show fc native"
-                />
+                android:layout_below="@+id/showInter"
+                android:text="Show fc native" />
         </RelativeLayout>
 
 
@@ -66,22 +62,6 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerAdView
-            android:id="@+id/bannerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:refresh_interval="10000"
-            app:show_time="5000" />
-
-        <com.ads.yeknomadmob.ads_components.ads_banner.YNMBannerCollapse
-            android:id="@+id/collapse_banner"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:refresh_interval="10000"
-            app:show_time="5000" />
+        <include layout="@layout/layout_ads_comp" />
     </RelativeLayout>
 </layout>
